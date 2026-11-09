@@ -1401,9 +1401,11 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      ${pf.fav&&parseRef(pf.fav)?`<p class="small" style="margin:6px 2px 0">${refA(pf.fav,'Open '+codeToLabel(pf.fav))}</p>`:''}
      <label class="l">Look</label><div class="chips">${[['','Auto'],['light','☀️ Light'],['sepia','📜 Sepia'],['dark','🌙 Dark']].map(([k,l])=>`<button class="chip ${pf.theme===k?'on':''}" data-act="setTheme" data-t="${k}">${l}</button>`).join('')}</div>
      <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div>
-   <h2 class="sec">My Loaded Bible</h2>
-   <div class="card"><p style="margin:0">🔒 <b>Just for you.</b> Your progress is saved on your website and is the same on every device where you enter your code.</p>
-     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="importSheet">📥 Import progress from Claude</button><button class="btn sm" data-act="copyAll">⧉ Back up my notes as text</button><button class="btn sm" data-act="lockNow">🔒 Lock this device</button></div></div>
+   <h2 class="sec">My progress</h2>
+   <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved <b>on this device</b> (this phone or computer).':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
+     <p class="small muted" style="margin:6px 0 0">Want it in the other version too (Claude app ↔ your website)? Tap <b>Copy my progress</b> here, then <b>Import progress</b> in the other one.</p>
+     <div class="row" style="margin-top:10px"><button class="btn sm pri" data-act="exportCopy">📋 Copy my progress</button><button class="btn sm" data-act="importSheet">📥 Import progress</button><button class="btn sm" data-act="copyAll">⧉ Back up notes as text</button></div>
+     <textarea id="exportBox" class="f" style="display:none;margin-top:10px;min-height:110px;font-size:12px" readonly></textarea></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
   const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
   const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
@@ -1476,8 +1478,7 @@ async function initAuth(){showAuth('loading');Store.readyResolve();
       applyTheme();updateAvatar();renderView()});
   }catch(e){console.warn(e);Auth.noFirebase=true;startGuest();toast('Couldn’t reach the login service — using guest mode')}}
 async function aiServer(prompt,onText,signal,tier){
-  if(!Lock.code)throw {code:'locked',message:'Enter your code first.'};
-  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json','X-Code':Lock.code},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
+  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
   if(!r.ok){let m='The AI helper isn’t available right now.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:r.status===429?'rate_limited':'server',message:m}}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf='',text='',stop=null;
   for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
@@ -1707,22 +1708,20 @@ Object.assign(A,{
     catch(e){authMsg('No connection. Check your internet and try again.')}
     b.disabled=false;b.textContent='🔓 Open'},
   lockNow:()=>confirmSheet('Lock this device? You’ll need your code to open it again. Your progress stays saved.','Lock',()=>{setTab('load');lockOut('')}),
-  importSheet:()=>openSheet(`<h3>📥 Import progress from Claude</h3><p class="small muted">In the Claude app, open Loaded Bible → <b>Copy my progress</b>. Then paste it here.</p>
+  importSheet:()=>openSheet(`<h3>📥 Import progress</h3><p class="small muted">In the other version (Claude app or your website), go to your picture → <b>Copy my progress</b>. Then paste it here. Items with the same name are replaced; everything else stays.</p>
     <textarea class="f" id="importBox" style="min-height:160px;font-size:12px" placeholder='Paste here — it starts with {"app":"loadedbible"…'></textarea>
     <div class="row" style="margin-top:12px"><button class="btn pri grow" data-act="importGo">Import</button></div><div id="importMsg" class="small muted" style="margin-top:8px"></div>`),
   importGo:async()=>{const m=$('#importMsg');let d;try{d=JSON.parse($('#importBox').value.trim())}catch(e){m.textContent='That doesn’t look right — copy it again in Claude and paste the whole thing.';return}
     if(!d||d.app!=='loadedbible'||!d.items){m.textContent='That doesn’t look like Loaded Bible progress.';return}
     const items={};Object.entries(d.items).forEach(([k,v])=>{if(isItemKey(k))items[k]=v});
-    m.innerHTML='<span class="spin"></span> Importing…';
-    try{const j=await (await api('/api/import',{method:'POST',body:JSON.stringify({items})})).json();closeSheet();toast(`Imported ${j.count} items 🎉`);setTimeout(()=>location.reload(),900)}
-    catch(e){m.textContent=e.message||'Import failed — try again.'}},
-  exportCopy:async()=>{const t=exportJSON();const n=Object.keys(JSON.parse(t).items).length;if(!n){toast('Still loading your progress — try again in a moment');return}
-    try{await navigator.clipboard.writeText(t);toast(`Copied ${n} items — now paste them on your website`)}
+    const ks=Object.keys(items);ks.forEach(k=>Store.set(k,items[k]));closeSheet();applyTheme();updateAvatar();renderView();toast(`Imported ${ks.length} items 🎉`)},
+  exportCopy:async()=>{const t=exportJSON();const n=Object.keys(JSON.parse(t).items).length;if(!n){toast('Nothing to copy yet');return}
+    try{await navigator.clipboard.writeText(t);toast(`Copied ${n} items — now tap Import progress in the other version`)}
     catch(e){const box=$('#exportBox');box.style.display='block';box.value=t;box.focus();box.select();toast('Select all and copy this text')}},
 });
 /* ---------- boot ---------- */
-if(STANDALONE){Store.LS='lb1:me:d:';setTab((location.hash||'#load').slice(1));initPersonal()}
-else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect();showLauncher()}
+if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#load').slice(1));updateAvatar()}
+else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
 Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});
 </script>
 <script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));</script>

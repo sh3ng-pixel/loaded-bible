@@ -1,9 +1,9 @@
-// Loaded Bible — personal edition (one user, unlocked with a code).
-// Serves the website from /public, keeps all progress in a Durable Object, and runs the ✨ AI helper.
-// Cloudflare secrets needed (Settings → Variables and Secrets):
-//   PASSCODE           your unlock code (e.g. 6 digits)
+// Loaded Bible — personal edition.
+// Serves the website from /public and runs the ✨ AI helper (with daily limits so nobody can run up your bill).
+// Progress is saved on each device (in the browser).
+// Cloudflare secret needed (Settings → Variables and Secrets):
 //   ANTHROPIC_API_KEY  for the ✨ features
-// Optional: MODEL, MODEL_QUICK
+// Optional: MODEL, MODEL_QUICK, DAILY_LIMIT (per person, default 80), DAILY_TOTAL (whole site, default 300)
 
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const KEY_RE = /^[A-Za-z0-9_.:@+~-]{1,120}$/;
@@ -23,6 +23,14 @@ export class Store {
         if (rec.n >= MAX_FAILS) return json({ ok: false, locked: true });
         if (body.ok) { if (rec.n) await st.delete(k); return json({ ok: true }); }
         rec.n++; await st.put(k, rec); return json({ ok: false, left: MAX_FAILS - rec.n });
+      }
+      case '/quota': { // simple daily limits for the ✨ helper
+        const day = new Date().toISOString().slice(0, 10);
+        const ipKey = 'q:' + day + ':' + (body.ip || 'x'), allKey = 'q:' + day + ':all';
+        const [a, b] = [(await st.get(ipKey)) || 0, (await st.get(allKey)) || 0];
+        if (a >= body.perIp || b >= body.perDay) return json({ ok: false });
+        await st.put({ [ipKey]: a + 1, [allKey]: b + 1 });
+        return json({ ok: true });
       }
       case '/all': {
         const m = await st.list({ prefix: 'd:' });
@@ -82,33 +90,17 @@ async function ai(request, env) {
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const { pathname } = url;
+    const { pathname } = new URL(request.url);
     if (!pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
-
-    const stub = env.STORE.get(env.STORE.idFromName('me'));
-    const db = (path, payload) => stub.fetch('https://store' + path, { method: 'POST', body: JSON.stringify(payload || {}) });
-
-    const denied = await auth(request, env, db);
-    if (denied) return denied;
-
-    if (pathname === '/api/login' && request.method === 'POST') return json({ ok: true });
-    if (pathname === '/api/data' && request.method === 'GET') return db('/all');
-    if (pathname === '/api/import' && request.method === 'POST') {
-      const body = await request.json().catch(() => ({}));
-      return db('/bulk', { items: body.items || {} });
+    if (pathname === '/api/ai' && request.method === 'POST') {
+      if (!env.ANTHROPIC_API_KEY) return ai(request, env);
+      const stub = env.STORE.get(env.STORE.idFromName('me'));
+      const ip = request.headers.get('CF-Connecting-IP') || 'x';
+      const q = await (await stub.fetch('https://store/quota', { method: 'POST', body: JSON.stringify({
+        ip, perIp: parseInt(env.DAILY_LIMIT || '80', 10), perDay: parseInt(env.DAILY_TOTAL || '300', 10) }) })).json();
+      if (!q.ok) return json({ error: 'You\u2019ve reached today\u2019s limit for ✨ requests. Try again tomorrow!' }, 429);
+      return ai(request, env);
     }
-    if (pathname.startsWith('/api/item/')) {
-      const key = decodeURIComponent(pathname.slice('/api/item/'.length));
-      if (!KEY_RE.test(key)) return json({ error: 'Bad key' }, 400);
-      if (request.method === 'PUT') {
-        const value = await request.json().catch(() => undefined);
-        if (value === undefined) return json({ error: 'Bad body' }, 400);
-        return db('/put', { key, value });
-      }
-      if (request.method === 'DELETE') return db('/del', { key });
-    }
-    if (pathname === '/api/ai' && request.method === 'POST') return ai(request, env);
     return json({ error: 'Not found' }, 404);
   }
 };
