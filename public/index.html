@@ -305,6 +305,7 @@ details.grp[open]>summary::after{content:"▴"}
 .codecard{border:2px solid var(--gold)}
 .codechip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:800;font-family:ui-monospace,Menlo,monospace;color:var(--accent);white-space:nowrap}
 .vpreview{margin:10px 0 2px;background:var(--soft);border-radius:12px;padding:9px 12px;font-size:14.5px}
+@media (max-width:420px){.brand{font-size:19px!important}header.top{gap:6px;padding:10px 12px}.codechip{padding:5px 8px;font-size:11.5px}}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),var(--accent2,#5a1c16));color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -320,6 +321,7 @@ details.grp[open]>summary::after{content:"▴"}
   <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
   <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
   <button class="codechip" id="codeChip" data-act="tab" data-tab="account" style="display:none" aria-label="My Bible code"></button>
+  <button class="hbtn" data-act="donate" aria-label="Donate">❤️</button>
   <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
 </header>
 <main id="view"></main>
@@ -1380,7 +1382,7 @@ function displayName(){const p=profile();return p.name||(Auth.user&&Auth.user.di
 function applyTheme(){const t=profile().theme;if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
 function avatarHtml(){const ph=Store.get('pic_avatar');return ph&&ph.data?`<img src="${ph.data}" alt="">`:esc(profile().avatar)}
 function bannerStyle(){const ph=Store.get('pic_banner');const pf=profile();if(pf.banner==='photo'&&ph&&ph.data)return `background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),url(${ph.data}) center/cover`;const b=BANNERS.find(x=>x[0]===pf.banner)||BANNERS[0];return 'background:'+b[1]}
-function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}const c=$('#codeChip');if(c){const v=STANDALONE&&typeof Code!=='undefined'?Code.value:null;c.style.display=v?'':'none';if(v)c.textContent='🔑 '+v.split('-')[0]}}
+function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}const c=$('#codeChip');if(c){const v=STANDALONE&&typeof Code!=='undefined'?Code.value:null;c.style.display=v?'':'none';if(v){const f=v.split('-')[0];c.textContent='🔑 '+(f.length>7?f.slice(0,6)+'…':f)}}}
 async function fileToJpeg(file,w,h,maxLen){const url=URL.createObjectURL(file);try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('That file isn\u2019t a picture I can open.'));i.src=url});
   const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');const sr=Math.max(w/img.naturalWidth,h/img.naturalHeight);const sw=w/sr,sh=h/sr;
   x.drawImage(img,(img.naturalWidth-sw)/2,(img.naturalHeight-sh)/2,sw,sh,0,0,w,h);let q=.86,d;do{d=c.toDataURL('image/jpeg',q);q-=.08}while(d.length>maxLen&&q>.3);return d}finally{URL.revokeObjectURL(url)}}
@@ -1444,6 +1446,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="votdLoad" data-r="${vref}">✨ Load it in my Bible</button>${vtxt?`<button class="btn sm" data-act="votdCopy">⧉ Copy</button>`:''}</div></div>
    <h2 class="sec">Badges</h2>
    <div class="badges">${BADGES.map(b=>{const ok=b[4](st);return `<div class="badge ${ok?'got':''}" title="${esc(b[3])}"><span>${ok?b[1]:'🔒'}</span><b>${esc(b[2])}</b><small>${esc(b[3])}</small></div>`}).join('')}</div>
+   <div class="card donatecard"><div class="row"><span style="font-size:30px">❤️</span><div class="grow"><b>Support Loaded Bible</b><div class="small muted">Help keep it free and growing.</div></div><button class="btn pri" data-act="donate">Donate</button></div></div>
    <h2 class="sec">My profile</h2>
    <div class="card"><label class="l" style="margin-top:0">Name</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
      <label class="l">Favorite verse</label><input class="f" id="pfFav" value="${esc(pf.fav?codeToLabel(pf.fav):'')}" placeholder="e.g. Psalm 46:10">
@@ -1455,6 +1458,11 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
      <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">🚪 Log out</button></div></div>`:''}
+   ${!STANDALONE?`<div class="card codecard"><b>🌐 My website</b>
+     <p class="small muted" style="margin:4px 0 8px">Your website: <b>${esc(SITE_URL.replace('https://',''))}</b>. Save the code you use there, then send your Claude progress to it with one tap.</p>
+     <label class="l" style="margin-top:4px">🔑 My website code</label><div class="row"><input class="f grow codein2" id="webCodeIn" style="font-size:18px" autocapitalize="characters" value="${esc(settings().webCode||'')}" placeholder="e.g. SHENG446644"><button class="btn sm" data-act="webCodeSave">Save</button></div>
+     <div id="syncBox" style="margin-top:10px"><button class="btn pri wide" data-act="syncPrepare">📲 Send my progress to my website</button></div>
+     <p class="small muted" style="margin:6px 0 0">One-way: it copies what\u2019s in the Claude app to your website. Tap it again whenever you want to update the website.</p></div>`:''}
    <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved online with your <b>Bible code</b>, so it\u2019s the same on every phone or computer where you log in.':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
      <div class="row" style="margin-top:10px"><button class="btn sm" data-act="copyAll">⧉ Back up my notes as text</button></div></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
@@ -1720,7 +1728,8 @@ const SITE_URL='https://loadmybible.shengcremers.workers.dev';
 const Lock={code:null};
 const LOCK_KEY='lb1:code';
 const Code={KEY:'lb1:bcode',SAVED:'lb1:bcode-saved',get value(){try{return localStorage.getItem(this.KEY)}catch(e){return null}},set(v){try{localStorage.setItem(this.KEY,v)}catch(e){}},clear(){try{localStorage.removeItem(this.KEY);localStorage.removeItem(this.SAVED)}catch(e){}}};
-const normCode=c=>{c=String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');const m=c.match(/^([A-Z]{3,8})([A-Z2-9]{4})([A-Z2-9]{4})$/);return m?`${m[1]}-${m[2]}-${m[3]}`:c};
+const GEN_RE=/^[A-Z]{3,8}-[A-Z2-9]{4}-[A-Z2-9]{4}$/,CUSTOM_RE=/^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{10,24}$/;
+const normCode=c=>{const raw=String(c||'').toUpperCase().trim();if(GEN_RE.test(raw))return raw;const a=raw.replace(/[^A-Z0-9]/g,'');if(CUSTOM_RE.test(a))return a;const m=a.match(/^([A-Z]{3,8})([A-Z2-9]{4})([A-Z2-9]{4})$/);return m?`${m[1]}-${m[2]}-${m[3]}`:a};
 async function api(path,opts={}){const r=await fetch(path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','X-Code':Code.value||''},opts.headers||{})}));
   if(r.status===401){codeLost();throw {code:'no_code',message:'Bible code not found'}}
   if(r.status===429){let j={};try{j=await r.clone().json()}catch(e){}if(j.error==='too_many'){toast('Too many wrong codes — wait 15 minutes.');throw {code:'too_many',message:'Too many tries'}}}
@@ -1784,7 +1793,9 @@ function showWelcome(msg){welcomeBox(`<h3 style="text-align:center;font-size:25p
    <button class="btn pri wide" data-act="codeOpen">📖 Log in</button>
    <div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div>
    <div class="or"><span>New here?</span></div>
-   <button class="btn wide" data-act="codeNew">✨ Get my own Bible code</button>
+   <button class="btn wide" data-act="codeNew">✨ Get a Bible code</button>
+   <button class="btn wide" data-act="codeChoose">✏️ Choose my own code</button>
+   ${S.pendingSync?'<div class="warnbox">📲 You\u2019re bringing progress from the Claude app. Log in with your code and it will be loaded in.</div>':''}
    <div class="card small" style="margin:14px 0 0">🔑 Your code is unique — it’s yours only, and it holds all your progress.<br>📱 Log in with it on any phone or computer.<br>📝 Keep it safe, like a key. Nobody can look it up for you.</div>`);
   const i=$('#codeIn2');i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
 function showHaveCode(msg){showWelcome(msg)}
@@ -1803,30 +1814,65 @@ function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24
    <button class="linkbtn" data-act="codeBack">← Back</button>`);
   const i=$('#codeIn2');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
 function codeLost(){Code.clear();Store.disconnect();Store.items.clear();clearLocal();showWelcome('That Bible code wasn’t found. Start fresh or try your code again.')}
-function startCode(){hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView()}
+function startCode(){hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
 Object.assign(A,{
   codeNew:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Making your code…';
     try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
-    catch(e){authMsg(e.message||'No connection — check your internet and try again.');el.disabled=false;el.textContent='✨ Get my own Bible code'}},
+    catch(e){authMsg(e.message||'No connection — check your internet and try again.');el.disabled=false;el.textContent='✨ Get a Bible code'}},
   codeCopy:async el=>{try{await navigator.clipboard.writeText(el.dataset.c);toast('Code copied ✓')}catch(e){const r=document.createRange();r.selectNodeContents($('#bigCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast('Select and copy the code')}},
   codeStart:el=>{Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome! Your progress now saves with your Bible code 🔑')},
   codeHave:()=>showHaveCode(''),
   codeBack:()=>showWelcome(''),
-  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!/^[A-Z]{3,8}-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(c)){authMsg('Type your Bible code — it looks like GRACE-7K4M-2QXT.');return}
+  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!GEN_RE.test(c)&&!CUSTOM_RE.test(c)){authMsg('Type your Bible code — it looks like GRACE-7K4M-2QXT, or your own code (10+ letters and numbers).');return}
     const b=$('[data-act=codeOpen]');b.disabled=true;b.innerHTML='<span class="spin"></span>';
     try{const r=await fetch('/api/code/check',{method:'POST',headers:{'X-Code':c}});
       if(r.ok){const n=localCount();if(n){welcomeBox(`<h3 style="text-align:center;margin:18px 0 6px">One question</h3><p style="text-align:center">This device already has some progress (${n} items) that isn’t saved with a code yet. Add it to <b>${esc(c)}</b> too?</p>
           <button class="btn pri wide" data-act="codeMerge" data-c="${esc(c)}" data-m="1">Yes, add it</button><button class="btn wide" data-act="codeMerge" data-c="${esc(c)}" data-m="0">No, just open my code</button>`);return}
         Code.set(c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖');return}
-      authMsg(r.status===429?'Too many wrong tries. Wait 15 minutes and try again.':'That code wasn’t found. Check the letters and numbers and try again.')}
+      if(r.status===401&&CUSTOM_RE.test(c)){welcomeBox(`<h3 style="text-align:center;margin:18px 0 6px">New code?</h3><p style="text-align:center"><b>${esc(c)}</b> isn\u2019t a Bible code yet. Do you want to make it <b>your</b> code?</p>
+          <button class="btn pri wide" data-act="codeClaim" data-c="${esc(c)}">✅ Yes, make it my code</button><button class="btn wide" data-act="codeBack">← No, go back</button><div id="authMsg" class="authmsg"></div>`);return}
+      authMsg(r.status===429?'Too many wrong tries. Wait 15 minutes and try again.':'That code wasn\u2019t found. Check the letters and numbers and try again.')}
     catch(e){authMsg('No connection — check your internet and try again.')}
     b.disabled=false;b.textContent='📖 Log in'},
   codeMerge:el=>{if(el.dataset.m!=='1')clearLocal();Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖')},
   codeShow:()=>{S.codeShown=!S.codeShown;renderView()},
+  codeChoose:()=>{welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">✏️ Choose your own code</h3>
+     <p class="small muted" style="text-align:center;margin:0 0 10px">At least 10 letters and numbers, with both letters and numbers. Make it something only you would think of.</p>
+     <input id="codeIn2" class="f codein2" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="e.g. SHENG446644">
+     <button class="btn pri wide" data-act="codeClaimTyped">✅ Make this my code</button><div id="authMsg" class="authmsg"></div>
+     <div class="warnbox">📝 Remember your code! It’s the only way to log in — nobody can look it up for you.</div>
+     <button class="linkbtn" data-act="codeBack">← Back to log in</button>`);$('#codeIn2').focus()},
+  codeClaimTyped:()=>{const c=normCode($('#codeIn2').value);$('#codeIn2').value=c;if(!CUSTOM_RE.test(c)){authMsg('Use at least 10 characters, with both letters and numbers (no spaces or symbols).');return}A.codeClaim({dataset:{c}})},
+  codeClaim:async el=>{const c=el.dataset.c;try{const r=await fetch('/api/code/claim',{method:'POST',headers:{'X-Code':c}});const j=await r.json().catch(()=>({}));
+      if(r.ok){Code.set(j.code||c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast(`🔑 ${j.code||c} is now your Bible code`);return}
+      authMsg(j.error==='taken'?'Someone already has that code — please choose another.':j.error==='weak'?'Use at least 10 letters and numbers.':j.error==='too_many'?'Too many tries. Wait 15 minutes.':(j.error||'Please try again.'))}
+    catch(e){authMsg('No connection — check your internet and try again.')}},
   codeCopyMine:async()=>{try{await navigator.clipboard.writeText(Code.value);toast('Code copied ✓')}catch(e){S.codeShown=true;renderView();toast('Select and copy your code')}},
   codeSwitch:()=>confirmSheet('Log out? Make sure you saved your Bible code — you\u2019ll need it to log in again. Your progress stays safe online under your code.','Log out',()=>{Code.clear();Store.disconnect();Store.items.clear();clearLocal();setTab('load');showWelcome('')}),
 });
+/* ---------- Claude app → website: one tap ---------- */
+const b64u={enc:u8=>{let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')},
+  dec:str=>{str=str.replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';const b=atob(str);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}};
+async function gzip(text){const cs=new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'));return new Uint8Array(await new Response(cs).arrayBuffer())}
+async function gunzip(u8){const ds=new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'));return await new Response(ds).text()}
+async function buildSyncLink(){const items={};for(const [k,v] of Store.items)if(isItemKey(k))items[k]=v;
+  let packed=b64u.enc(await gzip(JSON.stringify({app:'loadedbible',v:1,items})));let dropped=false;
+  if(packed.length>700000){delete items.pic_banner;delete items.pic_avatar;dropped=true;packed=b64u.enc(await gzip(JSON.stringify({app:'loadedbible',v:1,items})))}
+  return {url:SITE_URL+'/#lbsync='+packed,n:Object.keys(items).length,dropped}}
+async function showSyncPrompt(){const raw=S.pendingSync;if(!raw)return;let d;try{d=JSON.parse(await gunzip(b64u.dec(raw)))}catch(e){S.pendingSync=null;toast('That link from the Claude app didn’t work — try sending again.');return}
+  if(!d||d.app!=='loadedbible'||!d.items){S.pendingSync=null;return}const n=Object.keys(d.items).filter(isItemKey).length;S._syncData=d;
+  openSheet(`<div style="text-align:center"><div style="font-size:40px">📲</div><h3>Load your Claude progress?</h3><p>Add <b>${n} items</b> from the Claude app to <b>${esc(Code.value||'')}</b>?</p><p class="small muted">Items with the same name are replaced with the Claude version. Everything else stays.</p></div>
+    <div class="row"><button class="btn pri grow" data-act="syncYes">✅ Yes, load it</button><button class="btn grow" data-act="syncNo">Not now</button></div>`)}
+Object.assign(A,{
+  syncYes:()=>{const d=S._syncData;let n=0;Object.entries(d.items).forEach(([k,v])=>{if(isItemKey(k)){Store.set(k,v);n++}});S.pendingSync=null;S._syncData=null;closeSheet();applyTheme();updateAvatar();renderView();toast(`Loaded ${n} items from the Claude app 🎉`)},
+  syncNo:()=>{S.pendingSync=null;S._syncData=null;closeSheet()},
+  webCodeSave:()=>{const i=$('#webCodeIn');const c=normCode(i.value);i.value=c;if(c&&!GEN_RE.test(c)&&!CUSTOM_RE.test(c)){toast('That doesn’t look like a Bible code');return}saveSettings({webCode:c});toast(c?'Website code saved 🔑':'Website code removed')},
+  syncPrepare:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Packing your progress…';
+    try{const r=await buildSyncLink();const box=$('#syncBox');box.innerHTML=`<a class="btn pri wide" href="${esc(r.url)}" target="_blank" rel="noopener">📲 Open my website & load ${r.n} items ↗</a><p class="small muted" style="margin:6px 0 0">Log in there with <b>${esc(settings().webCode||'your code')}</b> and tap <b>Yes, load it</b>.${r.dropped?' (Your photos were too big to send this way, so they’re left out.)':''}</p>`}
+    catch(e){toast('Couldn’t pack your progress — try again');el.disabled=false;el.textContent='📲 Send my progress to my website'}},
+});
 /* ---------- boot ---------- */
+(function(){const m=location.hash.match(/^#lbsync=([A-Za-z0-9_-]+)$/);if(m){S.pendingSync=m[1];try{history.replaceState(null,'',location.pathname+'#load')}catch(e){location.hash='#load'}}})();
 if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#load').slice(1));updateAvatar();if(Code.value)startCode();else showWelcome('')}
 else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
 Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});

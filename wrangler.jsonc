@@ -5,6 +5,8 @@
   "assets": { "directory": "./public", "binding": "ASSETS" },
   // Your progress is stored here (created automatically on deploy, free plan friendly)
   "durable_objects": { "bindings": [{ "name": "STORE", "class_name": "Store" }] },
+  // Cloudflare's free built-in AI for the ✨ features
+  "ai": { "binding": "AI" },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Store"] }],
   // keep the secrets you add in the Cloudflare dashboard when the site updates
   "keep_vars": true
