@@ -309,6 +309,19 @@ details.grp[open]>summary::after{content:"▴"}
 .item.today{border:2px solid var(--accent)}
 .flipcard{background:var(--card);border:2px solid var(--gold);border-radius:20px;padding:26px 18px;text-align:center;min-height:220px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.1)}
 .fliptext{font-family:var(--serif);font-size:21px;line-height:1.5;margin:10px 0 0}
+.symgrid{display:grid;grid-template-columns:1fr;gap:6px;margin:10px 0}
+.symcell{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 8px}
+.sym{width:42px;height:42px;display:grid;place-items:center;font-size:24px;border-radius:10px;background:var(--soft);font-family:var(--serif)}
+.chainlist{margin-top:8px}.chainstep{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}
+.chainn{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+.moodbtn{font-size:24px;width:42px;height:42px;border-radius:12px;border:1.5px solid transparent;background:transparent;cursor:pointer}
+.moodbtn.on{border-color:var(--accent);background:var(--card)}
+.jwbody{min-height:300px;font-family:var(--serif);font-size:19px;line-height:1.6;margin-top:10px}
+.stylerow{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:10px 12px;margin-top:8px;border-radius:14px;border:1.5px solid var(--line,rgba(0,0,0,.12));background:transparent;color:inherit;font:inherit;cursor:pointer}
+.stylerow.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.mystyle{margin-top:12px;padding:10px 12px;border-radius:14px;border:1.5px dashed var(--gold)}
+.prayercard{margin-top:12px;border:2px solid var(--gold)}
+.prayercard .out{font-family:var(--serif);font-size:19px;line-height:1.6}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),var(--accent2,#5a1c16));color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -332,7 +345,7 @@ details.grp[open]>summary::after{content:"▴"}
 <nav class="bottom" id="nav">
   <button data-act="tab" data-tab="load"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 3 1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2 2.2.7-2.2.8L19 21l-.8-2.5L16 17.7l2.2-.7z"/></svg>Load</button>
   <button data-act="tab" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Study</button>
-  <button data-act="tab" data-tab="tabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M19 7h2M19 11h2M19 15h2"/><path d="M9 8h6M9 12h6"/></svg>Tabs & Key</button>
+  <button data-act="tab" data-tab="tabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M19 7h2M19 11h2M19 15h2"/><path d="M9 8h6M9 12h6"/></svg>Bible Kit</button>
   <button data-act="tab" data-tab="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Journal</button>
   <button data-act="tab" data-tab="online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>Online Bible</button>
 </nav>
@@ -479,7 +492,8 @@ const JTYPES={
  soap:{name:'S.O.A.P.',icon:'📖',fields:[['ref','Scripture reference','input'],['scripture','S — Scripture (write it out)','ta'],['obs','O — Observation: what does it say?','ta'],['app','A — Application: how does it change me?','ta'],['prayer','P — Prayer','ta']]},
  sermon:{name:'Sermon notes',icon:'⛪',fields:[['title','Sermon title','input'],['speaker','Speaker / church','input'],['ref','Main passage','input'],['points','Main points','ta'],['quotes','Key quotes & insights','ta'],['action','My takeaway / action step','ta']]},
  prayer:{name:'Prayer',icon:'🙏',fields:[['title','Prayer request','input'],['who','For whom','input'],['ref','Promise / verse to stand on','input'],['body','Details','ta'],['answer','How God answered','ta'],['answered','Answered','check']]},
- reflect:{name:'Reflection',icon:'✍️',fields:[['title','Title','input'],['ref','Passage','input'],['body','Thoughts','ta']]},
+ reflect:{name:'Free writing',icon:'✍️',fields:[['title','Title','input'],['ref','Passage','input'],['body','Thoughts','ta']]},
+ prayed:{name:'Written prayer',icon:'🕊️',fields:[['title','Title','input'],['ref','Verse','input'],['body','Prayer','ta']]},
 };
 const INSERT_TEMPLATES=[
  ['Book overview card','Book: \nAuthor: \nWritten to: \nKey theme: \nKey verse: \nOutline:\n1. \n2. \n3. '],
@@ -541,7 +555,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -764,11 +778,11 @@ async function runStudy(tool,refText,question,force){
 
 /* ---------- LOADED BIBLE ---------- */
 function viewLoaded(v){const sub=S.loadedSub;
-  v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: topic tabs with their highlighter colors, book tabs and insert cards to tuck inside.</p></div>
-  <div class="chips">${[['key','🏷️ Topic tabs'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['plans','📅 Reading plans'],['memory','🧠 Memory verses'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
+  v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Everything for your paper Bible: topic tabs and colors, book tabs, inserts, margin symbols, verse chains, reading plans and memory verses.</p></div>
+  <div class="chips">${[['key','🏷️ Topic tabs'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['symbols','✒️ Margin symbols'],['chains','🔗 Verse chains'],['plans','📅 Reading plans'],['memory','🧠 Memory verses'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
-  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
+  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,symbols:loadedSymbols,chains:loadedChains,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
 function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
   for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
     let g=null;
@@ -829,6 +843,24 @@ function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)
     <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
    :`<div class="empty">${K==='all'?'No insert cards yet — generate one or start with a template above.':'Nothing here yet — tap ✨ Generate above.'}</div>`}`}
+/* ----- ✒️ Margin symbols ----- */
+const DEF_SYMBOLS=[['✝','Jesus / salvation'],['♡','God’s love'],['△','God, Father Son and Spirit'],['🕊','The Holy Spirit'],['☆','A promise to hold onto'],['!','A command to obey'],['?','A question I still have'],['☁','Heaven / eternity'],['⚠','A warning'],['🙏','Prayer'],['→','Cross-reference: see the next verse'],['📅','A date God spoke to me']];
+const symList=()=>{const d=Store.get('symbols');return d&&d.list?d.list:DEF_SYMBOLS.map(([s,m])=>({s,m}))};
+function loadedSymbols(el){const L=symList();
+  el.innerHTML=`<p class="small muted">Small pen symbols you draw in your margins so you can see at a glance what a verse is about. Pick your set, then copy the key onto the inside cover of your Bible.</p>
+   <div class="symgrid">${L.map((x,i)=>`<div class="symcell"><div class="sym">${esc(x.s)}</div><div class="grow small">${esc(x.m)}</div><button class="btn sm ghost" data-act="symDel" data-i="${i}" aria-label="Remove">✕</button></div>`).join('')}</div>
+   <div class="card"><b>＋ Add your own symbol</b><div class="row" style="margin-top:8px"><input class="f" id="symS" maxlength="4" placeholder="✦" style="width:70px;text-align:center;font-size:22px"><input class="f grow" id="symM" maxlength="60" placeholder="What it means"><button class="btn sm pri" data-act="symAdd">Add</button></div></div>
+   <div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="symCopy">⧉ Copy my key</button><button class="btn sm" data-act="symAI">✨ Suggest more symbols</button><button class="btn sm ghost" data-act="symReset">↺ Reset to the starter set</button></div><div id="symOut" class="out small"></div>`}
+/* ----- 🔗 Verse chains ----- */
+const DEF_CHAINS=[{title:'The Romans Road (the gospel)',refs:['ROM 3:23','ROM 6:23','ROM 5:8','ROM 10:9-10','ROM 10:13','ROM 5:1','ROM 8:1']},{title:'Peace in worry',refs:['PHP 4:6-7','1PE 5:7','MAT 6:34','ISA 26:3','JHN 14:27']},{title:'Who I am in Christ',refs:['2CO 5:17','EPH 2:10','JHN 1:12','ROM 8:1','1PE 2:9','GAL 2:20']}];
+const chainList=()=>((Store.get('chains')||{}).list||[]);
+function loadedChains(el){const L=chainList();const ex=DEF_CHAINS.filter(c=>!L.some(x=>x.title===c.title));
+  el.innerHTML=`<p class="small muted">A verse chain links verses on one topic. In your paper Bible, write the <b>next</b> reference in the margin next to each verse, so you can follow the chain from verse to verse. Write the first verse of each chain on your inside cover.</p>
+   <div class="card"><b>✨ Make a chain on a topic</b><div class="row" style="margin-top:8px"><input class="f grow" id="chTopic" placeholder="e.g. forgiveness, courage, the Holy Spirit"><button class="btn sm pri" data-act="chainAI">Make</button></div>
+     <div class="small muted" style="margin-top:8px">Or build your own:</div><div class="row" style="margin-top:4px"><input class="f grow" id="chOwn" placeholder="Title, then verses: Hope: Rom 15:13, Jer 29:11"><button class="btn sm" data-act="chainOwn">Add</button></div></div>
+   ${ex.length?`<div class="chips" style="flex-wrap:wrap">${ex.map((c,i)=>`<button class="chip" data-act="chainAdd" data-i="${DEF_CHAINS.indexOf(c)}">＋ ${esc(c.title)}</button>`).join('')}</div>`:''}
+   ${L.length?L.map((c,ci)=>`<div class="item"><div class="h"><span>🔗</span><b class="grow">${esc(c.title)}</b><button class="btn sm ghost" data-act="chainCopy" data-i="${ci}">⧉</button><button class="btn sm ghost" data-act="chainDel" data-i="${ci}" aria-label="Delete">🗑</button></div>
+     <div class="chainlist">${c.refs.map((r,i)=>`<div class="chainstep"><span class="chainn">${i+1}</span>${refA(r,codeToLabel(r))}<span class="small muted grow" style="text-align:right">${i<c.refs.length-1?'margin: → '+esc(codeToLabel(c.refs[i+1])):'margin: ↺ '+esc(codeToLabel(c.refs[0]))}</span></div>`).join('')}</div></div>`).join(''):'<div class="empty">No chains yet. Add a starter chain above or make your own.</div>'}`}
 /* ----- 📅 Reading plans ----- */
 const RPLANS=[
  ['year','🌍','Bible in a year','The whole Bible, start to finish',365,()=>BOOKS],
@@ -837,6 +869,16 @@ const RPLANS=[
  ['psprov60','🎵','Psalms & Proverbs in 60 days','Praise, prayer and wisdom',60,()=>[BM.PSA,BM.PRO]],
  ['paul30','✉️','Paul’s letters in 30 days','Romans to Philemon',30,()=>BOOKS.filter(b=>b.genre==='pauline')],
  ['ot','📜','Old Testament in 9 months','Genesis to Malachi',270,()=>BOOKS.filter(b=>!b.nt)],
+ ['bible2y','🐢','Bible in 2 years','The whole Bible at a gentle pace',730,()=>BOOKS],
+ ['ntyear','📘','New Testament in a year','About one chapter a day',260,()=>BOOKS.filter(b=>b.nt)],
+ ['prov31','💡','Proverbs in 31 days','One chapter for each day of the month',31,()=>[BM.PRO]],
+ ['psalms30','🎶','Psalms in 30 days','About five Psalms a day',30,()=>[BM.PSA]],
+ ['john21','❤️','John in 21 days','Meet Jesus, one chapter a day',21,()=>[BM.JHN]],
+ ['acts28','🔥','Acts in 28 days','The early church, one chapter a day',28,()=>[BM.ACT]],
+ ['genesis50','🌱','Genesis in 50 days','Where it all begins',50,()=>[BM.GEN]],
+ ['wisdom45','🦉','Wisdom books in 45 days','Job, Psalms, Proverbs, Ecclesiastes, Song of Songs',45,()=>BOOKS.filter(b=>b.genre==='poetry')],
+ ['prophets90','📯','The Prophets in 90 days','Isaiah to Malachi',90,()=>BOOKS.filter(b=>b.genre==='majproph'||b.genre==='minproph')],
+ ['letters40','📨','All the letters in 40 days','Romans to Jude',40,()=>BOOKS.filter(b=>b.genre==='pauline'||b.genre==='general')],
 ];
 function planDays(id){const P=RPLANS.find(p=>p[0]===id);const chs=[];P[5]().forEach(b=>{for(let c=1;c<=b.chapters;c++)chs.push([b.abbr,c])});const n=chs.length,d=P[4];
   return Array.from({length:d},(_,i)=>chs.slice(Math.floor(i*n/d),Math.floor((i+1)*n/d)))}
@@ -887,13 +929,67 @@ function loadedProgress(el){const pr=progress();const read=Object.values(pr).red
    <p class="small muted">Mark chapters as read at the bottom of each chapter, or tap chapters on a book tab.</p>`}
 
 /* ---------- JOURNAL ---------- */
-function viewJournal(v){const es=Store.list('j_').sort((a,b)=>(b.date||0)-(a.date||0));
-  v.innerHTML=`<div class="hero"><h2>Journal</h2><p>S.O.A.P. devotions, sermon notes, prayer requests and reflections.</p></div>
-  <div class="toolgrid" style="margin:12px 0">${Object.entries(JTYPES).map(([k,t])=>`<button class="tool" data-act="newJournal" data-t="${k}"><span class="e">${t.icon}</span><div><b>New ${esc(t.name)}</b><span>${k==='soap'?'Scripture · Observation · Application · Prayer':k==='sermon'?'Points, quotes, takeaway':k==='prayer'?'Track requests & answers':'Free writing'}</span></div></button>`).join('')}</div>
-  ${es.length?es.map(journalItem).join(''):'<div class="empty">Your journal is empty. Start with a S.O.A.P. entry on today’s reading.</div>'}`}
+const JPROMPTS=['Where did you notice God today?','What are three things you’re thankful for right now?','What is weighing on your heart, and what would you like to tell God about it?','Which verse has stayed with you this week, and why?','What is something you need to forgive — or ask forgiveness for?','Where do you need God’s guidance right now?','Who can you encourage this week, and how?','What fear could you hand over to God today?','What has God taught you in a hard season?','Describe a prayer God answered. How did it feel?','What does it mean to you that God is your Father?','What would you do this week if you fully trusted God?','What is stealing your peace lately?','Write a letter to God about where you are right now.','What promise of God do you need to hold onto today?','How did you see someone show Christ’s love recently?','What habit is helping your faith grow — and which one is in the way?','If Jesus sat with you today, what would you ask Him?','What are you hoping for in the next month?','What did you learn about yourself in God’s Word lately?'];
+const PRAY_TOPICS=[['thankful','🙌 Thankful'],['anxious','😟 Worried or anxious'],['family','👨‍👩‍👧 Family'],['guidance','🧭 Guidance'],['forgive','💔 Forgiveness'],['healing','🩹 Healing'],['strength','💪 Strength'],['work','💼 Work or school'],['others','🌍 Praying for others'],['grief','😢 Grief or loss'],['relationships','❤️ Relationships'],['faith','🔥 Growing in faith']];
+const PRAY_STYLES=[['short','⚡ Short','A few heartfelt sentences'],['acts','🙏 A.C.T.S.','Adoration · Confession · Thanksgiving · Supplication'],['psalm','🎵 Psalm-style','Honest and poetic, like the Psalms'],['lords','✝️ Lord\u2019s Prayer','Follows the pattern Jesus taught (Matthew 6)'],['praise','🙌 Praise & thanks','Only worship and thankfulness'],['scripture','📖 Pray the verses','Prays Bible verses back to God'],['intercede','🤲 For others','Standing in the gap for someone'],['letter','💌 Letter to God','Personal, like writing to a Father'],['evening','🌙 End of the day','Looking back on today with God'],['mine','⭐ My style','The way you pray']];
+const MOODS=['😊','🙏','😌','🥰','😔','😟','😤','😢','🤔','🔥'];
+const prayStyle=()=>Object.assign({open:'',close:'',notes:''},settings().prayerStyle||{});
+function jStreak(){const days=new Set(Store.list('j_').map(e=>new Date(e.date).toDateString()));let n=0;const d=new Date();if(!days.has(d.toDateString()))d.setDate(d.getDate()-1);while(days.has(d.toDateString())){n++;d.setDate(d.getDate()-1)}return n}
+function viewJournal(v){const sub=S.jSub||'all';
+  v.innerHTML=`<div class="hero"><h2>Journal & Prayer</h2><p>Write freely, let prayers be written with you, keep your prayer list and sermon notes.</p></div>
+  <div class="chips subchips" style="margin:12px 0 4px">${[['all','📚 My journal'],['write','✍️ Free write'],['pray','✨ Prayer generator'],['list','🙏 Prayer list'],['sermon','⛪ Sermon notes']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="jSub" data-s="${k}">${l}</button>`).join('')}</div>
+  <div id="jBody"></div>`;
+  const el=$('#jBody',v);({all:jTimeline,write:jWrite,pray:jPray,list:jList,sermon:jSermons})[sub](el)}
+function jTimeline(el){const f=S.jFilter||'all';const groups={write:['reflect'],pray:['prayed','prayer'],soap:['soap'],sermon:['sermon']};
+  const all=Store.list('j_').sort((a,b)=>(b.date||0)-(a.date||0));const es=f==='all'?all:all.filter(e=>groups[f].includes(e.type));const st=jStreak();
+  el.innerHTML=`<div class="card row" style="gap:14px"><div style="font-size:34px">${st?'🔥':'📓'}</div><div class="grow"><b style="font-family:var(--serif);font-size:20px">${st?`${st}-day writing streak`:'Start your streak today'}</b><div class="small muted">${all.length} entr${all.length===1?'y':'ies'} · ${all.filter(e=>e.type==='prayer'&&e.fields&&e.fields.answered).length} answered prayers</div></div></div>
+   <div class="toolgrid" style="margin:10px 0">
+     <button class="tool" data-act="jSub" data-s="write"><span class="e">✍️</span><div><b>Free write</b><span>With a prompt if you like</span></div></button>
+     <button class="tool" data-act="jSub" data-s="pray"><span class="e">✨</span><div><b>Write a prayer with me</b><span>In your own style</span></div></button>
+     <button class="tool" data-act="newJournal" data-t="prayer"><span class="e">🙏</span><div><b>Prayer request</b><span>Track it until it’s answered</span></div></button>
+     <button class="tool" data-act="newJournal" data-t="sermon"><span class="e">⛪</span><div><b>Sermon notes</b><span>Notes from church</span></div></button>
+   </div>
+   <p class="small muted" style="margin:2px 2px 8px">📖 S.O.A.P. lives in <a class="ref" data-act="tab" data-tab="study">Study</a> now. When you save one there, it shows up here.</p>
+   <div class="chips">${[['all','All'],['write','✍️ Writing'],['pray','🙏 Prayers'],['soap','📖 S.O.A.P.'],['sermon','⛪ Sermons']].map(([k,l])=>`<button class="chip ${f===k?'on':''}" data-act="jFilter" data-f="${k}">${l}</button>`).join('')}</div>
+   ${es.length?es.map(journalItem).join(''):'<div class="empty">Nothing here yet. Try a free write or let a prayer be written with you.</div>'}`}
+function jWrite(el){const d=S.jDraft||(S.jDraft={title:'',ref:'',body:'',mood:'',prompt:JPROMPTS[Math.floor(Math.random()*JPROMPTS.length)],key:''});
+  el.innerHTML=`<div class="card" style="background:var(--soft,var(--card))"><div class="row"><div class="grow"><div class="small muted">💡 Prompt (optional)</div><b style="font-family:var(--serif);font-size:19px">${esc(d.prompt)}</b></div><button class="btn sm ghost" data-act="jPrompt" title="New prompt">🔀</button></div></div>
+   <div class="card">${d.key?'<div class="small muted" style="margin-bottom:6px">Editing an entry</div>':''}
+     <input class="f" id="jwTitle" placeholder="Title (optional)" value="${esc(d.title)}">
+     <div class="small muted" style="margin:10px 2px 4px">How are you feeling?</div>
+     <div class="row" style="flex-wrap:wrap;gap:4px">${MOODS.map(m=>`<button class="moodbtn ${d.mood===m?'on':''}" data-act="jMood" data-m="${m}">${m}</button>`).join('')}</div>
+     <input class="f" id="jwRef" placeholder="Link a verse (optional), e.g. Psalm 23" value="${esc(d.ref)}" style="margin-top:10px">
+     <textarea class="f jwbody" id="jwBody" placeholder="Just write. No rules — this is between you and God.">${esc(d.body)}</textarea>
+     <div class="row" style="margin-top:6px"><span class="small muted grow" id="jwCount">${d.body.trim()?d.body.trim().split(/\s+/).length:0} words</span>${d.key?'<button class="btn sm" data-act="jwNew">New entry</button>':''}<button class="btn pri" data-act="jwSave">💾 Save</button></div></div>`;
+  const bind=(id,k)=>$('#'+id,el).addEventListener('input',e=>{d[k]=e.target.value;if(k==='body')$('#jwCount').textContent=(d.body.trim()?d.body.trim().split(/\s+/).length:0)+' words'});
+  bind('jwTitle','title');bind('jwRef','ref');bind('jwBody','body')}
+function jPray(el){const P=S.pray||(S.pray={topics:[],words:'',ref:'',who:'',style:prayStyle().open||prayStyle().close?'mine':'short',out:'',busy:false,edit:false});const ps=prayStyle();
+  el.innerHTML=`<div class="card"><b style="font-family:var(--serif);font-size:20px">What’s on your heart?</b>
+     <div class="chips" style="flex-wrap:wrap;margin-top:8px">${PRAY_TOPICS.map(([k,l])=>`<button class="chip ${P.topics.includes(k)?'on':''}" data-act="prTopic" data-k="${k}">${l}</button>`).join('')}</div>
+     <textarea class="f" id="prWords" placeholder="In your own words (optional): what’s going on?" style="min-height:80px">${esc(P.words)}</textarea>
+     <div class="row"><input class="f grow" id="prWho" placeholder="For whom? (optional)" value="${esc(P.who)}"><input class="f grow" id="prRef" placeholder="Verse (optional)" value="${esc(P.ref)}"></div></div>
+   <div class="card"><b style="font-family:var(--serif);font-size:20px">Style</b>
+     <div class="chips" style="flex-wrap:wrap;margin-top:8px">${PRAY_STYLES.map(([k,l])=>`<button class="chip ${P.style===k?'on':''}" data-act="prStyle" data-k="${k}">${l}</button>`).join('')}</div>
+     <div class="small muted" style="margin:2px 2px 0">${esc((PRAY_STYLES.find(x=>x[0]===P.style)||PRAY_STYLES[0])[2])}</div>
+     <div class="mystyle"><div class="row"><b class="grow">⭐ My prayer style</b><button class="btn sm ghost" data-act="prStyleEdit">${ps.open||ps.close||ps.notes?'✏️ Edit':'＋ Set up'}</button></div>
+       ${ps.open||ps.close||ps.notes?`<div class="small" style="margin-top:4px">${ps.open?`<div><span class="muted">Starts with:</span> “${esc(ps.open)}”</div>`:''}${ps.close?`<div><span class="muted">Ends with:</span> “${esc(ps.close)}”</div>`:''}${ps.notes?`<div><span class="muted">Also:</span> ${esc(ps.notes)}</div>`:''}<div class="muted" style="margin-top:4px">Used for every prayer, in any style.</div></div>`:'<div class="small muted">Tell us how you usually start and end your prayers, and every prayer will be written that way.</div>'}</div></div>
+   <button class="btn pri wide" data-act="prGo" ${P.busy?'disabled':''}>${P.busy?'<span class="spin"></span> Writing your prayer…':P.out?'🔁 Write a new one':'✨ Write my prayer'}</button>
+   ${P.out||P.busy?`<div class="card prayercard"><div id="prOut">${P.edit?`<textarea class="f" id="prEdit" style="min-height:260px">${esc(P.out)}</textarea>`:`<div class="out">${md(P.out)}</div>`}</div>
+     ${P.out&&!P.busy?`<div class="row" style="flex-wrap:wrap;margin-top:10px"><button class="btn sm pri" data-act="prSave">💾 Save to journal</button><button class="btn sm" data-act="prEditT">${P.edit?'✓ Done editing':'✏️ Edit'}</button><button class="btn sm" data-act="prCopy">⧉ Copy</button><button class="btn sm" data-act="prReq">🙏 Add to prayer list</button></div>`:''}</div>`:''}`;
+  const bind=(id,k)=>{const i=$('#'+id,el);if(i)i.addEventListener('input',e=>{P[k]=e.target.value})};bind('prWords','words');bind('prWho','who');bind('prRef','ref');bind('prEdit','out')}
+function jList(el){const all=Store.list('j_').filter(e=>e.type==='prayer');const open=all.filter(e=>!(e.fields||{}).answered).sort((a,b)=>b.date-a.date);const done=all.filter(e=>(e.fields||{}).answered).sort((a,b)=>(b.fields.answeredAt||b.updated||0)-(a.fields.answeredAt||a.updated||0));
+  const row=e=>{const f=e.fields||{};return `<div class="item"><div class="h"><span>${f.answered?'🎉':'🙏'}</span><span class="grow" data-act="editJournal" data-k="${e.key}" style="cursor:pointer">${esc(f.title||'Prayer request')}</span>${f.answered?'':`<button class="btn sm" data-act="prAnswered" data-k="${e.key}">✓ Answered</button>`}</div>
+    <div class="small muted">${f.who?'For '+esc(f.who)+' · ':''}since ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}</div>${f.body?`<div class="txt">${esc(f.body.slice(0,160))}</div>`:''}${f.answered&&f.answer?`<div class="txt"><b>How God answered:</b> ${esc(f.answer)}</div>`:''}</div>`};
+  el.innerHTML=`<div class="row" style="margin:6px 2px"><b class="grow">${open.length} praying · ${done.length} answered</b><button class="btn sm pri" data-act="newJournal" data-t="prayer">＋ New request</button></div>
+   ${open.length?open.map(row).join(''):'<div class="empty">No open prayer requests. Add one, or tap “🙏 Add to prayer list” after writing a prayer.</div>'}
+   ${done.length?`<h3 style="font-size:20px;margin:16px 2px 4px">🎉 Answered prayers</h3><p class="small muted" style="margin:0 2px 6px">Look back at what God has done.</p>${done.map(row).join('')}`:''}`}
+function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sort((a,b)=>b.date-a.date);
+  el.innerHTML=`<p class="small muted">Sermon notes are what you write down while listening to a sermon (the preaching at church, or online): the main points, the Bible passage, quotes that stood out, and one thing you want to do with it.</p>
+   <button class="btn pri wide" data-act="newJournal" data-t="sermon">＋ New sermon notes</button>
+   ${es.length?es.map(journalItem).join(''):'<div class="empty">No sermon notes yet.</div>'}`}
 function journalItem(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const title=f.title||(f.ref?codeToLabel(f.ref):'')||t.name;
   const snippet=t.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean).join(' · ').slice(0,180);
-  return `<div class="item" data-act="editJournal" data-k="${e.key}" style="cursor:pointer"><div class="h"><span>${t.icon}</span><span class="grow">${esc(title)}</span>${e.type==='prayer'?`<span class="tag">${f.answered?'✓ answered':'praying'}</span>`:''}</div>
+  return `<div class="item" data-act="editJournal" data-k="${e.key}" style="cursor:pointer"><div class="h"><span>${f.mood||t.icon}</span><span class="grow">${esc(title)}</span>${e.type==='prayer'?`<span class="tag">${f.answered?'✓ answered':'praying'}</span>`:''}</div>
    <div class="small muted">${esc(t.name)} · ${fmtDate(e.date)}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>${snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}</div>`}
 function journalForm(type,key){const t=JTYPES[type];const e=key?Store.get(key):null;const f=(e&&e.fields)||{};
   if(!e&&type==='soap'&&S.sel.size){const s=settings();f.ref=refLabel(s.book,s.ch,selVerses());f.scripture=selText()}
@@ -901,6 +997,7 @@ function journalForm(type,key){const t=JTYPES[type];const e=key?Store.get(key):n
   openSheet(`<h3>${t.icon} ${esc(t.name)}</h3>
    ${t.fields.map(([k,l,kind])=>kind==='check'?`<label class="row" style="margin:12px 2px"><input type="checkbox" data-f="${k}" ${f[k]?'checked':''} style="width:20px;height:20px"> <b>${esc(l)}</b></label>`:
      `<label class="l">${esc(l)}</label>${kind==='ta'?`<textarea class="f" data-f="${k}">${esc(f[k]||'')}</textarea>`:`<input class="f" data-f="${k}" value="${esc(f[k]||'')}">`}`).join('')}
+   ${type==='sermon'?'<div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="genTakeaway">✨ Help me with a takeaway</button></div>':''}
    ${type==='soap'?'<div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="genSoap">✨ Generate S.O.A.P. for me</button><button class="btn sm" data-act="soapHelp">💡 Just give me ideas</button></div><div id="soapHelp" class="out small"></div>':''}
    <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="saveJournal" data-t="${type}" data-k="${key||''}">Save</button>${key?`<button class="btn" data-act="delItem" data-k="${key}">Delete</button>`:''}</div>`)}
 
@@ -1059,10 +1156,58 @@ const A={
   delItem:el=>confirmSheet('Delete this?','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
   /* journal */
   newJournal:el=>journalForm(el.dataset.t),
-  editJournal:el=>{const e=Store.get(el.dataset.k);if(e)journalForm(e.type,el.dataset.k)},
+  editJournal:el=>{const e=Store.get(el.dataset.k);if(!e)return;if(e.type==='reflect'){const f=e.fields||{};S.jDraft={title:f.title||'',ref:f.ref?codeToLabel(f.ref):'',body:f.body||'',mood:f.mood||'',prompt:f.prompt||JPROMPTS[0],key:el.dataset.k};S.jSub='write';if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0);return}journalForm(e.type,el.dataset.k)},
+  jSub:el=>{S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView()},
+  jFilter:el=>{S.jFilter=el.dataset.f;renderView()},
+  jPrompt:()=>{const d=S.jDraft;let p;do{p=JPROMPTS[Math.floor(Math.random()*JPROMPTS.length)]}while(p===d.prompt);d.prompt=p;renderView()},
+  jMood:el=>{const d=S.jDraft;d.mood=d.mood===el.dataset.m?'':el.dataset.m;renderView()},
+  jwNew:()=>{S.jDraft=null;renderView()},
+  jwSave:()=>{const d=S.jDraft;if(!d.body.trim()){toast('Write something first');return}const pr=d.ref&&parseRef(d.ref);
+    const f={title:d.title.trim(),ref:pr?`${pr.b} ${pr.c}${pr.v1?':'+pr.v1+(pr.v2?'-'+pr.v2:''):''}`:'',body:d.body.trim(),mood:d.mood,prompt:d.prompt};
+    const k=d.key||('j_'+newId());const base=d.key?Store.get(d.key):{type:'reflect',date:Date.now()};Store.set(k,Object.assign({},base,{fields:f,updated:Date.now()}));if(!d.key)touch();
+    S.jDraft=null;S.jSub='all';toast('Saved to your journal ✍️');renderView()},
+  prTopic:el=>{const P=S.pray,k=el.dataset.k;P.topics=P.topics.includes(k)?P.topics.filter(x=>x!==k):[...P.topics,k];renderView()},
+  prStyle:el=>{S.pray.style=el.dataset.k;if(el.dataset.k==='mine'){const ps=prayStyle();if(!ps.open&&!ps.close&&!ps.notes){A.prStyleEdit();return}}renderView()},
+  prStyleEdit:()=>{const ps=prayStyle();openSheet(`<h3>⭐ My prayer style</h3><p class="small muted">Write how you usually pray. Every prayer will start and end your way.</p>
+    <label class="l">How do you start your prayers?</label><input class="f" id="psOpen" maxlength="120" placeholder="e.g. Dear Heavenly Father," value="${esc(ps.open)}">
+    <label class="l">How do you end your prayers?</label><input class="f" id="psClose" maxlength="120" placeholder="e.g. In Jesus’ name, Amen." value="${esc(ps.close)}">
+    <label class="l">Anything else about how you pray? (optional)</label><textarea class="f" id="psNotes" maxlength="400" placeholder="e.g. I call God Abba, I like simple everyday words, I always thank Him first">${esc(ps.notes)}</textarea>
+    <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="prStyleSave">Save my style</button>${ps.open||ps.close||ps.notes?'<button class="btn" data-act="prStyleClear">Clear</button>':''}</div>`)},
+  prStyleSave:()=>{const ps={open:$('#psOpen').value.trim(),close:$('#psClose').value.trim(),notes:$('#psNotes').value.trim()};saveSettings({prayerStyle:ps});if(S.pray&&(ps.open||ps.close||ps.notes))S.pray.style='mine';closeSheet();toast('Your prayer style is saved ⭐');renderView()},
+  prStyleClear:()=>{saveSettings({prayerStyle:{open:'',close:'',notes:''}});if(S.pray&&S.pray.style==='mine')S.pray.style='short';closeSheet();renderView()},
+  prGo:async()=>{const P=S.pray;if(P.busy)return;if(!P.topics.length&&!P.words.trim()&&!P.ref.trim()){toast('Pick a topic or write what’s on your heart');return}
+    const ps=prayStyle();const tl=P.topics.map(k=>PRAY_TOPICS.find(t=>t[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
+    const styleTxt={short:'Keep it short: 4 to 6 heartfelt sentences, one paragraph.',acts:'Use the A.C.T.S. pattern with four short bold labels on their own line (**Adoration**, **Confession**, **Thanksgiving**, **Supplication**), each followed by 2 to 3 sentences.',psalm:'Write it like a Psalm: honest, poetic, short lines, moving from the struggle to trust and praise. 10 to 16 short lines.',mine:'Write it in the person\u2019s own style described below. Medium length, 2 to 3 short paragraphs.',
+      lords:'Follow the pattern of the Lord\u2019s Prayer (Matthew 6:9-13) in your own words: honouring God\u2019s name, His kingdom and will, daily needs, forgiveness, protection from temptation, and ending in praise. Short bold labels are not needed; 2 to 3 short paragraphs.',
+      praise:'Make it only praise and thanksgiving: worship God for who He is and thank Him for what He has done, with no requests. 2 short paragraphs.',
+      scripture:'Pray Scripture back to God: build the prayer from 3 to 5 Bible verses, turning each one into a personal sentence of prayer with its reference in brackets.',
+      intercede:'Make it an intercession: pray for the other person or people mentioned (or for others in general), for their needs, protection, faith and blessing. 2 to 3 short paragraphs.',
+      letter:'Write it like a personal letter to God, starting with a warm greeting, honest and conversational, 3 short paragraphs, ending like a letter.',
+      evening:'Make it an end-of-the-day prayer: look back on the day with gratitude, confess what went wrong, hand over worries, and ask for rest and peace. 2 to 3 short paragraphs.'}[P.style];
+    const mine=(ps.open?`Start the prayer exactly with: "${ps.open}"\n`:'')+(ps.close?`End the prayer exactly with: "${ps.close}"\n`:'')+(ps.notes?`About how they pray: ${ps.notes}\n`:'');
+    const prompt=`You help a Christian write a personal prayer to pray out loud or in their journal. Write in the first person ("I", "me"), warm, sincere and simple, not churchy or flowery. Weave in 1 to 3 Bible verses that fit (paraphrase or quote briefly) and put the reference in brackets after it, like (Philippians 4:6). Stay faithful to Scripture. Do not add any introduction, title or explanation: output only the prayer.
+${styleTxt}
+${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In Jesus’ name, Amen."\n'}${tl?`They want to pray about: ${tl}.\n`:''}${P.words.trim()?`In their own words: ${P.words.trim()}\n`:''}${P.who.trim()?`They are praying for: ${P.who.trim()}.\n`:''}${P.ref.trim()?`Build the prayer around this verse: ${P.ref.trim()}.\n`:''}`;
+    P.busy=true;P.out='';P.edit=false;renderView();
+    try{const r=await ai(prompt,t=>{P.out=t;const o=$('#prOut');if(o)o.innerHTML=`<div class="out">${md(t)}</div>`},null,'default');P.out=(r.text||P.out).trim()}
+    catch(e){P.out='';toast(aiErr(e))}P.busy=false;renderView()},
+  prEditT:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;P.edit=!P.edit;renderView()},
+  prCopy:()=>copyText(S.pray.out.replace(/\*\*/g,'')),
+  prSave:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;const pr=P.ref&&parseRef(P.ref);const tl=P.topics.map(k=>PRAY_TOPICS.find(t=>t[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
+    Store.set('j_'+newId(),{type:'prayed',date:Date.now(),fields:{title:'Prayer'+(tl?': '+tl:P.who.trim()?' for '+P.who.trim():''),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,'')}});touch();toast('Prayer saved to your journal 🕊️')},
+  prReq:()=>{const P=S.pray;const pr=P.ref&&parseRef(P.ref);const tl=P.topics.map(k=>PRAY_TOPICS.find(t=>t[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
+    Store.set('j_'+newId(),{type:'prayer',date:Date.now(),fields:{title:(P.words.trim().slice(0,60)||tl||'Prayer request'),who:P.who.trim(),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,''),answer:'',answered:false}});toast('Added to your prayer list 🙏')},
+  prAnswered:el=>{const e=Store.get(el.dataset.k);openSheet(`<h3>🎉 Prayer answered!</h3><p><b>${esc((e.fields||{}).title||'')}</b></p><label class="l">How did God answer? (optional)</label><textarea class="f" id="ansTxt" placeholder="Write it down so you can remember it."></textarea>
+    <button class="btn pri wide" data-act="prAnsSave" data-k="${el.dataset.k}" style="margin-top:12px">Mark as answered</button>`)},
+  prAnsSave:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields=Object.assign({},e.fields,{answered:true,answeredAt:Date.now(),answer:$('#ansTxt').value.trim()||(e.fields||{}).answer||''});Store.set(el.dataset.k,e);closeSheet();toast('Praise God! 🎉')},
+  genTakeaway:async()=>{const sh=$('#sheet');const g=k=>($(`[data-f="${k}"]`,sh)||{}).value||'';if(!g('points').trim()&&!g('ref').trim()){toast('Add the passage or main points first');return}
+    const btn=$('[data-act="genTakeaway"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Thinking…';
+    try{const r=await ai(`From these sermon notes, write one personal takeaway and one concrete action step for this week, in 2 to 3 short sentences, first person. Output only those sentences.\nTitle: ${g('title')}\nPassage: ${g('ref')}\nPoints: ${g('points')}\nQuotes: ${g('quotes')}`,null,null,'quick');
+      const t=$('[data-f="action"]',sh);t.value=(t.value.trim()?t.value.trim()+'\n\n':'')+r.text.trim()}catch(e){toast(aiErr(e))}btn.disabled=false;btn.innerHTML='✨ Help me with a takeaway'},
   saveJournal:el=>{const f={};$$('[data-f]',$('#sheet')).forEach(i=>f[i.dataset.f]=i.type==='checkbox'?i.checked:i.value.trim());
     const k=el.dataset.k;const base=k?Store.get(k):{type:el.dataset.t,date:Date.now()};
     const pr=f.ref&&parseRef(f.ref);if(pr)f.ref=`${pr.b} ${pr.c}${pr.v1?':'+pr.v1+(pr.v2?'-'+pr.v2:''):''}`;
+    if(f.answered){const old=(base.fields||{});f.answeredAt=old.answeredAt||Date.now()}if(base.fields&&base.fields.mood)f.mood=base.fields.mood;
     Store.set(k||('j_'+newId()),Object.assign({},base,{fields:f,updated:Date.now()}));closeSheet();toast('Journal saved')},
   soapHelp:async()=>{const ref=$('[data-f="ref"]',$('#sheet')).value.trim();const sc=$('[data-f="scripture"]',$('#sheet')).value.trim();const out=$('#soapHelp');if(!ref&&!sc){toast('Add the Scripture first');return}
     out.innerHTML='<div class="loadingline"></div>';
@@ -1174,7 +1319,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   ${loadingListHtml(plans)}
   <details class="guide"><summary>🖊️ What you need & tips</summary><div class="body">
    <b>Supplies:</b> Bible-safe highlighters (gel or dry highlighters don't bleed through thin pages), a fine-tip archival pen (e.g. 0.2–0.3 mm), sticky or adhesive Bible tabs, a small ruler.<br><br>
-   <b>Before you start:</b> test pens on a blank page at the back. Set your color meanings in <b>Tabs & Key</b> and copy the key onto your inside cover.<br><br>
+   <b>Before you start:</b> test pens on a blank page at the back. Set your color meanings in <b>Bible Kit</b> and copy the key onto your inside cover.<br><br>
    <b>Chain references:</b> write the next verse's reference in the margin by each verse on a topic, so you can flip from one to the next — the topic tool does this for you.<br><br>
    <b>Keep it readable:</b> write small, use abbreviations (Jn, Rom, Ps), and leave room for future notes.</div></details>`;
   const bb=$('#bBook',v);if(bb)bb.onchange=()=>{B.book=bb.value;B.ch=1;renderView()};
@@ -1288,12 +1433,12 @@ function insertForm(){const I=S.ins;const T=INS_TYPES.find(t=>t[0]===I.type)||IN
    ${T[5].length?`<div class="chips" style="flex-wrap:wrap;margin-top:6px">${T[5].map(x=>`<button class="chip ${I.subject===x?'on':''}" data-act="insSubj" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:''}
    <label class="l">Size</label><div class="chips">${INS_SIZES.map(z=>`<button class="chip ${I.size===z[0]?'on':''}" data-act="insSize" data-z="${z[0]}">${z[1]}</button>`).join('')}</div>
    <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Make my insert</button>
-   <p class="small muted">Inserts are cards and pages you tuck into your Bible. Save the ones you like — they go to <b>Tabs & Key → Inserts</b>.</p>`}
+   <p class="small muted">Inserts are cards and pages you tuck into your Bible. Save the ones you like — they go to <b>Bible Kit → Inserts</b>.</p>`}
 function insertOutHtml(){const I=S.ins;const n=Store.list('i_').length;const kept=Store.list('g_').sort((a,b)=>(b.at||0)-(a.at||0));const live=I.drafts.filter(d=>d.loading||d.err);
   if(!kept.length&&!live.length)return '';
   const kn=t=>(INS_TYPES.find(x=>x[0]===t)||INS_TYPES[INS_TYPES.length-1]);
-  return `<div class="row" style="margin:18px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">🗂️ My generated inserts</h2><button class="btn sm ghost" data-act="insGoSaved">Tabs & Key (${n})</button></div>
-   <p class="small muted" style="margin:0 2px 8px">Everything you generate is kept here. Tap <b>💾 Save to my inserts</b> on the ones you want in Tabs & Key → Inserts.</p>
+  return `<div class="row" style="margin:18px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">🗂️ My generated inserts</h2><button class="btn sm ghost" data-act="insGoSaved">Bible Kit (${n})</button></div>
+   <p class="small muted" style="margin:0 2px 8px">Everything you generate is kept here. Tap <b>💾 Save to my inserts</b> on the ones you want in Bible Kit → Inserts.</p>
    ${live.map(d=>`<div class="insert" style="--gc:var(--gold)">${d.err?`<p class="muted">${esc(d.err)}</p><button class="btn sm ghost" data-act="insDropLive">✕</button>`:d.text?`<div class="b">${md(d.text)}</div>`:'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>'}</div>`).join('')}
    ${kept.map(g=>{const open=S.openIns===g.key;const T=kn(g.type);return `<div class="plan ${open?'open':''}" id="gi-${g.key}"><div class="planhead" data-act="insToggle" data-k="${g.key}" role="button"><span class="pico">${T[1]}</span>
       <div class="grow" style="min-width:0"><div class="ptitle">${esc(insTitle(g.text))}</div><div class="small muted">${esc(T[2])}${g.subject?' · '+esc(g.subject):''} · ${new Date(g.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div></div>${g.saved?'<span class="pstat done">✓ Saved</span>':''}<span class="chev">${open?'▴':'▾'}</span></div>
@@ -1371,10 +1516,10 @@ Object.assign(A,{
   insType:el=>{S.ins.type=el.dataset.t;S.ins.subject='';renderView()},
   insSubj:el=>{S.ins.subject=el.dataset.v;renderView()},
   insSize:el=>{S.ins.size=el.dataset.z;renderView()},
-  insSave:el=>{const g=Store.get(el.dataset.k);const p=parseRef(g.subject||'');Store.set('i_'+newId(),{title:insTitle(g.text),ref:p?rc(p):'',body:g.text,md:true,kind:g.type,updated:Date.now()});Store.set(el.dataset.k,Object.assign({},g,{saved:true}));const kn=(INS_KINDS().find(x=>x[0]===(g.type==='custom'?'own':g.type))||[])[2];toast(`Saved to Tabs & Key → Inserts → ${kn||'Inserts'} 🗂️`)},
+  insSave:el=>{const g=Store.get(el.dataset.k);const p=parseRef(g.subject||'');Store.set('i_'+newId(),{title:insTitle(g.text),ref:p?rc(p):'',body:g.text,md:true,kind:g.type,updated:Date.now()});Store.set(el.dataset.k,Object.assign({},g,{saved:true}));const kn=(INS_KINDS().find(x=>x[0]===(g.type==='custom'?'own':g.type))||[])[2];toast(`Saved to Bible Kit → Inserts → ${kn||'Inserts'} 🗂️`)},
   insAgain:el=>{const g=Store.get(el.dataset.k);runInsert({type:g.type,size:g.size,subject:g.subject})},
   insCopy:el=>{copyText(plain(Store.get(el.dataset.k).text))},
-  insDel:el=>confirmSheet('Delete this generated insert? (Copies you saved in Tabs & Key stay.)','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
+  insDel:el=>confirmSheet('Delete this generated insert? (Copies you saved in Bible Kit stay.)','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
   insToggle:el=>{const k=el.dataset.k;S.openIns=S.openIns===k?null:k;renderBuildOut();if(S.openIns)setTimeout(()=>document.getElementById('gi-'+k)?.scrollIntoView({behavior:'smooth',block:'start'}),40)},
   insDropLive:()=>{S.ins.drafts=S.ins.drafts.filter(d=>!d.err);renderBuildOut()},
   insGoSaved:()=>{S.loadedSub='inserts';S.insKind='all';setTab('tabs')},
@@ -1385,6 +1530,22 @@ Object.assign(A,{
       const c=x=>plain((sec[x]||'').trim());Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref,scripture:c('S'),obs:c('O'),app:c('A'),prayer:c('P')}})}
     else Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:`${METHODS[st.tool][1]}: ${st.refLabel}`,ref,body:plain(t)}});
     toast('Saved to your Journal 📓')},
+  symAdd:()=>{const sy=$('#symS').value.trim(),m=$('#symM').value.trim();if(!sy||!m){toast('Add a symbol and what it means');return}Store.set('symbols',{list:[...symList(),{s:sy,m}]});toast('Symbol added ✒️')},
+  symDel:el=>{const L=symList().slice();L.splice(+el.dataset.i,1);Store.set('symbols',{list:L})},
+  symReset:()=>confirmSheet('Go back to the starter set of symbols? Your own symbols will be removed.','Reset',()=>{Store.del('symbols');renderView()}),
+  symCopy:()=>copyText('MY MARGIN SYMBOLS\n'+symList().map(x=>`${x.s}  ${x.m}`).join('\n')),
+  symAI:async()=>{const out=$('#symOut');out.innerHTML='<div class="loadingline"></div>';
+    try{const r=await ai(`Someone marks up their paper Bible with small hand-drawn pen symbols in the margin. They already use: ${symList().map(x=>x.s+' = '+x.m).join('; ')}. Suggest 6 more simple symbols that are easy to draw with a pen (no emoji that can't be drawn) and useful for Bible study. Format: a bullet list, each "symbol — meaning — one example verse".`,t=>{out.innerHTML=md(t)},null,'quick');out.innerHTML=md(r.text)+'<p class="small muted">Like one? Add it above with your own wording.</p>'}catch(e){out.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`}},
+  chainAdd:el=>{const c=DEF_CHAINS[+el.dataset.i];Store.set('chains',{list:[...chainList(),JSON.parse(JSON.stringify(c))]});toast('Chain added 🔗')},
+  chainDel:el=>confirmSheet('Delete this verse chain?','Delete',()=>{const L=chainList().slice();L.splice(+el.dataset.i,1);Store.set('chains',{list:L})}),
+  chainCopy:el=>{const c=chainList()[+el.dataset.i];copyText(c.title+'\n'+c.refs.map((r,i)=>`${i+1}. ${codeToLabel(r)}`).join('\n'))},
+  chainOwn:()=>{const v=$('#chOwn').value.trim();const m=v.match(/^([^:]{2,60}):\s*(.+)$/);const parts=(m?m[2]:v).split(/[,;\n]+/).map(x=>parseRef(x.trim())).filter(Boolean);
+    if(parts.length<2){toast('Add at least 2 verses, e.g. Hope: Rom 15:13, Jer 29:11');return}Store.set('chains',{list:[...chainList(),{title:m?m[1].trim():'My chain',refs:parts.map(rc)}]});toast('Chain added 🔗')},
+  chainAI:async()=>{const t=$('#chTopic').value.trim();if(!t){toast('Type a topic first');return}const btn=$('[data-act="chainAI"]');btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
+    try{const r=await ai(JSYS+`Make a verse chain on the topic "${t}": 5 to 8 Bible verses in a logical order that builds understanding of the topic. Return JSON: {"title": "short chain title", "refs": ["Book chapter:verse", ...]}`,null,null,'default');
+      const d=parseJSON(r.text);const refs=(d.refs||[]).map(x=>parseRef(String(x))).filter(Boolean).map(rc);if(refs.length<2)throw {message:'Could not make a chain. Try another topic.'};
+      Store.set('chains',{list:[...chainList(),{title:d.title||t,refs}]});toast('Chain made 🔗')}catch(e){toast(e&&e.message&&!e.code?e.message:aiErr(e))}
+    const b2=$('[data-act="chainAI"]');if(b2){b2.disabled=false;b2.innerHTML='Make'}},
   rpStart:el=>{Store.set('readplan',{id:el.dataset.p,start:todayStr(),done:{}});toast('Plan started — Day 1 is today 📅');renderView()},
   rpTick:el=>{const rp=JSON.parse(JSON.stringify(Store.get('readplan')));const d=+el.dataset.d;const days=planDays(rp.id);rp.done=rp.done||{};
     if(rp.done[d])delete rp.done[d];else{rp.done[d]=true;days[d].forEach(([b,c])=>{if(!isRead(b,c))toggleRead(b,c)});touch()}Store.set('readplan',rp)},
@@ -1412,7 +1573,7 @@ Object.assign(A,{
   delPlan:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const done=planProg(pl).done;
     confirmSheet(done?`Remove “${planTitle(pl)}” from your list? It stays counted in your badges and stats.`:`Delete “${planTitle(pl)}”? You haven\u2019t finished it yet.`,done?'Remove':'Delete',()=>{removePlan(k);toast(done?'Removed — well done! 🎉':'Deleted');renderView()})},
   bSoap:()=>{const pl=Store.get(S.build.planKey),x=pl.data.soap;Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref:`${pl.b} ${pl.c}:${x.v}`,scripture:x.scripture||'',obs:x.observation||'',app:x.application||'',prayer:x.prayer||''}});toast('S.O.A.P. saved to Journal')},
-  bTopicIns:()=>{const pl=Store.get(S.build.planKey),d=pl.data;Store.set('i_'+newId(),{title:`${d.emoji||''} ${d.title||pl.topic}`.trim(),ref:'',body:(d.intro?d.intro+'\n\n':'')+(d.verses||[]).map(x=>`${x.ref} — ${x.why||''}`).join('\n')+(d.prayer?'\n\nPrayer: '+d.prayer:''),updated:Date.now()});toast('Insert card saved (Tabs & Key → Inserts)')},
+  bTopicIns:()=>{const pl=Store.get(S.build.planKey),d=pl.data;Store.set('i_'+newId(),{title:`${d.emoji||''} ${d.title||pl.topic}`.trim(),ref:'',body:(d.intro?d.intro+'\n\n':'')+(d.verses||[]).map(x=>`${x.ref} — ${x.why||''}`).join('\n')+(d.prayer?'\n\nPrayer: '+d.prayer:''),updated:Date.now()});toast('Insert card saved (Bible Kit → Inserts)')},
   loadThisChapter:()=>{const s=settings();Object.assign(S.build,{mode:'chapter',book:s.book,ch:s.ch,planKey:null,err:''});setTab('load');runBuild()},
   genSoap:async()=>{const sh=$('#sheet');const ref=$('[data-f="ref"]',sh).value.trim();if(!ref){toast('Add a Scripture reference first');return}
     const btn=$('[data-act="genSoap"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Writing…';const s=settings();
