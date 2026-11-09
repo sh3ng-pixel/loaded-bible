@@ -343,6 +343,11 @@ details.grp[open]>summary::after{content:"▴"}
 .goalstep{gap:10px;padding:4px 0;cursor:pointer}.goalstep input{width:20px;height:20px;flex:none}.goaldone{opacity:.8}
 .snotecard{margin-top:12px;padding:14px;border-radius:14px;background:var(--card);border:2px dashed var(--gold)}
 .snotecard .out{font-family:var(--serif);font-size:18px;line-height:1.55}
+.jhead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:0 0 10px;border-radius:16px;background:var(--soft)}
+.jhead b{font-family:var(--serif);font-size:19px}.jhi{font-size:26px;line-height:1}
+.jitem{cursor:pointer}.jitem .h .iconbtn{min-width:32px;height:30px;padding:0 6px;font-size:13px}
+.tbadge{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--soft);color:var(--ink);font-weight:600;font-size:11.5px;margin-right:4px}
+.jseg.kseg button.on{background:var(--ink);color:var(--paper)}
 .jseg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;margin:10px 0 6px;background:var(--soft);border-radius:16px}
 .jseg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:15px;padding:10px 4px;border-radius:12px;cursor:pointer}
 .jseg button.on{background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 10px rgba(0,0,0,.15)}
@@ -821,9 +826,11 @@ async function runStudy(tool,refText,question,force){
 }
 
 /* ---------- LOADED BIBLE ---------- */
-function viewLoaded(v){const sub=S.loadedSub;
-  v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Everything for your paper Bible: topic tabs and colors, book tabs, inserts, margin symbols, verse chains, reading plans and memory verses.</p></div>
-  <div class="tabgrid g4">${[['key','🏷️','Topic tabs'],['books','📑','Book tabs'],['inserts','🗂️','Inserts'],['symbols','✒️','Margin symbols'],['chains','🔗','Verse chains'],['plans','📅','Reading plans'],['memory','🧠','Memory verses'],['progress','📈','Progress']].map(([k,e,l])=>`<button class="${sub===k?'on':''}" data-act="loadedSub" data-s="${k}"><span class="te">${e}</span>${l}</button>`).join('')}</div>
+const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✒️','Marking',[['symbols','✒️ Symbols'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
+function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
+  v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Set up and keep track of your paper Bible.</p></div>
+  <div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
+  <div class="subtabs">${KG[3].map(([k,l])=>`<button class="${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
   ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,symbols:loadedSymbols,chains:loadedChains,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
@@ -979,6 +986,8 @@ const PRAY_STYLES=[['short','⚡ Short','A few heartfelt sentences'],['acts','�
 const MOODS=['😊','🙏','😌','😔','😟','😢','🔥'];
 const prayStyle=()=>Object.assign({open:'',close:'',notes:''},settings().prayerStyle||{});
 function jStreak(){const days=new Set(Store.list('j_').map(e=>new Date(e.date).toDateString()));let n=0;const d=new Date();if(!days.has(d.toDateString()))d.setDate(d.getDate()-1);while(days.has(d.toDateString())){n++;d.setDate(d.getDate()-1)}return n}
+const jHead=(icon,title,desc,btn='')=>`<div class="jhead"><span class="jhi">${icon}</span><div class="grow"><b>${title}</b><div class="small muted">${desc}</div></div>${btn}</div>`;
+const newBtn=(act,extra)=>`<button class="btn sm pri" data-act="${act}" ${extra||''}>＋ New</button>`;
 const JGROUPS=[['journal','📓','Journal',[['all','📚 Timeline'],['write','✍️ Write'],['cal','📆 Calendar']]],['prayer','🙏','Prayer',[['pray','✨ Pray'],['list','📋 Requests'],['grat','🙌 Thanks']]],['grow','🌱','Growth',[['goals','🎯 Goals'],['testi','💬 Stories'],['sermon','⛪ Sermons']]]];
 const jGroupOf=sub=>JGROUPS.find(g=>g[3].some(x=>x[0]===sub))||JGROUPS[0];
 function viewJournal(v){const sub=S.jSub||'all';const G=jGroupOf(sub);
@@ -988,23 +997,23 @@ function viewJournal(v){const sub=S.jSub||'all';const G=jGroupOf(sub);
   const el=$('#jBody',v);({all:jTimeline,write:jWrite,pray:jPray,list:jList,sermon:jSermons,grat:jGrat,testi:jTesti,goals:jGoals,cal:jCal})[sub](el)}
 function jTimeline(el){const f=S.jFilter||'all';const groups={write:['reflect'],pray:['prayed','prayer'],grat:['grat'],testi:['testimony'],goal:['goal'],soap:['soap'],sermon:['sermon']};
   const all=Store.list('j_').sort((a,b)=>(b.date||0)-(a.date||0));const es=f==='all'?all:all.filter(e=>groups[f].includes(e.type));const st=jStreak();
-  el.innerHTML=`<div class="row" style="margin:4px 2px 10px;gap:10px"><div class="grow"><b style="font-size:16px">${st?`🔥 ${st}-day streak`:'📓 Start your streak today'}</b><div class="small muted">${all.length} entr${all.length===1?'y':'ies'}</div></div>
-     <select class="f jsel" id="jFilterSel">${[['all','Show all'],['write','✍️ Writing'],['pray','🙏 Prayers'],['grat','🙌 Thanks'],['testi','💬 Stories'],['goal','🎯 Goals'],['soap','📖 S.O.A.P.'],['sermon','⛪ Sermons']].map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>${l}</option>`).join('')}</select></div>
+  el.innerHTML=`${jHead('📚','Everything you wrote',`Newest first. Tap an entry to open it, or 🗑 to delete it.${st?` 🔥 ${st}-day streak!`:''}`)}
+   <div class="row" style="margin:0 2px 10px"><span class="small muted grow">${all.length} entr${all.length===1?'y':'ies'}</span><select class="f jsel" id="jFilterSel">${[['all','Show all'],['write','✍️ Writing'],['pray','🙏 Prayers'],['grat','🙌 Thanks'],['testi','💬 Stories'],['goal','🎯 Goals'],['soap','📖 S.O.A.P.'],['sermon','⛪ Sermons']].map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>${l}</option>`).join('')}</select></div>
    ${es.length?es.map(journalItem).join(''):'<div class="empty">Nothing here yet. Tap ✍️ Write to start. (S.O.A.P. studies you save in Study show up here too.)</div>'}`;
   $('#jFilterSel',el).onchange=e=>{S.jFilter=e.target.value;renderView()}}
 function jWrite(el){const d=S.jDraft||(S.jDraft={title:'',ref:'',body:'',mood:'',prompt:JPROMPTS[Math.floor(Math.random()*JPROMPTS.length)],key:''});
-  el.innerHTML=`<div class="card">${d.key?'<div class="small muted" style="margin-bottom:6px">Editing an entry</div>':''}
+  el.innerHTML=`${jHead('✍️',d.key?'Edit your entry':'Free write','Write whatever is on your heart. Stuck? Use the prompt or ✨ Fill in for me.')}<div class="card">
      <div class="promptline"><span class="grow">💡 ${esc(d.prompt)}</span><button class="iconbtn" data-act="jPrompt" title="Another prompt">🔀</button></div>
      <input class="f" id="jwTitle" placeholder="Title (optional)" value="${esc(d.title)}">
      <div class="row moodrow" style="flex-wrap:wrap;gap:2px;margin-top:8px"><span class="small muted" style="margin-right:4px">Mood</span>${MOODS.map(m=>`<button class="moodbtn ${d.mood===m?'on':''}" data-act="jMood" data-m="${m}">${m}</button>`).join('')}</div>
      <input class="f" id="jwRef" placeholder="Link a verse (optional), e.g. Psalm 23" value="${esc(d.ref)}" style="margin-top:10px">
      <textarea class="f jwbody" id="jwBody" placeholder="Just write. No rules — this is between you and God.">${esc(d.body)}</textarea>
      <div class="row" style="margin-top:6px"><button class="btn sm" data-act="jwAI">✨ Fill in for me</button><span class="small muted grow" id="jwCount" style="text-align:right">${d.body.trim()?d.body.trim().split(/\s+/).length:0} words</span></div>
-     <div class="row" style="margin-top:10px">${d.key?'<button class="btn" data-act="jwNew">New</button>':''}<button class="btn pri grow" data-act="jwSave">💾 Save</button></div></div>`;
+     <div class="row" style="margin-top:10px">${d.key?'<button class="btn" data-act="jwDel" title="Delete">🗑 Delete</button><button class="btn" data-act="jwNew">Cancel</button>':''}<button class="btn pri grow" data-act="jwSave">💾 Save</button></div></div>`;
   const bind=(id,k)=>$('#'+id,el).addEventListener('input',e=>{d[k]=e.target.value;if(k==='body')$('#jwCount').textContent=(d.body.trim()?d.body.trim().split(/\s+/).length:0)+' words'});
   bind('jwTitle','title');bind('jwRef','ref');bind('jwBody','body')}
 function jPray(el){const P=S.pray||(S.pray={topics:[],words:'',ref:'',who:'',style:prayStyle().open||prayStyle().close?'mine':'short',out:'',busy:false,edit:false});const ps=prayStyle();const hasPs=ps.open||ps.close||ps.notes;
-  el.innerHTML=`<div class="card"><b style="font-family:var(--serif);font-size:19px">What\u2019s on your heart?</b>
+  el.innerHTML=`${jHead('✨','Write a prayer','1. Pick what\u2019s on your heart  2. Pick a style  3. Tap ✨ Write my prayer')}<div class="card"><b style="font-family:var(--serif);font-size:19px">What\u2019s on your heart?</b>
      <div class="chips" style="margin-top:8px">${PRAY_TOPICS.map(([k,l])=>`<button class="chip ${P.topics.includes(k)?'on':''}" data-act="prTopic" data-k="${k}">${l}</button>`).join('')}</div>
      <textarea class="f" id="prWords" placeholder="In your own words (optional)" style="min-height:64px">${esc(P.words)}</textarea>
      <details class="more" ${P.who||P.ref?'open':''}><summary>For someone, or with a verse</summary><div class="row" style="margin-top:6px"><input class="f grow" id="prWho" placeholder="For whom?" value="${esc(P.who)}"><input class="f grow" id="prRef" placeholder="Verse" value="${esc(P.ref)}"></div></details></div>
@@ -1016,24 +1025,24 @@ function jPray(el){const P=S.pray||(S.pray={topics:[],words:'',ref:'',who:'',sty
      ${P.out&&!P.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="prSave">💾 Save</button><button class="btn sm grow" data-act="prReq">📋 To requests</button><button class="iconbtn" data-act="prEditT" title="Edit">${P.edit?'✓':'✏️'}</button><button class="iconbtn" data-act="prCopy" title="Copy">⧉</button></div>`:''}</div>`:''}`;
   const bind=(id,k)=>{const i=$('#'+id,el);if(i)i.addEventListener('input',e=>{P[k]=e.target.value})};bind('prWords','words');bind('prWho','who');bind('prRef','ref');bind('prEdit','out')}
 function jList(el){const all=Store.list('j_').filter(e=>e.type==='prayer');const open=all.filter(e=>!(e.fields||{}).answered).sort((a,b)=>b.date-a.date);const done=all.filter(e=>(e.fields||{}).answered).sort((a,b)=>(b.fields.answeredAt||b.updated||0)-(a.fields.answeredAt||a.updated||0));
-  const row=e=>{const f=e.fields||{};return `<div class="item"><div class="h"><span>${f.answered?'🎉':'🙏'}</span><span class="grow" data-act="editJournal" data-k="${e.key}" style="cursor:pointer">${esc(f.title||'Prayer request')}</span>${f.answered?'':`<button class="iconbtn" data-act="prAnswered" data-k="${e.key}" title="Mark answered">✓</button>`}</div>
+  const row=e=>{const f=e.fields||{};return `<div class="item"><div class="h"><span>${f.answered?'🎉':'🙏'}</span><span class="grow" data-act="editJournal" data-k="${e.key}" style="cursor:pointer">${esc(f.title||'Prayer request')}</span>${f.answered?'':`<button class="iconbtn" data-act="prAnswered" data-k="${e.key}" title="Mark answered">✓ Answered</button>`}<button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
     <div class="small muted">${f.who?'For '+esc(f.who)+' · ':''}since ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}</div>${f.body?`<div class="txt">${esc(f.body.slice(0,160))}</div>`:''}${f.answered&&f.answer?`<div class="txt"><b>How God answered:</b> ${esc(f.answer)}</div>`:''}</div>`};
-  el.innerHTML=`<div class="row" style="margin:4px 2px 8px"><b class="grow">${open.length} praying · ${done.length} answered</b><button class="btn sm pri" data-act="newJournal" data-t="prayer">＋ New</button></div>
+  el.innerHTML=`${jHead('📋','Prayer requests',`What you\u2019re praying for. Tap ✓ Answered when God answers. ${open.length} praying · ${done.length} answered`,newBtn('newJournal','data-t="prayer"'))}
    ${open.length?open.map(row).join(''):'<div class="empty">No open prayer requests. Tap ＋ New to add one.</div>'}
    ${done.length?`<h3 style="font-size:19px;margin:16px 2px 6px">🎉 Answered</h3>${done.map(row).join('')}`:''}`}
 function jGrat(el){const today=todayStr();const k='j_grat_'+today;const cur=Store.get(k);const items=cur?(cur.fields.body||'').split('\n'):[];while(items.length<3)items.push('');
   const past=Store.list('j_').filter(e=>e.type==='grat'&&e.key!==k).sort((a,b)=>b.date-a.date);const total=Store.list('j_').filter(e=>e.type==='grat').reduce((n,e)=>n+(e.fields.body||'').split('\n').filter(x=>x.trim()).length,0);
-  el.innerHTML=`<div class="card"><b style="font-family:var(--serif);font-size:20px">🙌 Today I’m thankful for…</b>
+  el.innerHTML=`${jHead('🙌','Thanks','Write a few things you\u2019re thankful for today, then tap 💾 Save.')}<div class="card"><b style="font-family:var(--serif);font-size:19px">Today I\u2019m thankful for…</b>
     ${items.map((x,i)=>`<input class="f gratin" data-i="${i}" placeholder="${['e.g. a good talk with a friend','e.g. sunshine on my walk','e.g. a verse that spoke to me'][i]||'One more thing'}" value="${esc(x)}" style="margin-top:8px">`).join('')}
     <div class="row" style="margin-top:8px"><button class="iconbtn" data-act="gratMore" title="One more">＋</button><button class="btn sm" data-act="gratAI">✨ Fill in for me</button><span class="grow"></span><button class="btn pri" data-act="gratSave">💾 Save</button></div></div>
    <p class="small muted" style="margin:6px 2px">${total} thing${total===1?'':'s'} you’ve thanked God for so far.</p>
-   ${past.map(e=>`<div class="item"><div class="small muted">${fmtDate(e.date)}</div><ul style="margin:4px 0 0;padding-left:20px">${(e.fields.body||'').split('\n').filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}`}
+   ${past.map(e=>`<div class="item"><div class="h"><span class="small muted grow">${fmtDate(e.date)}</span><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div><ul style="margin:4px 0 0;padding-left:20px">${(e.fields.body||'').split('\n').filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}`}
 function jTesti(el){const es=Store.list('j_').filter(e=>e.type==='testimony').sort((a,b)=>b.date-a.date);
-  el.innerHTML=`<div class="row" style="margin:4px 2px 8px"><span class="small muted grow">True stories of what God did in your life.</span><button class="btn sm pri" data-act="newJournal" data-t="testimony">＋ New</button></div>
+  el.innerHTML=`${jHead('💬','Testimonies','True stories of what God did in your life. Write them down so you never forget.',newBtn('newJournal','data-t="testimony"'))}
    ${es.length?es.map(journalItem).join(''):'<div class="empty">No testimonies yet. Think of a time God came through for you.</div>'}`}
 function jGoals(el){const es=Store.list('j_').filter(e=>e.type==='goal').sort((a,b)=>((a.fields.done?1:0)-(b.fields.done?1:0))||b.date-a.date);
-  el.innerHTML=`<div class="row" style="margin:4px 2px 8px"><span class="small muted grow">Goals to grow in faith, in small steps.</span><button class="btn sm pri" data-act="goalNew">＋ New</button></div>
-   ${es.length?es.map(e=>{const f=e.fields;const st=f.steps||[];const d=st.filter(x=>x.d).length;return `<div class="item ${f.done?'goaldone':''}"><div class="h"><span>${f.done?'🏆':'🎯'}</span><b class="grow">${esc(f.title)}</b><button class="btn sm ghost" data-act="goalEdit" data-k="${e.key}" aria-label="Edit">✏️</button></div>
+  el.innerHTML=`${jHead('🎯','Faith goals','Goals to grow in your faith. Tick off the small steps as you go.',newBtn('goalNew'))}
+   ${es.length?es.map(e=>{const f=e.fields;const st=f.steps||[];const d=st.filter(x=>x.d).length;return `<div class="item ${f.done?'goaldone':''}"><div class="h"><span>${f.done?'🏆':'🎯'}</span><b class="grow">${esc(f.title)}</b><button class="iconbtn" data-act="goalEdit" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
      ${f.why?`<div class="small muted">${esc(f.why)}</div>`:''}${f.ref?`<div class="small">${refA(f.ref,codeToLabel(f.ref))}</div>`:''}
      ${st.length?`<div class="prog" style="margin:8px 0 4px"><i style="width:${d/st.length*100}%"></i></div>${st.map((x,i)=>`<label class="row goalstep"><input type="checkbox" data-act="goalStep" data-k="${e.key}" data-i="${i}" ${x.d?'checked':''}><span class="${x.d?'muted':''}" style="${x.d?'text-decoration:line-through':''}">${esc(x.t)}</span></label>`).join('')}`:''}
      <div class="row" style="margin-top:6px">${f.done?`<span class="small grow">🏆 Done ${f.doneAt?fmtDate(f.doneAt):''}</span><button class="btn sm ghost" data-act="goalDone" data-k="${e.key}">↺ Reopen</button>`:`<span class="grow"></span><button class="btn sm" data-act="goalDone" data-k="${e.key}">🏆 Done</button>`}</div></div>`}).join(''):'<div class="empty">No faith goals yet.</div>'}`}
@@ -1041,7 +1050,7 @@ function jCal(el){const now=new Date();const m=S.calM||{y:now.getFullYear(),m:no
   const by={};Store.list('j_').forEach(e=>{const d=new Date(e.date);if(d.getFullYear()===m.y&&d.getMonth()===m.m)(by[d.getDate()]=by[d.getDate()]||[]).push(e)});
   const sel=S.calD&&S.calD.y===m.y&&S.calD.m===m.m?S.calD.d:null;const isT=d=>m.y===now.getFullYear()&&m.m===now.getMonth()&&d===now.getDate();
   const cnt=Object.values(by).reduce((n,a)=>n+a.length,0);
-  el.innerHTML=`<div class="card"><div class="row"><button class="btn sm ghost" data-act="calMove" data-d="-1">‹</button><b class="grow" style="text-align:center;font-family:var(--serif);font-size:20px">${first.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</b><button class="btn sm ghost" data-act="calMove" data-d="1">›</button></div>
+  el.innerHTML=`${jHead('📆','Calendar','Days you wrote something show an emoji. Tap a day to see what you wrote.')}<div class="card"><div class="row"><button class="btn sm ghost" data-act="calMove" data-d="-1">‹</button><b class="grow" style="text-align:center;font-family:var(--serif);font-size:20px">${first.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</b><button class="btn sm ghost" data-act="calMove" data-d="1">›</button></div>
    <div class="calgrid">${['Mo','Tu','We','Th','Fr','Sa','Su'].map(x=>`<div class="calh">${x}</div>`).join('')}${'<div></div>'.repeat(off)}${Array.from({length:days},(_,i)=>i+1).map(d=>{const es=by[d]||[];return `<button class="calday ${es.length?'has':''} ${isT(d)?'today':''} ${sel===d?'on':''}" data-act="calDay" data-d="${d}"><span>${d}</span>${es.length?`<i>${esc((es.find(e=>e.fields&&e.fields.mood)||{fields:{}}).fields.mood||(JTYPES[es[0].type]||JTYPES.reflect).icon)}</i>`:''}</button>`}).join('')}</div>
    <div class="small muted" style="text-align:center;margin-top:6px">${cnt} entr${cnt===1?'y':'ies'} this month</div></div>
    ${sel?`<h3 style="font-size:19px;margin:12px 2px 4px">${new Date(m.y,m.m,sel).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</h3>${(by[sel]||[]).length?(by[sel]).map(journalItem).join(''):'<div class="empty">Nothing written this day.</div>'}`:'<p class="small muted" style="text-align:center">Tap a day to see what you wrote.</p>'}`}
@@ -1053,12 +1062,12 @@ function goalSheet(key){const e=key?Store.get(key):null;const f=(e&&e.fields)||{
    <button class="btn sm" data-act="goalAI" style="margin-top:8px">✨ Fill in for me</button>
    <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="goalSave" data-k="${key||''}">Save</button>${key?`<button class="btn" data-act="delItem" data-k="${key}">Delete</button>`:''}</div>`)}
 function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sort((a,b)=>b.date-a.date);
-  el.innerHTML=`<div class="row" style="margin:4px 2px 8px"><span class="small muted grow">Notes while listening to a sermon, at church or online.</span><button class="btn sm pri" data-act="newJournal" data-t="sermon">＋ New</button></div>
+  el.innerHTML=`${jHead('⛪','Sermon notes','Notes you write while listening to a sermon, at church or online.',newBtn('newJournal','data-t="sermon"'))}
    ${es.length?es.map(journalItem).join(''):'<div class="empty">No sermon notes yet.</div>'}`}
-function journalItem(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const title=f.title||(f.ref?codeToLabel(f.ref):'')||t.name;
+function journalItem(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const fb=(f.body||'').trim().split(/\s+/);const title=f.title||(f.ref?codeToLabel(f.ref):'')||(fb[0]?fb.slice(0,6).join(' ')+(fb.length>6?'…':''):'')||t.name;
   const snippet=t.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean).join(' · ').slice(0,180);
-  return `<div class="item" data-act="editJournal" data-k="${e.key}" style="cursor:pointer"><div class="h"><span>${f.mood||t.icon}</span><span class="grow">${esc(title)}</span>${e.type==='prayer'?`<span class="tag">${f.answered?'✓ answered':'praying'}</span>`:''}</div>
-   <div class="small muted">${esc(t.name)} · ${fmtDate(e.date)}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>${snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}</div>`}
+  return `<div class="item jitem" data-act="editJournal" data-k="${e.key}"><div class="h"><span>${f.mood||t.icon}</span><span class="grow">${esc(title)}</span><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Open">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
+   <div class="small muted"><span class="tbadge">${esc(t.name)}</span> ${fmtDate(e.date)}${e.type==='prayer'?(f.answered?' · ✓ answered':' · praying'):''}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>${snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}</div>`}
 function journalForm(type,key){const t=JTYPES[type];const e=key?Store.get(key):null;const f=(e&&e.fields)||{};
   if(!e&&type==='soap'&&S.sel.size){const s=settings();f.ref=refLabel(s.book,s.ch,selVerses());f.scripture=selText()}
   else if(!e&&(type==='soap'||type==='reflect')){const s=settings();f.ref=refLabel(s.book,s.ch,[])}
@@ -1221,10 +1230,12 @@ const A={
   saveInsert:el=>{const k=el.dataset.k;const p=parseRef($('#iRef').value);const base=k?Store.get(k):{};
     Store.set(k||('i_'+newId()),Object.assign({},base,{title:$('#iTitle').value.trim(),ref:p?`${p.b} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`:'',body:$('#iBody').value,md:base.md&&base.body===$('#iBody').value,updated:Date.now()}));closeSheet();toast('Insert saved')},
   copyInsert:el=>{const x=Store.get(el.dataset.k);copyText(`${x.title}${x.ref?' ('+codeToLabel(x.ref)+')':''}\n\n${x.md?plain(x.body):x.body}`)},
-  delItem:el=>confirmSheet('Delete this?','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
+  delItem:el=>confirmSheet('Delete this? You can\u2019t undo this.','🗑 Delete',()=>{Store.del(el.dataset.k);closeSheet();toast('Deleted')}),
+  jwDel:()=>{const k=S.jDraft&&S.jDraft.key;if(!k)return;confirmSheet('Delete this entry? You can\u2019t undo this.','🗑 Delete',()=>{Store.del(k);S.jDraft=null;S.jSub='all';toast('Deleted');renderView()})},
   /* journal */
   newJournal:el=>journalForm(el.dataset.t),
   editJournal:el=>{const e=Store.get(el.dataset.k);if(!e)return;if(e.type==='goal'){goalSheet(el.dataset.k);return}if(e.type==='reflect'){const f=e.fields||{};S.jDraft={title:f.title||'',ref:f.ref?codeToLabel(f.ref):'',body:f.body||'',mood:f.mood||'',prompt:f.prompt||JPROMPTS[0],key:el.dataset.k};S.jSub='write';if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0);return}journalForm(e.type,el.dataset.k)},
+  kGroup:el=>{const G=KGROUPS.find(g=>g[0]===el.dataset.g);S.kLast=S.kLast||{};const cur=KGROUPS.find(g=>g[3].some(x=>x[0]===S.loadedSub))||KGROUPS[0];S.kLast[cur[0]]=S.loadedSub;S.loadedSub=S.kLast[G[0]]||G[3][0][0];renderView()},
   jGroup:el=>{const G=JGROUPS.find(g=>g[0]===el.dataset.g);S.jLast=S.jLast||{};const cur=jGroupOf(S.jSub||'all');S.jLast[cur[0]]=S.jSub||'all';S.jSub=S.jLast[G[0]]||G[3][0][0];renderView()},
   jSub:el=>{S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView()},
   gratMore:()=>{const c=$('.gratin:last-of-type');const i=document.createElement('input');i.className='f gratin';i.placeholder='One more thing';i.style.marginTop='8px';const all=$$('.gratin');all[all.length-1].after(i);i.focus()},
