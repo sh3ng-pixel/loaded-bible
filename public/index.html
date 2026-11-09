@@ -272,6 +272,14 @@ details.grp[open]>summary::after{content:"▴"}
 .pal small{position:absolute;left:0;right:0;bottom:3px;font-size:10.5px;font-weight:700;color:#222;opacity:.75}
 .pal.on{border-color:var(--ink)}
 .stepper{gap:14px}
+.instypes{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.instype{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:9px 10px;text-align:left;font-size:13.5px;font-weight:600;display:flex;gap:8px;align-items:center}
+.instype span{font-size:18px}.instype.on{border:2px solid var(--accent);background:var(--card)}
+.insert .b h1,.insert .b h2{font-size:21px;margin:0 0 4px;color:var(--accent)}.insert .b h3,.insert .b h4{font-size:17px;margin:8px 0 2px}
+.insert .b ul,.insert .b ol{margin:2px 0;padding-left:20px}.insert .b p{margin:2px 0}
+.chip.settab{display:inline-flex;align-items:center;padding:0;gap:0}
+.chip.settab button{border:0;background:none;color:inherit;font:inherit;padding:7px 4px 7px 13px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.chip.settab button.x{padding:7px 11px 7px 6px;opacity:.6;font-size:12px}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),#5a1c16);color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -700,8 +708,8 @@ async function runStudy(tool,refText,question,force){
 
 /* ---------- LOADED BIBLE ---------- */
 function viewLoaded(v){const sub=S.loadedSub;
-  v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: your topics & highlighter colors, book tabs and insert cards to tuck inside.</p></div>
-  <div class="chips">${[['key','🎨 Topics & colors'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
+  v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: topic tabs with their highlighter colors, book tabs and insert cards to tuck inside.</p></div>
+  <div class="chips">${[['key','🏷️ Topic tabs'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
   ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,progress:loadedProgress})[sub](body)}
@@ -754,10 +762,11 @@ function loadedColors(el){const hs=Store.list('h_');
   $$('input[data-label]',el).forEach(i=>i.addEventListener('change',()=>{const l=Object.assign({},settings().labels);l[i.dataset.label]=i.value.trim();saveSettings({labels:l});toast('Color key saved')}))}
 function loadedInserts(el){const ins=Store.list('i_').sort((a,b)=>(b.updated||0)-(a.updated||0));
   el.innerHTML=`<p class="small muted">Insert cards are the notes you'd tuck inside your Bible — book summaries, memory verses, sermon notes, prayer lists. Copy any card to print or share it.</p>
+  <button class="btn pri wide" style="margin:4px 0 10px" data-act="goMakeInsert">✨ Generate a new insert</button>
   <div class="chips">${INSERT_TEMPLATES.map((t,i)=>`<button class="chip" data-act="newInsert" data-i="${i}">＋ ${esc(t[0])}</button>`).join('')}<button class="chip" data-act="newInsert" data-i="-1">＋ Blank card</button></div>
   ${ins.length?ins.map(x=>`<div class="insert" style="--gc:${x.ref&&parseRef(x.ref)?GENRES[BM[parseRef(x.ref).b].genre][1]:'var(--gold)'}"><div class="row"><h4 class="grow">${esc(x.title||'Untitled')}</h4>${x.ref?`<a class="ref small" data-act="openRef" data-ref="${esc(x.ref)}">${esc(codeToLabel(x.ref))}</a>`:''}</div>
-    <div class="b">${x.md?md(x.body):esc(x.body)}</div>
-    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm ghost" data-act="delItem" data-k="${x.key}">Delete</button></div></div>`).join('')
+    <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
    :'<div class="empty">No insert cards yet — start with a template above.</div>'}`}
 function loadedProgress(el){const pr=progress();const read=Object.values(pr).reduce((a,x)=>a+x.length,0);
   const ot=BOOKS.filter(b=>!b.nt).reduce((a,b)=>a+(pr[b.abbr]||[]).length,0),otT=BOOKS.filter(b=>!b.nt).reduce((a,b)=>a+b.chapters,0);
@@ -1027,6 +1036,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     <label class="l">What do you want to add?</label>
     <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
+  else if(B.mode==='inserts')form=insertForm();
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
     <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
     <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
@@ -1038,7 +1048,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const plans=loadPlans();
   v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
   <div class="card">
-    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verse(s)'],['topic','💭 A feeling / topic'],['book','📚 A whole book']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verse(s)'],['topic','💭 A feeling / topic'],['book','📚 A whole book'],['inserts','🗂️ Inserts']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
     ${form}</div>
   <div id="buildOut"></div>
   ${loadingListHtml(plans)}
@@ -1051,6 +1061,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const bc=$('#bCh',v);if(bc)bc.onchange=()=>{B.ch=+bc.value;renderView()};
   const bo=$('#bBookOnly',v);if(bo)bo.onchange=()=>{B.bookOnly=bo.value;renderView()};
   const bt=$('#bTopic',v);if(bt)bt.oninput=()=>{B.topic=bt.value};
+  const isub=$('#insSubj',v);if(isub)isub.oninput=()=>{S.ins.subject=isub.value};
   const v1i=$('#bV1',v),v2i=$('#bV2',v);if(v1i){const upd=()=>{B.v1=Math.max(1,parseInt(v1i.value)||1);B.v2=Math.max(B.v1,parseInt(v2i.value)||B.v1);const b=$('[data-act=bGo]',v);if(b)b.textContent=`✨ Show me how to load ${BM[B.book].name} ${B.ch}:${B.v1}${B.v2>B.v1?'-'+B.v2:''}`};v1i.oninput=upd;v2i.oninput=upd}
   $$('details.grp>summary',v).forEach(sm=>sm.addEventListener('click',()=>{const d=sm.parentElement;S.grpState[d.dataset.g]=!d.open}));
   renderBuildOut()}
@@ -1136,6 +1147,42 @@ async function itemAI(key,id,mode,force){const pl=Object.assign({key},Store.get(
     updatePlan(key,p=>{p.extra=Object.assign({},p.extra);p.extra[id]=Object.assign({},p.extra[id],{[mode]:r.text})})}
   catch(e){toast(aiErr(e));if(!S.streams[sk+'|'+mode])delete S.panel[sk]}
   delete S.streams[sk+'|'+mode];S.itemBusy=null;renderView()}
+const INS_TYPES=[
+ ['book','📚','Book overview','a book overview: author, first readers, big theme, a short outline with chapter ranges, and key verses','e.g. Romans, Psalms, Acts',['Genesis','John','Romans','Psalms','Revelation']],
+ ['chapter','📄','Chapter summary','a chapter summary: what happens, the main point, key verses and one application','e.g. John 3, Psalm 23',['John 3','Psalm 23','Romans 8','Genesis 1','1 Corinthians 13']],
+ ['memory','🧠','Memory verse card','a memory verse card: the verse written out, what it means in a few words, and a tip to remember it','e.g. Philippians 4:13, or a theme like courage',['Joshua 1:9','Proverbs 3:5-6','Romans 8:28','Isaiah 40:31']],
+ ['topic','💭','Topic study','a topic study card: what the Bible says about it, and 5–7 key verses each with a one-line note','e.g. fear, forgiveness, money',['Fear','Forgiveness','Anxiety','Identity','Patience']],
+ ['person','👤','Bible character','a Bible character card: who they were, key moments with references, and lessons for today','e.g. David, Ruth, Peter',['David','Ruth','Peter','Moses','Esther','Paul']],
+ ['timeline','🕰️','Timeline','a timeline of the key events in order, each with its Bible reference','e.g. Life of Jesus, Kings of Israel',['Life of Jesus','The Exodus','Paul’s journeys','Creation to Abraham']],
+ ['gospel','✝️','Gospel explained','a clear explanation of the gospel with verses (like the Romans Road), easy to share with a friend','e.g. Romans Road, for a friend',['Romans Road','For a friend','In 5 verses']],
+ ['prayer','🙏','Prayer guide','a prayer guide: how to pray about it, verses to pray, and a short sample prayer','e.g. my family, anxiety, my church',['My family','Anxiety','Healing','My church','Thankfulness']],
+ ['qa','❓','Tough questions','a tough-questions card: 2–4 common questions with short, honest, Bible-based answers and references','e.g. suffering, Trinity, prayer',['Why does God allow suffering?','The Trinity','Is the Bible reliable?']],
+ ['custom','✨','Something else','an insert','describe what you want on it',[]],
+];
+const INS_SIZES=[['bookmark','🔖 Bookmark','a narrow bookmark insert: a title plus 4–7 very short lines, max 60 words'],['card','🗂️ Card','an index-card insert, max 140 words'],['page','📄 Full page','a full-page insert, 250–350 words']];
+S.ins={type:'book',size:'card',subject:'',drafts:[]};
+function insertForm(){const I=S.ins;const T=INS_TYPES.find(t=>t[0]===I.type)||INS_TYPES[0];
+  return `<label class="l">What kind of insert?</label>
+   <div class="instypes">${INS_TYPES.map(t=>`<button class="instype ${I.type===t[0]?'on':''}" data-act="insType" data-t="${t[0]}"><span>${t[1]}</span>${esc(t[2])}</button>`).join('')}</div>
+   <label class="l">About</label><input class="f" id="insSubj" value="${esc(I.subject)}" placeholder="${esc(T[4])}">
+   ${T[5].length?`<div class="chips" style="flex-wrap:wrap;margin-top:6px">${T[5].map(x=>`<button class="chip ${I.subject===x?'on':''}" data-act="insSubj" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:''}
+   <label class="l">Size</label><div class="chips">${INS_SIZES.map(z=>`<button class="chip ${I.size===z[0]?'on':''}" data-act="insSize" data-z="${z[0]}">${z[1]}</button>`).join('')}</div>
+   <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Make my insert</button>
+   <p class="small muted">Inserts are cards and pages you tuck into your Bible. Save the ones you like — they go to <b>Tabs & Key → Inserts</b>.</p>`}
+function insertOutHtml(){const I=S.ins;const n=Store.list('i_').length;
+  return (I.drafts.length?`<div class="row" style="margin:16px 2px 4px"><h2 class="sec grow" style="margin:0">Your new inserts</h2><button class="btn sm ghost" data-act="insGoSaved">🗂️ My inserts (${n})</button></div>`:'')+
+   I.drafts.map((d,i)=>`<div class="insert" style="--gc:var(--gold)">${d.loading&&!d.text?'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>':`<div class="b">${md(d.text||'')}</div>`}
+     ${d.err?`<p class="muted">${esc(d.err)}</p>`:''}
+     ${!d.loading&&d.text?`<div class="row" style="margin-top:8px">${d.saved?'<button class="btn sm" disabled>✓ Saved to my inserts</button>':`<button class="btn sm pri" data-act="insSave" data-i="${i}">💾 Save to my inserts</button>`}<button class="btn sm" data-act="insAgain" data-i="${i}">🔄 Another version</button><button class="btn sm" data-act="insCopy" data-i="${i}">⧉ Copy</button><button class="btn sm ghost" data-act="insDrop" data-i="${i}" aria-label="Remove">✕</button></div>`:''}</div>`).join('')}
+function insTitle(text){const m=String(text||'').match(/^\s*#{1,3}\s+(.+)$/m);return m?m[1].replace(/\*\*/g,'').trim().slice(0,60):'Insert'}
+async function runInsert(again){const I=S.ins;const src=again||{type:I.type,size:I.size,subject:(I.subject||'').trim()};
+  const T=INS_TYPES.find(t=>t[0]===src.type);if(!src.subject&&src.type!=='gospel'){toast('Type what the insert is about');$('#insSubj')?.focus();return}
+  const Z=INS_SIZES.find(z=>z[0]===src.size);const d=Object.assign({},src,{text:'',loading:true});I.drafts.unshift(d);renderBuildOut();
+  $('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'});const s=settings();
+  const prompt=SYS+`Make ${Z[2]} to tuck into a paper Bible. It is ${T[3]}${src.subject?` — about: ${src.subject}`:''}. Quote Scripture from the ${TRANS[s.trans]}.
+Start with one "# " title line (max 6 words). Then use short lines, bullet points and Bible references with full book names, so it can be printed or copied by hand. ${again?'Make this version clearly different from earlier ones.':''} No introduction or closing remarks about yourself.`;
+  try{const r=await ai(prompt,t=>{d.text=t;if(S.build.mode==='inserts')renderBuildOut()},null,'default');d.text=r.text}catch(e){d.err=aiErr(e)}
+  d.loading=false;if(!d.text&&d.err){}renderBuildOut()}
 function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
   const rows=plans.map(pl=>({pl,pp:planProg(pl)}));const act=rows.filter(r=>!r.pp.done),fin=rows.filter(r=>r.pp.done);
   const card=r=>{const open=B.planKey===r.pl.key;return `<div class="plan ${open?'open':''} ${r.pp.done?'isdone':''}" id="plan-${esc(r.pl.key)}">${planHead(r.pl,r.pp,open)}${open?`<div class="planbody">${planBody(r.pl,r.pp)}</div>`:''}</div>`};
@@ -1143,14 +1190,14 @@ function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
    <p class="small muted" style="margin:0 2px 8px">Tap a loading to open or close it.</p>
    ${act.length?act.map(card).join(''):'<div class="notice">Nothing in progress — pick a chapter or feeling above to start loading.</div>'}
    ${fin.length?`<div class="row" style="margin:16px 2px 4px"><h3 class="grow" style="margin:0;font-size:20px">✓ Finished</h3><button class="btn sm ghost" data-act="clearDone">🗑 Clear all finished</button></div>${fin.map(card).join('')}`:''}`}
-function renderBuildOut(){const o=$('#buildOut');if(!o)return;const B=S.build;
+function renderBuildOut(){const o=$('#buildOut');if(!o)return;const B=S.build;if(B.mode==='inserts'){o.innerHTML=insertOutHtml();return}
   if(B.loading){o.innerHTML=`<div class="card" style="text-align:center"><span class="spin"></span><p><b>Preparing your steps…</b><br><span class="small muted">${B.prog?`Writing (${Math.round(B.prog/100)/10}k characters)`:'Reading the passage and its context'}</span></p><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div>`;return}
   o.innerHTML=B.err?`<div class="card"><p class="muted">${esc(B.err)}</p></div>`:''}
 function scrollToPlan(k){setTimeout(()=>{const el=document.getElementById('plan-'+k);if(el){const y=el.getBoundingClientRect().top+window.scrollY-70;window.scrollTo({top:y,behavior:'smooth'})}},60)}
 function archivePlan(pl){const pp=planProg(pl);const st=Object.assign({},Store.get('stats')||{});const ar=Object.assign({loaded:0,topics:0,books:0,psalms:0,steps:0},st.arch||{});
   ar.steps+=pp.dn;if(pp.done){if(pl.kind==='chapter'){ar.loaded++;if(pl.b==='PSA')ar.psalms++}else if(pl.kind==='topic')ar.topics++;else ar.books++}st.arch=ar;Store.set('stats',st)}
 function removePlan(k){const pl=Store.get(k);if(!pl)return;archivePlan(pl);Store.del(k);if(S.build.planKey===k)S.build.planKey=null}
-async function runBuild(){const B=S.build;const s=settings();let prompt,meta,key;
+async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert();const s=settings();let prompt,meta,key;
   if(B.mode==='chapter'||B.mode==='verses'){const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
     const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;const keys=[];
     if(B.parts.context)keys.push('"context": {"heading": "short title to write above the chapter (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "who it was first written to (few words)", "setting": "when/where and what is happening (max 15 words)", "background": ["2-4 short historical or cultural facts a modern reader would miss (max 15 words each)"]}');
@@ -1197,6 +1244,15 @@ Object.assign(A,{
   panelTab:el=>{S.panel[el.dataset.k+'|'+el.dataset.i]=el.dataset.m;renderView()},
   panelClose:el=>{delete S.panel[el.dataset.k+'|'+el.dataset.i];renderView()},
   secPart:el=>{const m=el.dataset.m;if(m==='section')confirmSheet('Regenerate this whole section? Its ticks will be cleared.','Regenerate',()=>regenPart(el.dataset.k,el.dataset.s,'section'));else regenPart(el.dataset.k,el.dataset.s,'more')},
+  insType:el=>{S.ins.type=el.dataset.t;S.ins.subject='';renderView()},
+  insSubj:el=>{S.ins.subject=el.dataset.v;renderView()},
+  insSize:el=>{S.ins.size=el.dataset.z;renderView()},
+  insSave:el=>{const d=S.ins.drafts[+el.dataset.i];const p=parseRef(d.subject||'');Store.set('i_'+newId(),{title:insTitle(d.text),ref:p?rc(p):'',body:d.text,md:true,kind:d.type,updated:Date.now()});d.saved=true;renderBuildOut();toast('Saved to Tabs & Key → Inserts 🗂️')},
+  insAgain:el=>{const d=S.ins.drafts[+el.dataset.i];runInsert({type:d.type,size:d.size,subject:d.subject})},
+  insCopy:el=>{const d=S.ins.drafts[+el.dataset.i];copyText(plain(d.text))},
+  insDrop:el=>{S.ins.drafts.splice(+el.dataset.i,1);renderBuildOut()},
+  insGoSaved:()=>{S.loadedSub='inserts';setTab('tabs')},
+  goMakeInsert:()=>{S.build.mode='inserts';setTab('load')},
   togglePlan:el=>{const k=el.dataset.k;const was=S.build.planKey===k;S.build.planKey=was?null:k;S.build.err='';renderView();scrollToPlan(k)},
   redoPlan:el=>{const pl=Store.get(el.dataset.k);if(!pl)return;S.build.mode=pl.kind;if(pl.kind==='chapter'){S.build.book=pl.b;S.build.ch=pl.c}else if(pl.kind==='topic')S.build.topic=pl.topic;else S.build.bookOnly=pl.b;
     confirmSheet('Replace this checklist with new ideas? Your ticks will be cleared.','Get new ideas',()=>runBuild())},
@@ -1473,7 +1529,7 @@ function defaultMain(){const labels=(Store.get('settings')||{}).labels||{};
 function defaultStarter(){return {id:'starter',name:'Starter topics',builtin:true,topics:TOPICS.map(([id,ic,name,refs])=>({id,emoji:ic,name,color:STARTER_COLORS[id]||'y',meaning:'',verses:vv(refs)}))}}
 function getSet(id){const s=Store.get('s_'+id);if(s)return Object.assign({id},s);if(id==='main')return defaultMain();if(id==='starter')return defaultStarter();return null}
 const mainSet=()=>getSet('main');
-function allSets(){const out=[mainSet(),getSet('starter')];Store.list('s_').filter(s=>s.key!=='s_main'&&s.key!=='s_starter').sort((a,b)=>(a.at||0)-(b.at||0)).forEach(s=>out.push(Object.assign({},s,{id:s.key.slice(2)})));return out}
+function allSets(){const st=Store.get('s_starter');const out=[mainSet()];if(!(st&&st.deleted))out.push(getSet('starter'));Store.list('s_').filter(s=>s.key!=='s_main'&&s.key!=='s_starter').sort((a,b)=>(a.at||0)-(b.at||0)).forEach(s=>out.push(Object.assign({},s,{id:s.key.slice(2)})));return out}
 function updateSet(id,fn){const s=JSON.parse(JSON.stringify(getSet(id)));fn(s);delete s.key;Store.set('s_'+id,s);return s}
 const findTopic=(s,tid)=>(s.topics||[]).find(t=>t.id===tid);
 const sameName=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
@@ -1486,7 +1542,7 @@ const swBig=(c,emoji)=>`<span class="kdot sw-${okColor(c)}">${esc(emoji||'')}</s
 function keyLegend(s){return `<div class="legend">${(s.topics||[]).map(t=>`<span class="lg"><span class="swatch sw-${okColor(t.color)}"></span>${esc(t.name)}</span>`).join('')}</div>`}
 
 function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.keySet='main';const s=getSet(S.keySet);const isMain=s.id==='main';
-  el.innerHTML=`<div class="chips settabs">${sets.map(x=>`<button class="chip ${x.id===s.id?'on':''}" data-act="keySet" data-s="${esc(x.id)}">${x.id==='main'?'⭐ ':x.id==='starter'?'🌱 ':'✨ '}${esc(x.name)}</button>`).join('')}<button class="chip addchip" data-act="keyGenerate">＋ Generate a new set</button></div>
+  el.innerHTML=`<div class="chips settabs">${sets.map(x=>`<span class="chip settab ${x.id===s.id?'on':''}"><button data-act="keySet" data-s="${esc(x.id)}">${x.id==='main'?'⭐ ':x.id==='starter'?'🌱 ':'✨ '}${esc(x.name)}</button>${x.id==='main'?'':`<button class="x" data-act="keyDelSetId" data-s="${esc(x.id)}" aria-label="Delete ${esc(x.name)}">✕</button>`}</span>`).join('')}<button class="chip addchip" data-act="keyGenerate">＋ Generate a new set</button></div>
    <div class="card keyhead ${isMain?'ismain':''}">
      <div class="row"><h3 class="grow" style="margin:0;font-size:22px">${isMain?'⭐ ':''}${esc(s.name)}</h3><span class="tag">${s.topics.length} topics</span></div>
      <p class="small muted" style="margin:6px 0 8px">${isMain?'This is the key you use in your paper Bible: each topic has a highlighter color and its verses. Save verses or whole topics here from the other sets.':s.id==='starter'?'Ready-made topics to get you started. Tap ⭐ to save verses or topics into your main key.':`Generated${s.focus?' for “'+esc(s.focus)+'”':''}${s.at?' · '+new Date(s.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}. Compare the colors, then save what fits you with ⭐.`}</p>
@@ -1494,7 +1550,7 @@ function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.
      <div class="row" style="margin-top:10px">
        <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button>
        ${isMain?'<button class="btn sm" data-act="copyKey">📋 Copy key for my inside cover</button>':'<button class="btn sm pri" data-act="keyUseMain">⭐ Use as my main key</button>'}
-       ${!isMain?'<button class="btn sm" data-act="keyRename">✏️ Rename</button>':''}${!isMain&&s.id!=='starter'?'<button class="btn sm danger" data-act="keyDelSet">🗑 Delete set</button>':''}
+       ${!isMain?'<button class="btn sm" data-act="keyRename">✏️ Rename</button>':''}${!isMain?'<button class="btn sm danger" data-act="keyDelSet">🗑 Delete tab</button>':''}
      </div></div>
    ${s.topics.length?s.topics.map(t=>topicCard(s,t)).join(''):'<div class="empty">No topics yet — tap ＋ Add topic.</div>'}
    ${isMain?'<p class="small muted">Tip: in Online Bible you can tap verses → 🏷️ to add them here.</p>':''}`;
@@ -1523,7 +1579,8 @@ function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
    <div class="row stepper"><button class="iconbtn" data-act="genStep" data-d="-1">−</button><b id="genN" style="font-size:28px;min-width:44px;text-align:center">${S.genN}</b><button class="iconbtn" data-act="genStep" data-d="1">＋</button><span class="small muted">(2–12)</span></div>
    <label class="l">Focus (optional)</label><input class="f" id="genFocus" value="${esc(S.genFocus)}" placeholder="e.g. hard times, new believers, my marriage">
    <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FOCUS_IDEAS.map(f=>`<button class="chip" data-act="genFocusPick" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
-   <button class="btn pri wide" id="genGo" data-act="genGo">✨ Generate ${S.genN} topics</button><div id="genMsg" class="small muted" style="text-align:center;margin-top:8px"></div>`);
+   <button class="btn pri wide" id="genGo" data-act="genGo">✨ Generate ${S.genN} topics</button><div id="genMsg" class="small muted" style="text-align:center;margin-top:8px"></div>
+   ${(Store.get('s_starter')||{}).deleted?'<button class="linkbtn" data-act="keyRestoreStarter">🌱 Bring back the Starter topics tab</button>':''}`);
   $('#genFocus').addEventListener('input',e=>S.genFocus=e.target.value)}
 async function runGenerate(){const n=S.genN,focus=(S.genFocus||'').trim();const btn=$('#genGo');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generating your set…'}
   const pal=PALETTE.map(([c,nm])=>`${c}=${nm}`).join(', ');
@@ -1575,7 +1632,9 @@ Object.assign(A,{
     Store.set('s_main',{name:'My main key',main:true,topics:JSON.parse(JSON.stringify(s.topics))});S.keySet='main';renderView();toast('This is now your main key ⭐')})},
   keyRename:()=>{const s=getSet(S.keySet);openSheet(`<h3>Rename set</h3><input class="f" id="setName" value="${esc(s.name)}" maxlength="40"><div class="row" style="margin-top:12px"><button class="btn pri grow" data-act="keyRenameGo">Save</button></div>`)},
   keyRenameGo:()=>{const n=$('#setName').value.trim();if(!n)return;updateSet(S.keySet,s=>{s.name=n});closeSheet();renderView()},
-  keyDelSet:()=>{const s=getSet(S.keySet);confirmSheet(`Delete the set “${s.name}”? Anything you saved to your main key stays.`,'Delete set',()=>{Store.del('s_'+S.keySet);S.keySet='main';renderView();toast('Set deleted')})},
+  keyDelSet:()=>A.keyDelSetId({dataset:{s:S.keySet}}),
+  keyDelSetId:el=>{const id=el.dataset.s;const s=getSet(id);if(!s||id==='main')return;confirmSheet(`Delete the tab “${s.name}”? Anything you saved to your main key stays.`,'Delete tab',()=>{if(id==='starter')Store.set('s_starter',{deleted:true,name:'Starter topics',topics:[]});else Store.del('s_'+id);if(S.keySet===id)S.keySet='main';renderView();toast('Tab deleted')})},
+  keyRestoreStarter:()=>{Store.del('s_starter');S.keySet='starter';closeSheet();renderView();toast('Starter topics are back 🌱')},
 });
 
 function saveVerseToMainQuiet(topic,verse){updateSet('main',m=>{let t=m.topics.find(x=>sameName(x.name,topic.name));if(!t){t={id:'t'+newId(),emoji:topic.emoji,name:topic.name,color:topic.color,meaning:topic.meaning||'',verses:[]};m.topics.push(t)}if(!t.verses.some(x=>x.ref===verse.ref))t.verses.push(verse)})}
