@@ -1,17 +1,114 @@
-// Loaded Bible — Cloudflare Worker entry.
-// Serves the website from /public and runs the small server parts (AI + TikTok login).
-import { onRequestPost as aiPost } from './functions/api/ai.js';
-import { onRequestGet as tiktokStart } from './functions/api/tiktok/start.js';
-import { onRequestGet as tiktokCallback } from './functions/api/tiktok/callback.js';
+// Loaded Bible — personal edition (one user, unlocked with a code).
+// Serves the website from /public, keeps all progress in a Durable Object, and runs the ✨ AI helper.
+// Cloudflare secrets needed (Settings → Variables and Secrets):
+//   PASSCODE           your unlock code (e.g. 6 digits)
+//   ANTHROPIC_API_KEY  for the ✨ features
+// Optional: MODEL, MODEL_QUICK
+
+const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+const KEY_RE = /^[A-Za-z0-9_.:@+~-]{1,120}$/;
+const MAX_FAILS = 8, WINDOW_MS = 15 * 60 * 1000;
+
+export class Store {
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  async fetch(request) {
+    const url = new URL(request.url);
+    const st = this.ctx.storage;
+    const body = request.method === 'POST' ? await request.json().catch(() => ({})) : {};
+    switch (url.pathname) {
+      case '/check': { // rate-limited code check
+        const k = 'rl:' + (body.ip || 'x');
+        const rec = (await st.get(k)) || { n: 0, t: Date.now() };
+        if (Date.now() - rec.t > WINDOW_MS) { rec.n = 0; rec.t = Date.now(); }
+        if (rec.n >= MAX_FAILS) return json({ ok: false, locked: true });
+        if (body.ok) { if (rec.n) await st.delete(k); return json({ ok: true }); }
+        rec.n++; await st.put(k, rec); return json({ ok: false, left: MAX_FAILS - rec.n });
+      }
+      case '/all': {
+        const m = await st.list({ prefix: 'd:' });
+        const items = {}; for (const [k, v] of m) items[k.slice(2)] = v;
+        return json({ items });
+      }
+      case '/put': { await st.put('d:' + body.key, body.value); return json({ ok: true }); }
+      case '/del': { await st.delete('d:' + body.key); return json({ ok: true }); }
+      case '/bulk': {
+        const entries = Object.entries(body.items || {}).filter(([k]) => KEY_RE.test(k));
+        for (let i = 0; i < entries.length; i += 100) {
+          const chunk = {}; entries.slice(i, i + 100).forEach(([k, v]) => { chunk['d:' + k] = v; });
+          await st.put(chunk);
+        }
+        return json({ ok: true, count: entries.length });
+      }
+    }
+    return json({ error: 'not found' }, 404);
+  }
+}
+
+function safeEqual(a, b) {
+  a = String(a); b = String(b);
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return diff === 0;
+}
+
+async function auth(request, env, db) {
+  if (!env.PASSCODE) return json({ error: 'not_set' }, 503);
+  const ip = request.headers.get('CF-Connecting-IP') || 'x';
+  const code = request.headers.get('X-Code') || '';
+  const ok = safeEqual(code, env.PASSCODE);
+  const r = await (await db('/check', { ip, ok })).json();
+  if (r.locked) return json({ error: 'too_many' }, 429);
+  if (!ok) return json({ error: 'wrong_code', left: r.left }, 401);
+  return null;
+}
+
+async function ai(request, env) {
+  if (!env.ANTHROPIC_API_KEY) return json({ error: 'The ✨ helper isn’t switched on yet: add ANTHROPIC_API_KEY in Cloudflare (see SETUP.md).' }, 503);
+  let body; try { body = await request.json(); } catch (e) { return json({ error: 'Bad request' }, 400); }
+  const prompt = body && body.prompt;
+  if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 20000) return json({ error: 'Bad request' }, 400);
+  const model = body.tier === 'quick' ? (env.MODEL_QUICK || 'claude-haiku-5-5') : (env.MODEL || 'claude-sonnet-5-5');
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    body: JSON.stringify({ model, max_tokens: 8000, stream: true, messages: [{ role: 'user', content: prompt }] })
+  });
+  if (!r.ok) {
+    console.log('Anthropic error', r.status, (await r.text()).slice(0, 500));
+    return json({ error: r.status === 429 ? 'The AI helper is busy — try again in a minute.' : r.status === 401 ? 'Your Anthropic key isn’t working — check ANTHROPIC_API_KEY in Cloudflare.' : 'The AI helper had a problem. Please try again.' }, 502);
+  }
+  return new Response(r.body, { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
+}
 
 export default {
-  async fetch(request, env, ctx) {
-    const { pathname } = new URL(request.url);
-    if (pathname === '/api/ai') {
-      return request.method === 'POST' ? aiPost({ request, env, ctx }) : new Response('Method not allowed', { status: 405 });
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const { pathname } = url;
+    if (!pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+
+    const stub = env.STORE.get(env.STORE.idFromName('me'));
+    const db = (path, payload) => stub.fetch('https://store' + path, { method: 'POST', body: JSON.stringify(payload || {}) });
+
+    const denied = await auth(request, env, db);
+    if (denied) return denied;
+
+    if (pathname === '/api/login' && request.method === 'POST') return json({ ok: true });
+    if (pathname === '/api/data' && request.method === 'GET') return db('/all');
+    if (pathname === '/api/import' && request.method === 'POST') {
+      const body = await request.json().catch(() => ({}));
+      return db('/bulk', { items: body.items || {} });
     }
-    if (pathname === '/api/tiktok/start') return tiktokStart({ request, env, ctx });
-    if (pathname === '/api/tiktok/callback') return tiktokCallback({ request, env, ctx });
-    return env.ASSETS.fetch(request);
+    if (pathname.startsWith('/api/item/')) {
+      const key = decodeURIComponent(pathname.slice('/api/item/'.length));
+      if (!KEY_RE.test(key)) return json({ error: 'Bad key' }, 400);
+      if (request.method === 'PUT') {
+        const value = await request.json().catch(() => undefined);
+        if (value === undefined) return json({ error: 'Bad body' }, 400);
+        return db('/put', { key, value });
+      }
+      if (request.method === 'DELETE') return db('/del', { key });
+    }
+    if (pathname === '/api/ai' && request.method === 'POST') return ai(request, env);
+    return json({ error: 'Not found' }, 404);
   }
 };

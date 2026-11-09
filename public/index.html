@@ -280,6 +280,8 @@ details.grp[open]>summary::after{content:"▴"}
 .chip.settab{display:inline-flex;align-items:center;padding:0;gap:0}
 .chip.settab button{border:0;background:none;color:inherit;font:inherit;padding:7px 4px 7px 13px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
 .chip.settab button.x{padding:7px 11px 7px 6px;opacity:.6;font-size:12px}
+.codein{width:100%;max-width:260px;font-size:34px;letter-spacing:.5em;text-align:center;padding:12px;border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);outline:none}
+.codein:focus{border-color:var(--accent)}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),#5a1c16);color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -294,7 +296,6 @@ details.grp[open]>summary::after{content:"▴"}
 <header class="top">
   <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
   <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
-  <button class="hbtn" data-act="donate" aria-label="Donate">❤️</button>
   <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
 </header>
 <main id="view"></main>
@@ -1366,19 +1367,15 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="votdLoad" data-r="${vref}">✨ Load it in my Bible</button>${vtxt?`<button class="btn sm" data-act="votdCopy">⧉ Copy</button>`:''}</div></div>
    <h2 class="sec">Badges</h2>
    <div class="badges">${BADGES.map(b=>{const ok=b[4](st);return `<div class="badge ${ok?'got':''}" title="${esc(b[3])}"><span>${ok?b[1]:'🔒'}</span><b>${esc(b[2])}</b><small>${esc(b[3])}</small></div>`}).join('')}</div>
-   <div class="card donatecard"><div class="row"><span style="font-size:30px">❤️</span><div class="grow"><b>Support Loaded Bible</b><div class="small muted">Help keep it free and growing.</div></div><button class="btn pri" data-act="donate">Donate</button></div></div>
    <h2 class="sec">My profile</h2>
    <div class="card"><label class="l" style="margin-top:0">Name</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
      <label class="l">Favorite verse</label><input class="f" id="pfFav" value="${esc(pf.fav?codeToLabel(pf.fav):'')}" placeholder="e.g. Psalm 46:10">
      ${pf.fav&&parseRef(pf.fav)?`<p class="small" style="margin:6px 2px 0">${refA(pf.fav,'Open '+codeToLabel(pf.fav))}</p>`:''}
      <label class="l">Look</label><div class="chips">${[['','Auto'],['light','☀️ Light'],['sepia','📜 Sepia'],['dark','🌙 Dark']].map(([k,l])=>`<button class="chip ${pf.theme===k?'on':''}" data-act="setTheme" data-t="${k}">${l}</button>`).join('')}</div>
      <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div>
-   <h2 class="sec">Account</h2>
-   <div class="card"><p style="margin:0"><b>Signed in with:</b> ${esc(prov)}${STANDALONE&&Auth.user&&Auth.user.email?`<br><span class="small muted">${esc(Auth.user.email)}</span>`:''}</p>
-     ${!STANDALONE?'<p class="small muted">You’re using Loaded Bible inside Claude, so your progress saves to your Claude account automatically. Logging in with email, Google or TikTok happens on your own website version — Claude’s preview can’t connect to Google.</p><button class="btn sm" data-act="authPreview">👀 Preview the login screen</button>':''}
-     ${STANDALONE&&Auth.guest?'<p class="small muted">Your progress is only saved on this device. Create a free account to keep it safe and use it on your phone and computer.</p><button class="btn pri" data-act="goSignup">Create an account</button>':''}
-     ${STANDALONE&&Auth.user?`<div class="row" style="margin-top:10px">${prov==='Email & password'?'<button class="btn sm" data-act="acctReset">🔑 Change password</button>':''}<button class="btn sm" data-act="signOut">Sign out</button><button class="btn sm ghost" data-act="deleteAcct">Delete account</button></div>`:''}
-     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="copyAll">⧉ Back up all my notes as text</button></div></div>
+   <h2 class="sec">My Loaded Bible</h2>
+   <div class="card"><p style="margin:0">🔒 <b>Just for you.</b> Your progress is saved on your website and is the same on every device where you enter your code.</p>
+     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="importSheet">📥 Import progress from Claude</button><button class="btn sm" data-act="copyAll">⧉ Back up my notes as text</button><button class="btn sm" data-act="lockNow">🔒 Lock this device</button></div></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
   const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
   const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
@@ -1451,9 +1448,8 @@ async function initAuth(){showAuth('loading');Store.readyResolve();
       applyTheme();updateAvatar();renderView()});
   }catch(e){console.warn(e);Auth.noFirebase=true;startGuest();toast('Couldn’t reach the login service — using guest mode')}}
 async function aiServer(prompt,onText,signal,tier){
-  if(!Auth.user)throw {code:'need_account',message:'Create a free account (or sign in) to use the ✨ features.'};
-  const tok=await Auth.user.getIdToken();
-  const r=await fetch(CFG.aiEndpoint||'/api/ai',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
+  if(!Lock.code)throw {code:'locked',message:'Enter your code first.'};
+  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json','X-Code':Lock.code},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
   if(!r.ok){let m='The AI helper isn’t available right now.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:r.status===429?'rate_limited':'server',message:m}}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf='',text='',stop=null;
   for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
@@ -1638,9 +1634,67 @@ Object.assign(A,{
 });
 
 function saveVerseToMainQuiet(topic,verse){updateSet('main',m=>{let t=m.topics.find(x=>sameName(x.name,topic.name));if(!t){t={id:'t'+newId(),emoji:topic.emoji,name:topic.name,color:topic.color,meaning:topic.meaning||'',verses:[]};m.topics.push(t)}if(!t.verses.some(x=>x.ref===verse.ref))t.verses.push(verse)})}
+/* ---------- PERSONAL EDITION: code lock + one online store ---------- */
+const SITE_URL='https://loadmybible.shengcremers.workers.dev';
+const Lock={code:null};
+const LOCK_KEY='lb1:code';
+async function api(path,opts={}){const r=await fetch(path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','X-Code':Lock.code||''},opts.headers||{})}));
+  if(r.status===401||r.status===429){if(path!=='/api/login')lockOut('Please enter your code again.');throw {code:'locked',message:'Locked'}}
+  if(!r.ok){let m='Couldn’t reach your Loaded Bible.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:'server',message:m}}return r}
+Store.connectServer=function(){const col={
+  doc:k=>({set:v=>api('/api/item/'+encodeURIComponent(k),{method:'PUT',body:JSON.stringify(v)}),delete:()=>api('/api/item/'+encodeURIComponent(k),{method:'DELETE'})}),
+  onSnapshot:(next,err)=>{let busy=false;const pull=async()=>{if(busy)return;busy=true;try{const j=await (await api('/api/data')).json();next({docs:Object.entries(j.items||{}).map(([id,v])=>({id,exists:true,data:()=>v})),metadata:{fromCache:false}})}catch(e){if(e.code!=='locked')setSync('Offline — saved on this device')}busy=false};
+    pull();const iv=setInterval(()=>{if(!document.hidden)pull()},90000);const vis=()=>{if(!document.hidden)pull()};document.addEventListener('visibilitychange',vis);
+    return ()=>{clearInterval(iv);document.removeEventListener('visibilitychange',vis)}}};
+  this.subscribe(col)};
+function showLock(msg){const el=$('#auth');el.classList.add('show');
+  el.innerHTML=`<div class="authbox" style="text-align:center"><div class="brand" style="justify-content:center;font-size:30px">${BOOK_SVG}Loaded Bible</div>
+   <p class="muted" style="margin:8px 0 22px">Enter your code to open your Bible.</p>
+   <input id="codeIn" class="codein" type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="••••••" aria-label="Your code">
+   <button class="btn pri wide" data-act="unlock">🔓 Open</button><div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div></div>`;
+  const i=$('#codeIn');i.focus();i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'');if(i.value.length===6)A.unlock()});
+  i.addEventListener('keydown',e=>{if(e.key==='Enter')A.unlock()})}
+function lockOut(msg){Lock.code=null;try{localStorage.removeItem(LOCK_KEY)}catch(e){}try{Object.keys(localStorage).filter(k=>k.startsWith('lb1:me:')).forEach(k=>localStorage.removeItem(k))}catch(e){}Store.disconnect();Store.items.clear();showLock(msg||'')}
+async function startPersonal(){hideAuth();Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView()}
+async function initPersonal(){Store.readyResolve();let saved=null;try{saved=localStorage.getItem(LOCK_KEY)}catch(e){}
+  if(saved){Lock.code=saved;startPersonal()}else showLock('')}
+function showLauncher(){const el=$('#auth');el.classList.add('show');
+  el.innerHTML=`<div class="authbox" style="text-align:center"><div class="brand" style="justify-content:center;font-size:30px">${BOOK_SVG}Loaded Bible</div>
+   <p style="margin:10px 0 18px">Your Loaded Bible lives on your own website now, so your progress is the same everywhere.</p>
+   <a class="btn pri wide" href="${SITE_URL}" target="_blank" rel="noopener">📖 Open my Loaded Bible ↗</a>
+   <p class="small muted" style="margin:8px 0 0">${esc(SITE_URL.replace('https://',''))}</p>
+   <div class="card" style="text-align:left;margin-top:22px"><b>Move your progress from Claude (one time)</b>
+     <p class="small muted" style="margin:6px 0 10px">Copies everything you made here — loadings, highlights, notes, journal, topic tabs, inserts, photos.</p>
+     <button class="btn wide" data-act="exportCopy">📋 Copy my progress</button>
+     <ol class="small" style="margin:10px 0 0;padding-left:20px"><li>Tap <b>Copy my progress</b>.</li><li>Open your Loaded Bible and enter your code.</li><li>Tap your picture (top right) → <b>📥 Import progress from Claude</b> → paste → <b>Import</b>.</li></ol>
+     <textarea id="exportBox" class="f" style="display:none;margin-top:10px;min-height:120px;font-size:12px" readonly></textarea></div></div>`}
+function exportJSON(){const items={};for(const [k,v] of Store.items)if(isItemKey(k))items[k]=v;return JSON.stringify({app:'loadedbible',v:1,at:Date.now(),items})}
+Object.assign(A,{
+  unlock:async()=>{const i=$('#codeIn');const code=(i&&i.value||'').trim();if(code.length<4){authMsg('Enter your code.');return}
+    const b=$('[data-act=unlock]');b.disabled=true;b.innerHTML='<span class="spin"></span>';
+    try{const r=await fetch('/api/login',{method:'POST',headers:{'X-Code':code}});
+      if(r.ok){Lock.code=code;try{localStorage.setItem(LOCK_KEY,code)}catch(e){}startPersonal();return}
+      const j=await r.json().catch(()=>({}));
+      authMsg(r.status===429||j.error==='too_many'?'Too many wrong tries. Wait 15 minutes and try again.':j.error==='not_set'?'Your code isn’t set up yet. Add the secret PASSCODE in Cloudflare (see SETUP.md).':`Wrong code.${j.left!=null?' '+j.left+' tries left.':''}`);i.value='';i.focus()}
+    catch(e){authMsg('No connection. Check your internet and try again.')}
+    b.disabled=false;b.textContent='🔓 Open'},
+  lockNow:()=>confirmSheet('Lock this device? You’ll need your code to open it again. Your progress stays saved.','Lock',()=>{setTab('load');lockOut('')}),
+  importSheet:()=>openSheet(`<h3>📥 Import progress from Claude</h3><p class="small muted">In the Claude app, open Loaded Bible → <b>Copy my progress</b>. Then paste it here.</p>
+    <textarea class="f" id="importBox" style="min-height:160px;font-size:12px" placeholder='Paste here — it starts with {"app":"loadedbible"…'></textarea>
+    <div class="row" style="margin-top:12px"><button class="btn pri grow" data-act="importGo">Import</button></div><div id="importMsg" class="small muted" style="margin-top:8px"></div>`),
+  importGo:async()=>{const m=$('#importMsg');let d;try{d=JSON.parse($('#importBox').value.trim())}catch(e){m.textContent='That doesn’t look right — copy it again in Claude and paste the whole thing.';return}
+    if(!d||d.app!=='loadedbible'||!d.items){m.textContent='That doesn’t look like Loaded Bible progress.';return}
+    const items={};Object.entries(d.items).forEach(([k,v])=>{if(isItemKey(k))items[k]=v});
+    m.innerHTML='<span class="spin"></span> Importing…';
+    try{const j=await (await api('/api/import',{method:'POST',body:JSON.stringify({items})})).json();closeSheet();toast(`Imported ${j.count} items 🎉`);setTimeout(()=>location.reload(),900)}
+    catch(e){m.textContent=e.message||'Import failed — try again.'}},
+  exportCopy:async()=>{const t=exportJSON();const n=Object.keys(JSON.parse(t).items).length;if(!n){toast('Still loading your progress — try again in a moment');return}
+    try{await navigator.clipboard.writeText(t);toast(`Copied ${n} items — now paste them on your website`)}
+    catch(e){const box=$('#exportBox');box.style.display='block';box.value=t;box.focus();box.select();toast('Select all and copy this text')}},
+});
 /* ---------- boot ---------- */
-if(STANDALONE){Store.LS='lb1:none:d:';setTab((location.hash||'#load').slice(1));initAuth()}
-else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
+if(STANDALONE){Store.LS='lb1:me:d:';setTab((location.hash||'#load').slice(1));initPersonal()}
+else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect();showLauncher()}
 Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});
 </script>
 <script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));</script>

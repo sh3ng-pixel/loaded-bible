@@ -1,7 +1,5 @@
-# Loaded Bible
+# Loaded Bible (personal edition)
 
-Load your paper Bible: what to highlight (and why), margin notes, context, cross-references, topic tabs and S.O.A.P. — plus an online Bible, journal, accounts and donations.
+Load your paper Bible: what to highlight (and why), margin notes, context, cross-references, topic tabs, inserts and S.O.A.P., plus an online Bible and journal. Unlocked with a personal code; progress is saved online.
 
-- **Setup guide:** see [SETUP.md](SETUP.md)
-- **Settings:** `config.js`
-- Bible text: King James Version (public domain)
+See [SETUP.md](SETUP.md).
