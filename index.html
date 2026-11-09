@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Loaded Bible — Study Companion</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#8b2e24">
+<meta name="description" content="Load your paper Bible: what to highlight and why, margin notes, context, tabs and S.O.A.P.">
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6efe2; --card:#fffaf0; --ink:#2a2018; --muted:#857561; --line:#e4d8c3;
+  --accent:#8b2e24; --accent-ink:#fff; --gold:#b07d2a; --soft:#efe5d2;
+  --hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff;
+  --serif:"Crimson Pro",Georgia,serif; --sans:Inter,system-ui,-apple-system,sans-serif;
+  --navh:64px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#17130f; --card:#221c16; --ink:#ede3d2; --muted:#a6957e; --line:#3a3028; --soft:#2c241c;
+    --accent:#d0705f; --accent-ink:#1a120d; --gold:#d6a24e;
+    --hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78;}
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+body{padding-top:env(safe-area-inset-top);padding-bottom:calc(var(--navh) + env(safe-area-inset-bottom) + 12px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:10px}
+.brand{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+.brand svg{color:var(--accent)}
+.sync{margin-left:auto;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+.sync.ok i{background:#4a9a5a}
+main{max-width:760px;margin:0 auto;padding:12px 14px 30px}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+nav.bottom button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--muted);padding:4px 0;max-width:110px}
+nav.bottom button svg{width:23px;height:23px}
+nav.bottom button.on{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+h1,h2,h3,h4{font-family:var(--serif);margin:.2em 0 .4em;line-height:1.15}
+h2.sec{font-size:24px;margin:14px 2px 6px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 13px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:10px}
+.btn:disabled{opacity:.5}
+input.f,textarea.f,select.f{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;font-size:16px;outline:none}
+textarea.f{min-height:90px;resize:vertical;line-height:1.45}
+input.f:focus,textarea.f:focus{border-color:var(--accent)}
+label.l{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:12px 2px 6px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+/* reader */
+.readerbar{position:sticky;top:53px;z-index:15;background:var(--paper);display:flex;align-items:center;gap:6px;padding:6px 0 8px}
+.readerbar .refbtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--serif);font-size:20px;font-weight:700;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 10px;text-align:center}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;font-weight:700;flex:none}
+.readerbar select{width:72px;padding:8px;border-radius:12px;font-size:14px;font-weight:600;background:var(--card)}
+.scripture{font-family:var(--serif);line-height:1.62}
+.chap-title{text-align:center;margin:10px 0 14px}
+.chap-title .bk{display:block;font-size:.75em;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.chap-title .cn{display:block;font-size:2.6em;color:var(--accent);line-height:1}
+.v{margin:0;padding:3px 6px;border-radius:6px;position:relative;cursor:pointer;transition:background .2s}
+.v sup{font-family:var(--sans);font-size:.55em;font-weight:700;color:var(--accent);margin-right:4px;vertical-align:.55em}
+.v.hl-y{background:var(--hl-y)}.v.hl-g{background:var(--hl-g)}.v.hl-b{background:var(--hl-b)}.v.hl-p{background:var(--hl-p)}.v.hl-o{background:var(--hl-o)}.v.hl-v{background:var(--hl-v)}
+.v.sel{outline:2px dashed var(--accent);outline-offset:1px}
+.v.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 4px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
+.v .mk{font-family:var(--sans);font-size:12px;border:0;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:1px 6px;margin-left:5px;vertical-align:2px;font-weight:700}
+.v .bm{color:var(--gold);font-size:.8em;margin-left:4px}
+.chap-end{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:22px 0 6px}
+.loadingline{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));background-size:200% 100%;animation:sh 1.2s infinite;margin:10px 0}
+@keyframes sh{to{background-position:-200% 0}}
+.empty{text-align:center;padding:28px 12px;color:var(--muted)}
+/* selection bar */
+#selbar{position:fixed;left:0;right:0;bottom:calc(var(--navh) + env(safe-area-inset-bottom));z-index:25;display:none;padding:0 10px 8px}
+#selbar.show{display:block}
+.sb{max-width:740px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px 12px}
+.sb .top{display:flex;align-items:center;gap:8px;font-weight:700;font-family:var(--serif);font-size:18px}
+.dots{display:flex;gap:9px;margin:9px 0;align-items:center}
+.dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line)}
+.dot.y{background:var(--hl-y)}.dot.g{background:var(--hl-g)}.dot.b{background:var(--hl-b)}.dot.p{background:var(--hl-p)}.dot.o{background:var(--hl-o)}.dot.v{background:var(--hl-v)}
+.dot.x{background:var(--paper);display:grid;place-items:center;font-size:13px;color:var(--muted)}
+.sbacts{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.sbacts button{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:7px 2px;font-size:11.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px}
+.sbacts button b{font-size:17px;font-weight:400}
+/* sheet */
+#sheetWrap{position:fixed;inset:0;z-index:50;display:none}
+#sheetWrap.show{display:block}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--card);border-radius:22px 22px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto;animation:up .22s ease}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheetx{position:sticky;top:0;float:right;width:34px;height:34px;margin:-4px -6px 0 8px;z-index:2}
+.grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 10px}
+.sheet h3{font-size:24px}
+.bookgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:6px;margin-bottom:10px}
+.bk-btn{border:1px solid var(--line);border-left:5px solid var(--gc);background:var(--paper);border-radius:9px;padding:8px 8px;text-align:left;font-size:13.5px;font-weight:600}
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px}
+.chgrid button{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 0;font-weight:700}
+.chgrid button.read{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.glabel{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:10px 2px 6px;display:flex;align-items:center;gap:6px}
+.glabel i{width:10px;height:10px;border-radius:3px;background:var(--gc)}
+/* study output */
+.out{font-size:16px;line-height:1.55}
+.out h2,.out h3,.out h4{color:var(--accent)}
+.out h2{font-size:23px}.out h3{font-size:20px}.out h4{font-size:18px}
+.out ul,.out ol{padding-left:22px}
+.out li{margin:3px 0}
+.out blockquote{border-left:3px solid var(--gold);margin:8px 0;padding:2px 12px;font-family:var(--serif);font-size:18px}
+a.ref{text-decoration:none;border-bottom:1px dotted var(--accent);cursor:pointer;font-weight:600}
+.toolgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.tool{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:11px;text-align:left;display:flex;gap:10px;align-items:flex-start}
+.tool .e{font-size:22px;line-height:1}
+.tool b{display:block;font-size:14px}
+.tool span{font-size:12px;color:var(--muted)}
+details.guide{border:1px solid var(--line);border-radius:14px;background:var(--card);margin:8px 0;padding:0 14px}
+details.guide summary{padding:13px 0;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details.guide summary::after{content:"+";color:var(--muted)}
+details.guide[open] summary::after{content:"–"}
+details.guide .body{padding-bottom:12px;line-height:1.5;font-size:15px}
+/* lists */
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin:8px 0;position:relative}
+.item .h{display:flex;align-items:center;gap:8px;font-weight:700}
+.item .ref{font-family:var(--serif);font-size:18px}
+.item .txt{margin-top:6px;font-size:14.5px;line-height:1.45;white-space:pre-wrap}
+.item .vt{font-family:var(--serif);font-size:16px;color:var(--muted);margin-top:4px}
+.tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--muted)}
+.swatch{width:14px;height:14px;border-radius:4px;display:inline-block;flex:none}
+.sw-y{background:var(--hl-y)}.sw-g{background:var(--hl-g)}.sw-b{background:var(--hl-b)}.sw-p{background:var(--hl-p)}.sw-o{background:var(--hl-o)}.sw-v{background:var(--hl-v)}
+/* loaded bible: book tabs */
+.edge{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.btab{position:relative;border:0;border-radius:12px 12px 12px 4px;background:var(--gc);color:#fff;padding:10px 11px 12px;text-align:left;overflow:hidden;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.btab .ab{font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.8}
+.btab .nm{font-family:var(--serif);font-size:19px;font-weight:700;line-height:1.1;display:block;margin-top:1px}
+.btab .pg{position:absolute;left:0;bottom:0;height:4px;background:rgba(255,255,255,.85)}
+.btab .ct{font-size:11px;opacity:.85}
+.topic{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:9px 0;overflow:hidden}
+.topic>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.topic>summary .ic{width:36px;height:36px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-size:18px}
+.topic>summary b{font-family:var(--serif);font-size:19px}
+.topic .refs{padding:0 14px 12px}
+.refrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px dashed var(--line)}
+.insert{background:repeating-linear-gradient(var(--card),var(--card) 27px,var(--line) 28px);border:1px solid var(--line);border-left:6px solid var(--gc,var(--gold));border-radius:6px 14px 14px 6px;padding:12px 14px;margin:10px 0;box-shadow:0 2px 0 var(--line)}
+.insert h4{font-size:21px;margin:0}
+.insert .b{white-space:pre-wrap;font-family:var(--serif);font-size:17px;line-height:28px;margin-top:4px}
+.prog{height:8px;border-radius:5px;background:var(--soft);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent)}
+.step{display:flex;gap:12px;align-items:flex-start;margin:6px 0}
+.step.done{opacity:.6}
+.step.done>.grow{text-decoration:line-through;text-decoration-color:var(--muted)}
+.step.done>.grow .hand{text-decoration:line-through}
+.tick{flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);background:var(--card);color:var(--accent-ink);font-weight:800;font-size:16px;margin-top:1px}
+.step.done .tick{background:var(--accent)}
+.hand{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--accent);background:var(--soft);border-radius:8px;padding:4px 9px;margin-top:4px}
+:root[data-theme=light]{
+  --paper:#f6efe2; --card:#fffaf0; --ink:#2a2018; --muted:#857561; --line:#e4d8c3;
+  --accent:#8b2e24; --accent-ink:#fff; --gold:#b07d2a; --soft:#efe5d2;
+  --hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff;
+  --serif:"Crimson Pro",Georgia,serif; --sans:Inter,system-ui,-apple-system,sans-serif;
+  --navh:64px;
+}
+:root[data-theme=dark]{--paper:#17130f; --card:#221c16; --ink:#ede3d2; --muted:#a6957e; --line:#3a3028; --soft:#2c241c;
+    --accent:#d0705f; --accent-ink:#1a120d; --gold:#d6a24e;
+    --hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78;}
+:root[data-theme=sepia]{--paper:#efe2c4;--card:#f8eed6;--ink:#3a2a19;--muted:#7a6346;--line:#dbc7a0;--soft:#e8d7b2;--accent:#8b2e24;--accent-ink:#fff;--gold:#a8741f;--hl-y:#ffe27a;--hl-g:#a8e6a3;--hl-b:#a9d0ff;--hl-p:#ffbfd0;--hl-o:#ffc98a;--hl-v:#d6c2ff}
+.hbtn{background:none;border:0;font-size:20px;padding:4px;line-height:1}
+.avatar{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-size:20px;display:grid;place-items:center;padding:0}
+.avatar.on{border-color:var(--accent)}
+@media (max-width:440px){.sync span{display:none}}
+.hero.acct{display:flex;gap:14px;align-items:center}
+.hero.acct h2{margin:0}
+.bigavatar{width:74px;height:74px;flex:none;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:rgba(255,255,255,.15);font-size:40px;display:grid;place-items:center}
+.prog.light{background:rgba(255,255,255,.25)}.prog.light i{background:#fff}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+@media (max-width:520px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.tile b{display:block;font-size:22px;font-family:var(--serif)}.tile span{font-size:12px;color:var(--muted)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.badge{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px;text-align:center;opacity:.55}
+.badge.got{opacity:1;border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.badge span{font-size:28px;display:block}.badge b{display:block;font-size:12.5px;margin-top:3px}.badge small{display:block;font-size:10.5px;color:var(--muted);line-height:1.25;margin-top:2px}
+.donatecard{border-color:var(--accent)}
+.amts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.amt{border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:13px 0;font-size:19px;font-weight:700}
+.amt.on{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.wide{width:100%;justify-content:center;margin-top:10px;padding:12px;font-size:15.5px;text-decoration:none}
+.btn.paypal{background:#0070ba;border-color:#0070ba;color:#fff}
+.avgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.avgrid button{font-size:30px;border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:10px 0}
+#auth{position:fixed;inset:0;z-index:70;background:var(--paper);display:none;overflow:auto;padding:calc(20px + env(safe-area-inset-top)) 16px 30px}
+#auth.show{display:block}
+.authbox{max-width:400px;margin:4vh auto 0}
+.authbox .f{margin-top:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:9px;padding:9px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pw{position:relative}.pw .eye{position:absolute;right:6px;top:15px;border:0;background:none;font-size:18px;opacity:.6}
+.linkbtn{display:block;margin:12px auto 0;border:0;background:none;color:var(--accent);font-weight:600;font-size:14px}
+.linkbtn.muted{color:var(--muted)}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:16px 0 4px}.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.btn.social{background:var(--card);gap:10px}
+.btn.social.tt{background:#111;color:#fff;border-color:#111}
+.authmsg{margin-top:12px;font-size:14px;text-align:center;min-height:1px}.authmsg.bad{color:#c0392b}.authmsg.ok{color:#2e7d4f}
+.plan{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:10px 0;overflow:hidden}
+.plan.open{border:2px solid var(--accent);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.plan.isdone:not(.open){opacity:.8}
+.planhead{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.plan.open .planhead{background:var(--soft);border-bottom:1px solid var(--line)}
+.pico{width:42px;height:42px;flex:none;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:22px}
+.plan.open .pico{background:var(--card)}
+.ptitle{font-family:var(--serif);font-size:20px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pstat{flex:none;font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+.pstat.new{background:var(--gold);color:#fff}
+.pstat.done{background:#3f8f5a;color:#fff}
+.chev{flex:none;font-size:18px;color:var(--muted);width:18px;text-align:center}
+.planbody{padding:4px 12px 14px}
+details.grp{margin:8px 0}
+details.grp>summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 4px 6px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary::after{content:"▾";font-size:14px}
+details.grp[open]>summary::after{content:"▴"}
+.tag.ok{background:#3f8f5a;color:#fff}
+.donebanner{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,#3f8f5a 18%,var(--card));border:1px solid #3f8f5a;border-radius:14px;padding:12px;margin:8px 0}
+.planfoot{margin-top:12px;gap:6px}
+.btn.danger{color:#c0392b;border-color:color-mix(in srgb,#c0392b 40%,var(--line))}
+.profilecard{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:8px 0 6px}
+.banner{height:150px;position:relative;background-size:cover;background-position:center}
+.bannerbtn{position:absolute;right:10px;top:10px;border:0;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700;background:rgba(0,0,0,.45);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.pc-body{display:flex;gap:14px;align-items:flex-start;padding:0 16px 16px;position:relative}
+.avwrap{position:relative;flex:none;margin-top:-46px}
+.pc-info{padding-top:10px!important}
+.bigavatar{width:96px;height:96px;border-radius:50%;border:4px solid var(--card);background:var(--soft);font-size:48px;display:grid;place-items:center;padding:0;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.bigavatar img,.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar{overflow:hidden}
+.camdot{position:absolute;right:-2px;bottom:4px;width:32px;height:32px;border-radius:50%;border:2px solid var(--card);background:var(--accent);font-size:15px;display:grid;place-items:center;padding:0}
+.pc-info{flex:1;min-width:0;padding-bottom:2px}.pc-info h2{margin:0 0 2px;font-size:25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bannergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bannerpick{height:58px;border-radius:12px;border:3px solid transparent;width:100%;position:relative}
+.bannerpick.on{border-color:var(--ink)}
+.bannerpick span{position:absolute;left:8px;bottom:6px;color:#fff;font-weight:700;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.bannerpick[data-b=photo]{height:90px;margin-top:6px}
+.previewbar{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:12px;padding:8px 10px;margin-bottom:14px;font-size:13px;font-weight:600}
+#toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hero{background:linear-gradient(135deg,var(--accent),#5a1c16);color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
+.hero h2{font-size:26px;margin:0 0 4px}
+.hero p{margin:0;opacity:.9;font-size:14.5px}
+.notice{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13.5px;color:var(--muted);margin:10px 0}
+.spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
+  <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
+  <button class="hbtn" data-act="donate" aria-label="Donate">❤️</button>
+  <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
+</header>
+<main id="view"></main>
+<div id="selbar"></div>
+<nav class="bottom" id="nav">
+  <button data-act="tab" data-tab="load"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 3 1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2 2.2.7-2.2.8L19 21l-.8-2.5L16 17.7l2.2-.7z"/></svg>Load</button>
+  <button data-act="tab" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Study</button>
+  <button data-act="tab" data-tab="tabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M19 7h2M19 11h2M19 15h2"/><path d="M9 8h6M9 12h6"/></svg>Tabs & Key</button>
+  <button data-act="tab" data-tab="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Journal</button>
+  <button data-act="tab" data-tab="online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>Online Bible</button>
+</nav>
+<div id="sheetWrap"><div class="scrim" data-act="closeSheet"></div><div class="sheet" id="sheet"></div></div>
+<div id="toast"></div>
+<div id="auth"></div>
+
+<script src="/config.js"></script>
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej({code:'timeout'}),ms))]);
+let toastT; function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200)}
+const fmtDate=t=>new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+
+/* ---------- Bible data ---------- */
+const GENRES={
+  law:['Law (Torah)','#8b2e24'], history:['History','#b0692a'], poetry:['Poetry & Wisdom','#6a7d34'],
+  majproph:['Major Prophets','#2f6b80'], minproph:['Minor Prophets','#4a5a96'],
+  gospel:['Gospels','#a52a3c'], acts:['Church History','#c07a35'], pauline:["Paul's Letters",'#2c6e5c'],
+  general:['General Letters','#6a4c8c'], prophecy:['Prophecy','#3c3530']
+};
+const RAW=`GEN|Genesis|50|law|Moses|Beginnings: creation, the fall, and God's covenant with Abraham's family|12:2-3
+EXO|Exodus|40|law|Moses|God rescues Israel from Egypt, gives the Law, and dwells among them|20:2-3
+LEV|Leviticus|27|law|Moses|Holiness: how a sinful people can live near a holy God|19:2
+NUM|Numbers|36|law|Moses|Wilderness wanderings, unbelief, and God's faithfulness|6:24-26
+DEU|Deuteronomy|34|law|Moses|Moses renews the covenant: love the Lord and obey him|6:4-5
+JOS|Joshua|24|history|Joshua (traditionally)|Entering the Promised Land by trusting God|1:9
+JDG|Judges|21|history|Unknown (Samuel by tradition)|Cycles of sin, oppression, crying out, and deliverance|21:25
+RUT|Ruth|4|history|Unknown|Loyal love and a kinsman-redeemer; ancestors of David|1:16
+1SA|1 Samuel|31|history|Unknown (Samuel tradition)|From judges to kings: Samuel, Saul, and David|16:7
+2SA|2 Samuel|24|history|Unknown|David's reign and God's promise of an everlasting throne|7:16
+1KI|1 Kings|22|history|Unknown (Jeremiah by tradition)|Solomon's glory, then a divided kingdom|18:21
+2KI|2 Kings|25|history|Unknown (Jeremiah by tradition)|Kings decline until exile to Assyria and Babylon|17:13
+1CH|1 Chronicles|29|history|Ezra (traditionally)|David's line and temple worship, retold for returning exiles|16:11
+2CH|2 Chronicles|36|history|Ezra (traditionally)|The temple, Judah's kings, and the call to return to God|7:14
+EZR|Ezra|10|history|Ezra|Return from exile and rebuilding the temple|7:10
+NEH|Nehemiah|13|history|Nehemiah|Rebuilding Jerusalem's walls and renewing the people|8:10
+EST|Esther|10|history|Unknown|God's hidden providence saves his people|4:14
+JOB|Job|42|poetry|Unknown|Suffering, God's wisdom, and his sovereignty|19:25
+PSA|Psalms|150|poetry|David and others|Israel's songbook of praise, lament, and trust|23:1
+PRO|Proverbs|31|poetry|Solomon and others|Practical wisdom rooted in the fear of the Lord|3:5-6
+ECC|Ecclesiastes|12|poetry|Solomon (the Preacher)|Life "under the sun" is fleeting without God|12:13
+SNG|Song of Solomon|8|poetry|Solomon|A celebration of love between bride and groom|8:7
+ISA|Isaiah|66|majproph|Isaiah|Judgment and comfort; the coming Servant and Messiah|53:5
+JER|Jeremiah|52|majproph|Jeremiah|Warning before exile and the promise of a new covenant|29:11
+LAM|Lamentations|5|majproph|Jeremiah (traditionally)|Grief over Jerusalem; God's mercies are new every morning|3:22-23
+EZK|Ezekiel|48|majproph|Ezekiel|God's glory departs and returns; a new heart and new life|36:26
+DAN|Daniel|12|majproph|Daniel|Faithfulness in exile; God rules over the kingdoms|2:44
+HOS|Hosea|14|minproph|Hosea|God's faithful love for an unfaithful people|6:6
+JOL|Joel|3|minproph|Joel|The Day of the Lord and the outpoured Spirit|2:28
+AMO|Amos|9|minproph|Amos|Justice for the poor and true worship|5:24
+OBA|Obadiah|1|minproph|Obadiah|Judgment on Edom's pride|1:15
+JON|Jonah|4|minproph|Jonah|God's mercy reaches even Israel's enemies|2:9
+MIC|Micah|7|minproph|Micah|Do justice, love mercy, walk humbly; a ruler from Bethlehem|6:8
+NAM|Nahum|3|minproph|Nahum|Judgment on Nineveh; the Lord is a stronghold|1:7
+HAB|Habakkuk|3|minproph|Habakkuk|Wrestling with God; the righteous live by faith|2:4
+ZEP|Zephaniah|3|minproph|Zephaniah|The Day of the Lord and God rejoicing over his people|3:17
+HAG|Haggai|2|minproph|Haggai|Rebuild the temple; put God first|2:9
+ZEC|Zechariah|14|minproph|Zechariah|Visions of restoration and the coming King|9:9
+MAL|Malachi|4|minproph|Malachi|Return to me; the messenger is coming|3:1
+MAT|Matthew|28|gospel|Matthew|Jesus is the promised King and Messiah|28:19-20
+MRK|Mark|16|gospel|Mark|Jesus the suffering Servant and Son of God|10:45
+LUK|Luke|24|gospel|Luke|Jesus the Savior for all people|19:10
+JHN|John|21|gospel|John|Believe that Jesus is the Christ and have life|20:31
+ACT|Acts|28|acts|Luke|The Spirit empowers the church to witness to the world|1:8
+ROM|Romans|16|pauline|Paul|The gospel: God's righteousness received by faith|1:16
+1CO|1 Corinthians|16|pauline|Paul|Correcting a divided church; love and the resurrection|13:13
+2CO|2 Corinthians|13|pauline|Paul|Strength in weakness; the ministry of reconciliation|12:9
+GAL|Galatians|6|pauline|Paul|Freedom in Christ: justified by faith, not law|2:20
+EPH|Ephesians|6|pauline|Paul|Our identity in Christ and unity in his church|2:8-9
+PHP|Philippians|4|pauline|Paul|Joy in Christ in every circumstance|4:4
+COL|Colossians|4|pauline|Paul|The supremacy and sufficiency of Christ|1:15
+1TH|1 Thessalonians|5|pauline|Paul|Living faithfully while awaiting Christ's return|5:16-18
+2TH|2 Thessalonians|3|pauline|Paul|Stand firm until the Lord comes|3:3
+1TI|1 Timothy|6|pauline|Paul|Leading the church and guarding sound teaching|4:12
+2TI|2 Timothy|4|pauline|Paul|Paul's final charge: preach the Word|3:16-17
+TIT|Titus|3|pauline|Paul|Sound teaching leads to good works|2:11-12
+PHM|Philemon|1|pauline|Paul|Forgiveness and reconciliation in Christ|1:16
+HEB|Hebrews|13|general|Unknown|Jesus is better: our great High Priest|12:1-2
+JAS|James|5|general|James|Faith that works|2:17
+1PE|1 Peter|5|general|Peter|Hope and holiness in suffering|5:7
+2PE|2 Peter|3|general|Peter|Grow in grace; beware of false teachers|3:18
+1JN|1 John|5|general|John|Assurance: walk in light, love, and truth|1:9
+2JN|2 John|1|general|John|Walk in truth and love|1:6
+3JN|3 John|1|general|John|Support those who serve the truth|1:4
+JUD|Jude|1|general|Jude|Contend for the faith|1:24-25
+REV|Revelation|22|prophecy|John|Christ wins; God makes all things new|21:4`;
+const BOOKS=RAW.split('\n').map((l,i)=>{const [abbr,name,ch,genre,author,theme,key]=l.split('|');return {abbr,name,chapters:+ch,genre,author,theme,key,idx:i,nt:i>=39}});
+const BM=Object.fromEntries(BOOKS.map(b=>[b.abbr,b]));
+const TOTAL_CH=BOOKS.reduce((a,b)=>a+b.chapters,0);
+const NAMEMAP={};BOOKS.forEach(b=>{NAMEMAP[b.name.toLowerCase()]=b;NAMEMAP[b.abbr.toLowerCase()]=b});
+Object.assign(NAMEMAP,{'psalm':BM.PSA,'song of songs':BM.SNG,'songs':BM.SNG,'canticles':BM.SNG});
+function findBook(n){n=String(n).toLowerCase().replace(/\s+/g,' ').replace(/\.$/,'').trim();if(NAMEMAP[n])return NAMEMAP[n];
+  const m=n.replace(/^(i{1,3}|first|second|third)\s/,(x,r)=>({i:'1 ',ii:'2 ',iii:'3 ',first:'1 ',second:'2 ',third:'3 '}[r]));if(NAMEMAP[m])return NAMEMAP[m];
+  const c=m.replace(/\s/g,'');return BOOKS.find(b=>b.name.toLowerCase().replace(/\s/g,'').startsWith(c)&&c.length>=3)||null}
+function parseRef(s){const m=String(s).trim().match(/^(.+?)\s*(\d{1,3})(?:\s*:\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?)?$/);if(!m)return null;const b=findBook(m[1]);if(!b)return null;const ch=+m[2];if(ch<1||ch>b.chapters)return null;return {b:b.abbr,c:ch,v1:m[3]?+m[3]:null,v2:m[4]?+m[4]:null}}
+function rangeStr(vs){vs=[...vs].sort((a,b)=>a-b);const out=[];let s=vs[0],p=vs[0];for(let i=1;i<=vs.length;i++){if(vs[i]===p+1){p=vs[i];continue}out.push(s===p?''+s:s+'-'+p);s=p=vs[i]}return out.join(',')}
+const refLabel=(b,c,vs)=>`${BM[b].name} ${c}${vs&&vs.length?':'+rangeStr(vs):''}`;
+const refCode=(b,c,vs)=>`${b} ${c}${vs&&vs.length?':'+rangeStr(vs):''}`;
+const codeToLabel=code=>{const p=parseRef(code);if(!p)return code;return `${BM[p.b].name} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`};
+
+const TRANS={KJV:'King James Version (KJV, 1769)',WEB:'World English Bible (WEB)',ASV:'American Standard Version (ASV, 1901)',YLT:"Young's Literal Translation (YLT, 1898)"};
+const COLORS=[['y','Promises of God'],['g','Commands & growth'],['b','Prayer & worship'],['p','God’s love & grace'],['o','Sin & warnings'],['v','Jesus & the Holy Spirit']];
+const TOPICS=[
+ ['salvation','✝️','Salvation',['JHN 3:16','ROM 3:23','ROM 6:23','ROM 10:9','EPH 2:8-9']],
+ ['romansroad','🛣️','The Romans Road',['ROM 3:23','ROM 6:23','ROM 5:8','ROM 10:9-10','ROM 10:13']],
+ ['prayer','🙏','Prayer',['PHP 4:6-7','MAT 6:9-13','1TH 5:17','JAS 5:16','1JN 5:14']],
+ ['peace','🕊️','Anxiety & Peace',['MAT 6:34','1PE 5:7','ISA 26:3','JHN 14:27','PSA 55:22']],
+ ['forgive','🤍','Forgiveness',['1JN 1:9','EPH 4:32','COL 3:13','PSA 103:12','MAT 6:14']],
+ ['strength','💪','Strength & Courage',['ISA 40:31','PHP 4:13','2CO 12:9','PSA 46:1','JOS 1:9']],
+ ['identity','👑','Identity in Christ',['2CO 5:17','GAL 2:20','EPH 2:10','1PE 2:9','ROM 8:1']],
+ ['hope','🌅','Hope',['ROM 15:13','JER 29:11','LAM 3:22-23','HEB 6:19','ROM 8:28']],
+ ['wisdom','📜','Wisdom & Guidance',['PRO 3:5-6','JAS 1:5','PRO 9:10','PSA 119:105','COL 3:16']],
+ ['love','❤️','Love',['1CO 13:4-7','JHN 15:13','1JN 4:19','ROM 5:8','ROM 8:38-39']],
+ ['temptation','🛡️','Temptation',['1CO 10:13','JAS 4:7','HEB 4:15','MAT 26:41','PSA 119:11']],
+ ['comfort','🫂','Grief & Comfort',['PSA 34:18','MAT 5:4','REV 21:4','2CO 1:3-4','JHN 11:25']],
+];
+const TOOLS={
+ context:['🏛️','Context & background','Author, audience, history, culture','Explain the historical, cultural, and literary context of {R}: who wrote it, to whom, roughly when, what was happening, where this passage sits in the flow of the book, and customs or background a modern reader would miss. Use short headed sections.'],
+ meaning:['💡','What it means','Plain-language explanation','Explain what {R} means, thought by thought, in clear everyday language. Point out the main idea, anything confusing, and where Christian traditions interpret it differently.'],
+ words:['🔤','Word study','Hebrew & Greek key words','Do a word study on the 3–5 most important words in {R}: give the original Hebrew/Aramaic/Greek word (transliterated, and the Strong’s number only if you are confident of it), its range of meaning, and how it is used elsewhere in Scripture. Say plainly when something is uncertain.'],
+ xref:['🔗','Cross-references','Connected passages','List 8–12 cross-references for {R}. Group them by theme. Write each as the full book name and reference in bold (e.g. **Romans 5:8**) followed by one line explaining the connection.'],
+ apply:['🌱','Life application','Live it out this week','Give practical life application for {R}: the timeless principle, 3–5 concrete ways to live it out this week, two honest self-reflection questions, and a short prayer based on the passage.'],
+ questions:['❓','Study questions','For you or a small group','Write a study guide for {R}: one icebreaker, then 4 observation questions, 4 interpretation questions, and 4 application questions.'],
+ christ:['✝️','Big picture','How it fits God’s story & points to Jesus','Show how {R} fits into the big story of the Bible (creation, fall, redemption, restoration) and how it connects to or points to Jesus. Be careful not to force connections the text doesn’t support.'],
+ outline:['🗂️','Outline','Structure of the passage','Make a clear outline of {R} with headings and verse ranges, and a one-sentence summary of the whole.'],
+};
+const SYS='You are a warm, careful Bible study helper inside a study app. Stay faithful to the text, be accurate about history and languages, and say when something is uncertain or debated among scholars or Christian traditions. Format in Markdown: ## headings, short paragraphs, bullet lists, **bold** references written with full book names (e.g. **John 3:16**). Do not add an introduction about yourself. Keep it under about 450 words unless asked otherwise.\n\n';
+const JTYPES={
+ soap:{name:'S.O.A.P.',icon:'📖',fields:[['ref','Scripture reference','input'],['scripture','S — Scripture (write it out)','ta'],['obs','O — Observation: what does it say?','ta'],['app','A — Application: how does it change me?','ta'],['prayer','P — Prayer','ta']]},
+ sermon:{name:'Sermon notes',icon:'⛪',fields:[['title','Sermon title','input'],['speaker','Speaker / church','input'],['ref','Main passage','input'],['points','Main points','ta'],['quotes','Key quotes & insights','ta'],['action','My takeaway / action step','ta']]},
+ prayer:{name:'Prayer',icon:'🙏',fields:[['title','Prayer request','input'],['who','For whom','input'],['ref','Promise / verse to stand on','input'],['body','Details','ta'],['answer','How God answered','ta'],['answered','Answered','check']]},
+ reflect:{name:'Reflection',icon:'✍️',fields:[['title','Title','input'],['ref','Passage','input'],['body','Thoughts','ta']]},
+};
+const INSERT_TEMPLATES=[
+ ['Book overview card','Book: \nAuthor: \nWritten to: \nKey theme: \nKey verse: \nOutline:\n1. \n2. \n3. '],
+ ['Verse memory card','Verse: \n\nWhat it means to me: \n\nReview dates: '],
+ ['Sermon insert','Date: \nSpeaker: \nPassage: \n\nMain points:\n• \n• \n\nAction step: '],
+ ['Gospel / Romans Road','Romans 3:23 — All have sinned\nRomans 6:23 — The wages of sin is death, but the gift of God is eternal life\nRomans 5:8 — Christ died for us while we were still sinners\nRomans 10:9-10 — Confess and believe\nRomans 10:13 — Whoever calls on the Lord will be saved'],
+ ['Prayer list','Family:\n\nFriends:\n\nChurch:\n\nWorld:\n\nMyself:'],
+];
+const GUIDES=[
+ ['S.O.A.P. method','<b>S</b>cripture — read slowly and write out a verse that stands out.<br><b>O</b>bservation — what do you notice? Who, what, where, repeated words, commands, promises.<br><b>A</b>pplication — what does this mean for your life today? Be specific.<br><b>P</b>rayer — talk to God about what you read. Use the Journal tab to save a S.O.A.P. entry.'],
+ ['Inductive study (Observe → Interpret → Apply)','<b>Observe:</b> what does it say? Ask who, what, when, where, why, how. Mark repeated words and contrasts.<br><b>Interpret:</b> what did it mean to the first readers? Check context (the paragraph, chapter and book), cross-references and word meanings.<br><b>Apply:</b> what timeless truth is here, and how will you obey it this week?'],
+ ['Reading in context — 5 questions','1. Who wrote it, and to whom?<br>2. What kind of writing is it (law, history, poetry, prophecy, gospel, letter, apocalyptic)?<br>3. What comes right before and after?<br>4. What did it mean to the original readers?<br>5. How does it fit the whole story of the Bible and point to Jesus?'],
+ ['Color-coding your Bible','Pick one meaning per color and stick to it — see <b>Loaded Bible → Color Key</b>, where you can rename every color. Tap any verse in Read, then tap a color to highlight it.'],
+ ['Making a "loaded" Bible','A loaded Bible is your personal study Bible: highlights, margin notes, cross-references, book tabs, topic tabs and inserts. Use <b>Loaded Bible</b> for book & topic tabs and printable-style insert cards, <b>Read</b> to highlight and note verses, and <b>Study</b> for context and word studies you can save straight into your notes.'],
+];
+
+/* ---------- storage (Claude db when available, else this browser) ---------- */
+const Store={
+  items:new Map(),col:null,db:null,uid:null,timers:new Map(),queues:new Map(),lastRemote:new Set(),LS:'lb1:d:',
+  readyResolve:null,ready:null,
+  loadLocal(){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(this.LS))this.items.set(k.slice(this.LS.length),JSON.parse(localStorage.getItem(k)))}}catch(e){}},
+  get(k){return this.items.get(k)},
+  list(prefix){const o=[];for(const [k,v] of this.items)if(k.startsWith(prefix))o.push(Object.assign({key:k},v));return o},
+  set(k,v){this.items.set(k,v);this.persist(k,v);if(/^(n|h|b|j|t|i)_/.test(k)||k==='progress')touch();changed()},
+  del(k){this.items.delete(k);this.persist(k,null);changed()},
+  persist(k,v){try{v==null?localStorage.removeItem(this.LS+k):localStorage.setItem(this.LS+k,JSON.stringify(v))}catch(e){}
+    if(!this.col)return;clearTimeout(this.timers.get(k));
+    this.timers.set(k,setTimeout(()=>{this.timers.delete(k);const cur=this.items.get(k);this.enqueue(k,()=>cur==null?this.col.doc(k).delete():this.col.doc(k).set(JSON.parse(JSON.stringify(cur))))},350))},
+  enqueue(k,fn){const p=(this.queues.get(k)||Promise.resolve()).then(fn).catch(e=>{console.warn('save failed',k,e);if(e&&e.code==='quota_exceeded')toast('Storage is full — delete a few old notes');});this.queues.set(k,p)},
+  unsub:null,
+  useNamespace(ns,mergeGuest){this.disconnect();this.lastRemote=new Set();this.items.clear();this.LS='lb1:'+ns+':d:';this.loadLocal();let moved=0;
+    if(mergeGuest){const g='lb1:guest:d:',ks=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(g))ks.push(k)}}catch(e){}
+      ks.forEach(k=>{try{const key=k.slice(g.length);if(!this.items.has(key)&&key!=='settings'){const v=JSON.parse(localStorage.getItem(k));this.items.set(key,v);localStorage.setItem(this.LS+key,JSON.stringify(v));moved++}localStorage.removeItem(k)}catch(e){}})}
+    changed();return moved},
+  disconnect(){if(this.unsub){try{this.unsub()}catch(e){}}this.unsub=null;this.col=null},
+  subscribe(col){let first=true;const timer=setTimeout(()=>setSync('Saved on this device'),10000);
+    this.unsub=col.onSnapshot(snap=>{
+      const remote=new Map();
+      snap.docs.forEach(d=>{if(d.exists&&isItemKey(d.id))remote.set(d.id,JSON.parse(JSON.stringify(d.data())))});
+      if(!snap.metadata.fromCache){clearTimeout(timer);
+        if(first){first=false;this.col=col;for(const [k,v] of this.items)if(!remote.has(k))this.enqueue(k,()=>col.doc(k).set(JSON.parse(JSON.stringify(v))));}
+        setSync('Synced to your account',true)}
+      for(const k of this.lastRemote)if(!remote.has(k)&&!this.timers.has(k))this.items.delete(k);
+      for(const [k,v] of remote)if(!this.timers.has(k)||!this.col)this.items.set(k,v);
+      this.lastRemote=new Set(remote.keys());changed();if(S.tab==='account'||S.tab==='load')applyTheme();
+    },e=>{clearTimeout(timer);console.warn(e);setSync('Saved on this device')})},
+  async connect(){
+    try{
+      const c=await waitClaude();if(!c){this.readyResolve();return}
+      const [db,user]=await Promise.all([c.use('db'),c.use('user')]);
+      if(!db||!user){this.readyResolve();return}
+      const id=await user.id();if(!id){this.readyResolve();return}
+      this.db=db;this.uid=id;this.readyResolve();
+      this.subscribe(db.collection('data/users/'+id));
+    }catch(e){this.readyResolve()}
+  },
+  connectFire(uid){const {F,db}=Auth.fb;const path=`users/${uid}/items`;
+    this.subscribe({doc:k=>({set:v=>F.setDoc(F.doc(db,path,k),v),delete:()=>F.deleteDoc(F.doc(db,path,k))}),
+      onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
+};
+Store.ready=new Promise(r=>Store.readyResolve=r);
+const isItemKey=k=>/^(n|h|b|j|t|i|k)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner'].includes(k);
+function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
+async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
+
+const Cache={
+  mem:new Map(),
+  ref(kind,k){return Store.db&&Store.uid?Store.db.doc('data/users/'+Store.uid+'/cache').collection(kind).doc(k):null},
+  async get(kind,k){const mk=kind+':'+k;if(this.mem.has(mk))return this.mem.get(mk);
+    try{const s=localStorage.getItem('lb1:c:'+mk);if(s){const v=JSON.parse(s);this.mem.set(mk,v);return v}}catch(e){}
+    await withTimeout(Store.ready,4000).catch(()=>{});
+    const r=this.ref(kind,k);if(r){try{const snap=await withTimeout(r.get(),6000);if(snap.exists){const v=snap.data();this.mem.set(mk,v);this.local(mk,v);return v}}catch(e){}}
+    return null},
+  local(mk,v){try{localStorage.setItem('lb1:c:'+mk,JSON.stringify(v))}catch(e){}},
+  put(kind,k,v){const mk=kind+':'+k;this.mem.set(mk,v);this.local(mk,v);const r=this.ref(kind,k);if(r)r.set(v).catch(()=>{})},
+  drop(kind,k){const mk=kind+':'+k;this.mem.delete(mk);try{localStorage.removeItem('lb1:c:'+mk)}catch(e){}const r=this.ref(kind,k);if(r)r.delete().catch(()=>{})}
+};
+
+/* ---------- AI (Claude) ---------- */
+let sampleP=null;
+function getSample(){if(!sampleP)sampleP=waitClaude().then(c=>c?c.use('sample'):null).catch(()=>null);return sampleP}
+async function ai(prompt,onText,signal,tier){
+  if(STANDALONE)return aiServer(prompt,onText,signal,tier);
+  const sample=await getSample();
+  if(!sample)throw {code:'unavailable_here',message:'AI features need this page open in Claude.'};
+  const opts={onText:onText?(({text})=>onText(text)):undefined,signal};if(tier)opts.modelTier=tier;
+  return await sample(prompt,opts);
+}
+function aiErr(e){if(!e)return 'Something went wrong.';if(e.code==='unavailable_here')return e.message;if(e.code==='not_granted')return 'Claude access was not allowed for this page.';if(e.code==='rate_limited')return 'Too many requests — wait a minute and try again.';if(e.name==='AbortError'||e.code==='aborted')return 'Stopped.';return e.message||'Something went wrong.'}
+
+/* ---------- state ---------- */
+const settings=()=>Object.assign({trans:'KJV',font:20,book:'JHN',ch:1,labels:{}},Store.get('settings')||{});
+function saveSettings(p){Store.set('settings',Object.assign(settings(),p))}
+const S={tab:'load',onlineSub:'read',verses:null,loadingCh:false,chErr:'',sel:new Set(),ctrl:null,studyRef:'',study:null,studyCtrl:null,notesFilter:'all',notesColor:'',q:'',loadedSub:'colors',flashV:null,bookIntro:{}};
+const progress=()=>(Store.get('progress')||{read:{}}).read||{};
+function isRead(b,c){return (progress()[b]||[]).includes(c)}
+function toggleRead(b,c){const r=JSON.parse(JSON.stringify(progress()));const a=new Set(r[b]||[]);a.has(c)?a.delete(c):a.add(c);r[b]=[...a].sort((x,y)=>x-y);Store.set('progress',{read:r})}
+const chKey=()=>{const s=settings();return `${s.trans}_${s.book}_${s.ch}`};
+
+/* ---------- render scheduling ---------- */
+let rq=false;
+function changed(){if(rq)return;rq=true;requestAnimationFrame(()=>{rq=false;
+  if(isReading()){renderVerses();renderSelbar()}
+  else{const a=document.activeElement;if(a&&$('#view').contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;renderView()}})}
+
+/* ---------- router ---------- */
+const isReading=()=>S.tab==='online'&&S.onlineSub==='read';
+function setTab(t){if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['load','study','tabs','journal','online','account'].includes(t))t='load';S.tab=t;updateAvatar();
+  try{if(location.hash!=='#'+t)history.replaceState(null,'','#'+t)}catch(e){}
+  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderView();window.scrollTo(0,0)}
+window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
+
+function renderView(){const v=$('#view');
+  ({load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,online:viewOnline,account:viewAccount})[S.tab](v);
+  renderSelbar()}
+
+/* ---------- ONLINE BIBLE ---------- */
+function viewOnline(v){v.innerHTML=`<div class="chips" style="padding-top:2px">${[['read','📖 Read'],['notes','🔖 My notes & highlights']].map(([k,l])=>`<button class="chip ${S.onlineSub===k?'on':''}" data-act="onlineSub" data-s="${k}">${l}</button>`).join('')}</div><div id="onlineBody"></div>`;
+  const body=$('#onlineBody');if(S.onlineSub==='read'){viewRead(body);if(!S.verses&&!S.loadingCh&&!S.chErr)loadChapter(settings().trans==='KJV')}else viewNotes(body)}
+/* ---------- READ ---------- */
+function viewRead(v){const s=settings();const b=BM[s.book];
+  v.innerHTML=`<div class="readerbar">
+    <button class="iconbtn" data-act="prevCh" aria-label="Previous chapter">‹</button>
+    <button class="refbtn" data-act="pickBook">${esc(b.name)} ${s.ch} ▾</button>
+    <button class="iconbtn" data-act="nextCh" aria-label="Next chapter">›</button>
+    <select class="f" id="transSel" aria-label="Translation">${Object.keys(TRANS).map(t=>`<option value="${t}" ${t===s.trans?'selected':''}>${t}</option>`).join('')}</select>
+    <button class="iconbtn" data-act="font" data-d="-1" aria-label="Smaller text" style="font-size:13px">A−</button>
+    <button class="iconbtn" data-act="font" data-d="1" aria-label="Larger text">A+</button>
+  </div>
+  <article class="scripture" id="scripture" style="font-size:${s.font}px">
+    <h2 class="chap-title"><span class="bk">${esc(b.name)}</span><span class="cn">${s.ch}</span></h2>
+    <div id="verses"></div>
+  </article>`;
+  $('#transSel').onchange=e=>{saveSettings({trans:e.target.value});S.verses=null;loadChapter(true)};
+  renderVerses();}
+function chapterNotes(b,c){return Store.list('n_').filter(n=>n.b===b&&n.c===c)}
+function renderVerses(){const box=$('#verses');if(!box)return;const s=settings();
+  if(S.chErr&&!S.verses?.length){box.innerHTML=`<div class="empty"><p>${esc(S.chErr)}</p><button class="btn pri" data-act="reloadCh">Try again</button></div>`;return}
+  if(!S.verses){box.innerHTML=S.loadingCh?(S.loadMsg?`<p class="small muted" style="text-align:center">${esc(S.loadMsg)}</p>`:'')+'<div class="loadingline"></div><div class="loadingline" style="width:80%"></div><div class="loadingline" style="width:90%"></div>':
+    `<div class="empty"><p>Ready to open <b>${esc(BM[s.book].name)} ${s.ch}</b> (${s.trans}).</p><button class="btn pri" data-act="reloadCh">Open chapter</button><p class="small">${s.trans==='KJV'?'':'This translation is typed out by Claude the first time, then saved so it opens instantly after that.'}</p></div>`;return}
+  const notes=chapterNotes(s.book,s.ch);const nv={};notes.forEach(n=>(n.vs||[]).forEach(x=>nv[x]=(nv[x]||0)+1));
+  let h='';S.verses.forEach((t,i)=>{const n=i+1;if(t==null)return;const hl=Store.get(`h_${s.book}.${s.ch}.${n}`);const bm=Store.get(`b_${s.book}.${s.ch}.${n}`);
+    h+=`<p class="v ${hl?'hl-'+hl.color:''} ${S.sel.has(n)?'sel':''}" id="v${n}" data-act="verse" data-v="${n}"><sup>${n}</sup>${S.vIt&&S.vIt[i]!=null?italV(S.vIt[i]):esc(t)}${bm?'<span class="bm">🔖</span>':''}${nv[n]?`<button class="mk" data-act="verseNotes" data-v="${n}">✎ ${nv[n]}</button>`:''}</p>`});
+  if(S.loadingCh)h+='<div class="loadingline" style="width:70%"></div>';
+  else{const b=BM[s.book];const read=isRead(s.book,s.ch);
+    h+=`<div class="chap-end"><button class="btn" data-act="markRead">${read?'✓ Chapter read':'Mark chapter as read'}</button>
+      <button class="btn pri" data-act="loadThisChapter">✨ Load this chapter</button><button class="btn" data-act="studyChapter">🔍 Study</button>
+      ${s.ch<b.chapters||b.idx<65?'<button class="btn" data-act="nextCh">Next chapter ›</button>':''}</div>
+      <p class="small muted" style="text-align:center">${esc(TRANS[s.trans])} · public domain${s.trans==='KJV'&&S.vIt?'':' · typed out by Claude, so compare with a printed Bible for important study'}</p>`}
+  box.innerHTML=h;
+  if(S.flashV){const el=$('#v'+S.flashV);if(el){el.scrollIntoView({block:'center'});el.classList.add('flash');S.flashV=null}}}
+
+/* ---------- KJV text (public domain, loaded from an npm data package) ---------- */
+let KJV=null,kjvP=null,kjvFailed=false;
+function loadKJV(){if(kjvP)return kjvP;
+  kjvP=(async()=>{const srcs=[
+      ['https://unpkg.com/es-kjv',m=>m.verses||(m.default&&m.default.verses)],
+      ['https://cdn.jsdelivr.net/npm/es-kjv/+esm',m=>m.verses||(m.default&&m.default.verses)],
+      ['https://cdn.jsdelivr.net/npm/kjv@1.0.0/json/verses-1769.json/+esm',m=>m.default||m]];
+    for(const [u,pick] of srcs){try{const m=await withTimeout(import(u),60000);const v=pick(m);
+      if(v&&typeof v==='object'&&Object.keys(v).length>20000){KJV=buildKJV(v);return KJV}}catch(e){console.warn('KJV source failed',u,e)}}
+    kjvFailed=true;return null})();
+  return kjvP}
+function buildKJV(v){const idx={},order=[];
+  for(const k in v){const m=k.match(/^(.+?)\s+(\d+):(\d+)$/);if(!m)continue;let bi=order.indexOf(m[1]);if(bi<0){order.push(m[1]);bi=order.length-1}
+    const b=BOOKS[bi];if(!b)continue;const c=+m[2],n=+m[3];const bk=idx[b.abbr]||(idx[b.abbr]={});(bk[c]||(bk[c]=[]))[n-1]=String(v[k]).replace(/^\s*#\s*/,'').trim()}
+  return idx}
+const plainV=t=>String(t||'').replace(/[\[\]]/g,'');
+const italV=t=>esc(t).replace(/\[([^\]]+)\]/g,'<i>$1</i>');
+
+async function loadChapter(allowFetch){
+  const s=settings();const key=chKey();S.chErr='';S.sel.clear();S.vIt=null;
+  if(S.ctrl){S.ctrl.abort();S.ctrl=null}
+  if(s.trans==='KJV'&&!kjvFailed){
+    if(!KJV){S.verses=null;S.loadingCh=true;S.loadMsg='Loading the King James Bible… (first time only, about 5 MB)';renderVerses();await loadKJV();S.loadMsg=''}
+    if(chKey()!==key)return;
+    const raw=KJV&&KJV[s.book]&&KJV[s.book][s.ch];
+    if(raw&&raw.length){for(let i=0;i<raw.length;i++)if(raw[i]==null)raw[i]='';S.vIt=raw;S.verses=raw.map(plainV);S.loadingCh=false;renderVerses();renderSelbar();return}
+  }
+  const cached=await Cache.get('chapters',key);
+  if(chKey()!==key)return;
+  if(cached&&cached.verses){S.verses=cached.verses;S.loadingCh=false;renderVerses();renderSelbar();return}
+  S.verses=null;
+  if(!allowFetch){S.loadingCh=false;renderVerses();return}
+  S.loadingCh=true;renderVerses();renderSelbar();
+  const ctrl=new AbortController();S.ctrl=ctrl;const b=BM[s.book];
+  const parse=txt=>{const arr=[];txt.split('\n').forEach(l=>{const m=l.replace(/\*\*/g,'').trim().match(/^\[?(?:v(?:erse)?\.?\s*)?(\d{1,3})\]?\s*[|.:)\-–]?\s+(.+)$/i)||l.trim().match(/^(\d{1,3})\|(.+)$/);if(m&&+m[1]>0&&+m[1]<200)arr[+m[1]-1]=m[2].replace(/^\|\s*/,'').trim()});return arr};
+  let all=[],lastText='';
+  try{
+    for(let round=0;round<4;round++){
+      const start=all.length+1;
+      const prompt=`This is for a Bible reading app. ${TRANS[s.trans]} is in the public domain. Output the text of ${b.name} chapter ${s.ch}${start>1?`, starting at verse ${start} and continuing to the end of the chapter`:''}, every verse in order, one per line, formatted exactly as:\n<verse number>|<verse text>\nNo title, no headings, no commentary, no blank lines, no other text.`;
+      const res=await ai(prompt,txt=>{if(chKey()!==key)return;const part=parse(txt);const merged=all.slice();part.forEach((t,i)=>{if(t)merged[i]=t});if(merged.length){S.verses=merged;renderVerses()}},ctrl.signal,'default');
+      lastText=res.text||'';const part=parse(lastText);const before=all.length;part.forEach((t,i)=>{if(t)all[i]=t});
+      if(!res.truncated||all.length===before)break;
+    }
+    if(chKey()!==key)return;
+    for(let i=0;i<all.length;i++)if(all[i]==null)all[i]='';
+    if(!all.length)throw {message:'Claude didn\u2019t send the verses back'+(lastText?` (it replied: “${lastText.slice(0,140)}”)`:'')+'. Try again, or switch to KJV.'};
+    S.verses=all;Cache.put('chapters',key,{verses:all,at:Date.now()});
+  }catch(e){if(chKey()!==key)return;S.chErr=aiErr(e);if(!S.verses?.length)S.verses=null}
+  S.loadingCh=false;S.ctrl=null;renderVerses();renderSelbar();
+}
+function goTo(b,c,v){const bk=BM[b];if(!bk)return;c=Math.max(1,Math.min(bk.chapters,c));saveSettings({book:b,ch:c});S.flashV=v||null;S.verses=null;
+  if(!isReading())setTab('read');else{renderView();window.scrollTo(0,0)}loadChapter(true)}
+function openRefCode(code){const p=parseRef(code);if(!p){toast('Couldn’t read that reference');return}closeSheet();goTo(p.b,p.c,p.v1)}
+
+/* selection bar */
+function selVerses(){return [...S.sel].sort((a,b)=>a-b)}
+function selText(){return selVerses().map(n=>`${n} ${S.verses?.[n-1]||''}`).join(' ')}
+function renderSelbar(){const bar=$('#selbar');if(!isReading()||!S.sel.size){bar.classList.remove('show');bar.innerHTML='';return}
+  const s=settings();bar.classList.add('show');
+  bar.innerHTML=`<div class="sb"><div class="top"><span class="grow">${esc(refLabel(s.book,s.ch,selVerses()))}</span><button class="iconbtn" style="width:32px;height:32px" data-act="clearSel" aria-label="Clear selection">✕</button></div>
+   <div class="dots">${COLORS.map(([c])=>`<button class="dot ${c}" data-act="hl" data-c="${c}" title="${esc(colorLabel(c))}"></button>`).join('')}<button class="dot x" data-act="hl" data-c="" title="Remove highlight">⌫</button></div>
+   <div class="sbacts"><button data-act="addNote"><b>✎</b>Note</button><button data-act="bookmark"><b>🔖</b>Bookmark</button><button data-act="addToTab"><b>🏷️</b>Topic tab</button><button data-act="studySel"><b>🔍</b>Study</button><button data-act="copySel"><b>⧉</b>Copy</button></div></div>`}
+const colorLabel=c=>(settings().labels||{})[c]||(COLORS.find(x=>x[0]===c)||[])[1]||'';
+
+/* ---------- STUDY ---------- */
+function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.book,s.ch,[]);
+  const st=S.study;
+  v.innerHTML=`<div class="hero"><h2>Study a passage</h2><p>Context, meaning, original words, cross-references and life application — for any verse or chapter.</p></div>
+  <div class="card"><label class="l" style="margin-top:0">Passage</label>
+   <div class="row"><input class="f grow" id="studyRef" value="${esc(S.studyRef)}" placeholder="e.g. Romans 8:28 or Psalm 23"><button class="btn sm" data-act="useCurrent">Current</button></div>
+   <label class="l">Choose a tool</label>
+   <div class="toolgrid">${Object.entries(TOOLS).map(([k,t])=>`<button class="tool" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>
+   <label class="l">Or ask your own question</label>
+   <textarea class="f" id="askQ" placeholder="e.g. Why did Jesus speak in parables here? What does 'born again' mean?" style="min-height:70px"></textarea>
+   <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>
+  </div>
+  <div id="studyOut">${studyOutHtml()}</div>
+  <h2 class="sec">Study methods</h2>
+  ${GUIDES.map(g=>`<details class="guide"><summary>${g[0]}</summary><div class="body">${g[1]}</div></details>`).join('')}`;
+  $('#studyRef').oninput=e=>S.studyRef=e.target.value;
+  if(st&&st.loading)$('#studyOut').scrollIntoView({block:'start'});
+}
+function studyOutHtml(){const st=S.study;if(!st)return '';
+  return `<div class="card out"><div class="row" style="margin-bottom:6px"><span class="tag">${esc(st.title)}</span><b class="grow" style="font-family:var(--serif);font-size:19px">${esc(st.refLabel)}</b>${st.loading?'<span class="spin"></span>':''}</div>
+   <div id="studyBody">${st.err?`<p class="muted">${esc(st.err)}</p>`:(st.text?md(st.text):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>')}</div>
+   ${st.loading?'<div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="stopStudy">Stop</button></div>':
+   (st.text?`<div class="row" style="margin-top:10px"><button class="btn sm pri" data-act="saveStudy">＋ Save to my notes</button><button class="btn sm" data-act="insertStudy">🗂️ Make insert</button><button class="btn sm" data-act="copyStudy">⧉ Copy</button><button class="btn sm ghost" data-act="redoStudy">↻ Redo</button></div>`:'')}</div>
+   <p class="small muted">Study helps are written by Claude — test them against Scripture (Acts 17:11) and a trusted pastor or commentary.</p>`}
+function updateStudyOut(){const o=$('#studyOut');if(o&&S.tab==='study')o.innerHTML=studyOutHtml()}
+async function runStudy(tool,refText,question,force){
+  refText=(refText||'').trim();if(!refText){toast('Type a passage first');return}
+  const p=parseRef(refText);const label=p?codeToLabel(refCode(p.b,p.c,p.v1?(p.v2?Array.from({length:p.v2-p.v1+1},(_,i)=>p.v1+i):[p.v1]):[])):refText;
+  const code=p?refCode(p.b,p.c,p.v1?(p.v2?Array.from({length:p.v2-p.v1+1},(_,i)=>p.v1+i):[p.v1]):[]):refText;
+  const title=question?'Question':TOOLS[tool][1];
+  const ck=question?null:(tool+'__'+code.replace(/[^A-Za-z0-9:\-]/g,'_'));
+  if(S.studyCtrl)S.studyCtrl.abort();
+  S.study={tool,question,refLabel:label,refCode:code,title,text:'',loading:true};
+  if(S.tab!=='study')setTab('study');else updateStudyOut();
+  $('#studyOut')?.scrollIntoView({block:'start',behavior:'smooth'});
+  if(ck&&!force){const c=await Cache.get('studies',ck);if(c&&c.text){S.study.text=c.text;S.study.loading=false;updateStudyOut();return}}
+  let passage='';const s=settings();
+  if(p&&p.b===s.book&&p.c===s.ch&&S.verses?.length){const vs=p.v1?S.verses.slice(p.v1-1,(p.v2||p.v1)):S.verses;if(vs.join(' ').length<9000)passage=`\n\nPassage text (${s.trans}):\n${vs.map((t,i)=>((p.v1||1)+i)+' '+t).join('\n')}`}
+  const prompt=SYS+(question?`Answer this question about ${label}: ${question}`:TOOLS[tool][3].replace(/\{R\}/g,label))+passage;
+  const ctrl=new AbortController();S.studyCtrl=ctrl;const my=S.study;
+  try{const res=await ai(prompt,t=>{if(S.study!==my)return;my.text=t;const b=$('#studyBody');if(b)b.innerHTML=md(t)},ctrl.signal,'default');
+    my.text=res.text;my.loading=false;if(ck)Cache.put('studies',ck,{text:res.text,at:Date.now()})}
+  catch(e){my.loading=false;if(!my.text)my.err=aiErr(e)}
+  if(S.study===my)updateStudyOut();
+}
+
+/* ---------- LOADED BIBLE ---------- */
+function viewLoaded(v){const sub=S.loadedSub;
+  v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: your highlighter color key, book tabs, topic tabs and insert cards to tuck inside.</p></div>
+  <div class="chips">${[['colors','🎨 Color key'],['books','📑 Book tabs'],['topics','🏷️ Topic tabs'],['inserts','🗂️ Inserts'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
+  <div id="loadedBody"></div>`;
+  const body=$('#loadedBody');
+  ({books:loadedBooks,topics:loadedTopics,colors:loadedColors,inserts:loadedInserts,progress:loadedProgress})[sub](body)}
+function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
+  for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
+    let g=null;
+    BOOKS.filter(b=>b.nt===nt).forEach(b=>{if(b.genre!==g){if(g)h+='</div>';g=b.genre;h+=`<div class="glabel" style="--gc:${GENRES[g][1]}"><i></i>${GENRES[g][0]}</div><div class="edge">`}
+      const r=(pr[b.abbr]||[]).length;h+=`<button class="btab" style="--gc:${GENRES[b.genre][1]}" data-act="bookCard" data-b="${b.abbr}"><span class="ab">${b.abbr}</span><span class="nm">${esc(b.name)}</span><span class="ct">${b.chapters} ch${r?` · ${r} read`:''}</span><i class="pg" style="width:${Math.round(r/b.chapters*100)}%"></i></button>`});
+    h+='</div>'}
+  el.innerHTML=h}
+function bookCard(abbr){const b=BM[abbr];const pr=progress()[abbr]||[];const intro=S.bookIntro[abbr];
+  const [kc,kv]=b.key.split(':');
+  openSheet(`<div class="row"><span class="tag" style="background:${GENRES[b.genre][1]};color:#fff">${GENRES[b.genre][0]}</span><span class="small muted">${b.nt?'New':'Old'} Testament · book ${b.idx+1} of 66</span></div>
+   <h3>${esc(b.name)}</h3>
+   <p><b>Author:</b> ${esc(b.author)}<br><b>Theme:</b> ${esc(b.theme)}<br><b>Key verse:</b> <a class="ref" data-act="openRef" data-ref="${abbr} ${b.key}">${esc(b.name)} ${b.key}</a></p>
+   <label class="l">Chapters · ${pr.length}/${b.chapters} read</label>
+   <div class="prog" style="margin-bottom:10px"><i style="width:${pr.length/b.chapters*100}%"></i></div>
+   <div class="chgrid">${Array.from({length:b.chapters},(_,i)=>`<button class="${pr.includes(i+1)?'read':''}" data-act="openCh" data-b="${abbr}" data-c="${i+1}">${i+1}</button>`).join('')}</div>
+   <div class="row" style="margin-top:14px"><button class="btn pri" data-act="loadBookPaper" data-b="${abbr}">✨ Load this book in my Bible</button></div><div class="row" style="margin-top:8px"><button class="btn" data-act="bookIntro" data-b="${abbr}">📖 ${intro?.text?'Refresh':'Read'} book introduction</button><button class="btn" data-act="openCh" data-b="${abbr}" data-c="1">Start reading</button></div>
+   <div id="introOut" class="out" style="margin-top:12px">${intro?introHtml(abbr):''}</div>`);
+  if(!intro)Cache.get('studies','intro__'+abbr).then(c=>{if(c&&c.text&&!S.bookIntro[abbr]){S.bookIntro[abbr]={text:c.text};const o=$('#introOut');if(o)o.innerHTML=introHtml(abbr)}})}
+function introHtml(abbr){const it=S.bookIntro[abbr];if(!it)return '';
+  return (it.err?`<p class="muted">${esc(it.err)}</p>`:(it.text?md(it.text):'<div class="loadingline"></div><div class="loadingline"></div>'))+
+   (it.text&&!it.loading?`<div class="row"><button class="btn sm pri" data-act="introInsert" data-b="${abbr}">🗂️ Save as insert card</button><button class="btn sm" data-act="introNote" data-b="${abbr}">＋ Save to notes</button></div>`:'')}
+async function loadIntro(abbr,force){const b=BM[abbr];
+  if(!force){const c=await Cache.get('studies','intro__'+abbr);if(c&&c.text){S.bookIntro[abbr]={text:c.text};const o=$('#introOut');if(o)o.innerHTML=introHtml(abbr);return}}
+  const it={text:'',loading:true};S.bookIntro[abbr]=it;const o=()=>$('#introOut');if(o())o().innerHTML=introHtml(abbr);
+  try{const res=await ai(SYS.replace('450','700')+`Write a study-Bible style introduction to the book of ${b.name} with these sections: Author & date; Audience & setting; Purpose; Key themes; Outline (with chapter ranges); Key verses; How it fits the big story of the Bible and points to Jesus. Note where scholars disagree (for example on authorship or date).`,t=>{it.text=t;if(o())o().innerHTML=md(t)},null,'default');
+    it.text=res.text;it.loading=false;Cache.put('studies','intro__'+abbr,{text:res.text,at:Date.now()})}
+  catch(e){it.loading=false;if(!it.text)it.err=aiErr(e)}
+  if(o())o().innerHTML=introHtml(abbr)}
+function topicData(){const custom=Store.list('t_');const map=new Map();
+  TOPICS.forEach(([id,ic,name,refs])=>map.set(id,{id,ic,name,refs:refs.slice(),base:new Set(refs),builtin:true}));
+  custom.forEach(t=>{const id=t.key.slice(2);const cur=map.get(id)||{id,ic:t.ic||'🏷️',name:t.name,refs:[],base:new Set(),builtin:false};
+    (t.refs||[]).forEach(r=>{if(!cur.refs.includes(r))cur.refs.push(r)});if(!cur.builtin){cur.name=t.name;cur.ic=t.ic||'🏷️'}map.set(id,cur)});
+  return [...map.values()].sort((a,b)=>(a.builtin===b.builtin?0:a.builtin?1:-1))}
+function loadedTopics(el){const ts=topicData();
+  el.innerHTML=`<div class="row" style="margin:6px 0"><p class="small muted grow" style="margin:0">Topic tabs are your index of verses by subject. Add verses here, or tap verses in Read → 🏷️ Topic tab.</p><button class="btn sm pri" data-act="newTopic">＋ New tab</button></div>
+  ${ts.map(t=>`<details class="topic" ${S.openTopic===t.id?'open':''} data-topic="${t.id}"><summary><span class="ic">${esc(t.ic)}</span><b class="grow">${esc(t.name)}</b><span class="tag">${t.refs.length}</span></summary>
+   <div class="refs">${t.refs.map(r=>`<div class="refrow"><a class="ref grow" data-act="openRef" data-ref="${esc(r)}">${esc(codeToLabel(r))}</a>${t.base.has(r)?'':`<button class="btn sm ghost" data-act="topicRemove" data-t="${t.id}" data-r="${esc(r)}" aria-label="Remove">✕</button>`}</div>`).join('')||'<p class="small muted">No verses yet.</p>'}
+   <div class="row" style="margin-top:8px"><input class="f grow" id="tadd_${t.id}" placeholder="Add a verse, e.g. Psalm 27:1"><button class="btn sm" data-act="topicAdd" data-t="${t.id}">Add</button></div>
+   <div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="loadTopicPaper" data-n="${esc(t.name)}">✨ Load in my Bible</button><button class="btn sm" data-act="topicStudy" data-t="${t.id}">🔍 Study this topic</button>${t.builtin?'':`<button class="btn sm ghost" data-act="topicDelete" data-t="${t.id}">Delete tab</button>`}</div></div></details>`).join('')}`;
+  $$('details.topic',el).forEach(d=>d.addEventListener('toggle',()=>{if(d.open)S.openTopic=d.dataset.topic}))}
+function loadedColors(el){const hs=Store.list('h_');
+  el.innerHTML=`<p class="small muted">Give each highlighter color a meaning. The Load tab uses this key when it tells you what to highlight.</p>
+  ${COLORS.map(([c,def])=>{const n=hs.filter(h=>h.color===c).length;return `<div class="item"><div class="row"><span class="swatch sw-${c}" style="width:34px;height:34px;border-radius:10px"></span>
+   <input class="f grow" data-label="${c}" value="${esc(colorLabel(c))}" placeholder="${esc(def)}"><button class="btn sm" data-act="colorView" data-c="${c}">${n} verse${n===1?'':'s'}</button></div></div>`}).join('')}
+  <div class="row"><button class="btn sm pri" data-act="copyKey">📋 Copy key for my inside cover</button><button class="btn sm ghost" data-act="resetColors">Reset to suggested meanings</button></div>
+  <p class="small muted">Tip: draw a small color key on the inside cover of your Bible so you remember what each color means.</p>`;
+  $$('input[data-label]',el).forEach(i=>i.addEventListener('change',()=>{const l=Object.assign({},settings().labels);l[i.dataset.label]=i.value.trim();saveSettings({labels:l});toast('Color key saved')}))}
+function loadedInserts(el){const ins=Store.list('i_').sort((a,b)=>(b.updated||0)-(a.updated||0));
+  el.innerHTML=`<p class="small muted">Insert cards are the notes you'd tuck inside your Bible — book summaries, memory verses, sermon notes, prayer lists. Copy any card to print or share it.</p>
+  <div class="chips">${INSERT_TEMPLATES.map((t,i)=>`<button class="chip" data-act="newInsert" data-i="${i}">＋ ${esc(t[0])}</button>`).join('')}<button class="chip" data-act="newInsert" data-i="-1">＋ Blank card</button></div>
+  ${ins.length?ins.map(x=>`<div class="insert" style="--gc:${x.ref&&parseRef(x.ref)?GENRES[BM[parseRef(x.ref).b].genre][1]:'var(--gold)'}"><div class="row"><h4 class="grow">${esc(x.title||'Untitled')}</h4>${x.ref?`<a class="ref small" data-act="openRef" data-ref="${esc(x.ref)}">${esc(codeToLabel(x.ref))}</a>`:''}</div>
+    <div class="b">${x.md?md(x.body):esc(x.body)}</div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm ghost" data-act="delItem" data-k="${x.key}">Delete</button></div></div>`).join('')
+   :'<div class="empty">No insert cards yet — start with a template above.</div>'}`}
+function loadedProgress(el){const pr=progress();const read=Object.values(pr).reduce((a,x)=>a+x.length,0);
+  const ot=BOOKS.filter(b=>!b.nt).reduce((a,b)=>a+(pr[b.abbr]||[]).length,0),otT=BOOKS.filter(b=>!b.nt).reduce((a,b)=>a+b.chapters,0);
+  el.innerHTML=`<div class="card"><h3 style="font-size:22px">${read} of ${TOTAL_CH} chapters read</h3><div class="prog"><i style="width:${read/TOTAL_CH*100}%"></i></div>
+   <p class="small muted">Old Testament ${ot}/${otT} · New Testament ${read-ot}/${TOTAL_CH-otT}</p></div>
+   ${Object.keys(GENRES).map(g=>{const bs=BOOKS.filter(b=>b.genre===g);const t=bs.reduce((a,b)=>a+b.chapters,0),r=bs.reduce((a,b)=>a+(pr[b.abbr]||[]).length,0);
+    return `<div class="item"><div class="row"><span class="swatch" style="background:${GENRES[g][1]}"></span><b class="grow">${GENRES[g][0]}</b><span class="small muted">${r}/${t}</span></div><div class="prog" style="margin-top:8px"><i style="width:${r/t*100}%;background:${GENRES[g][1]}"></i></div></div>`}).join('')}
+   <p class="small muted">Mark chapters as read at the bottom of each chapter, or tap chapters on a book tab.</p>`}
+
+/* ---------- JOURNAL ---------- */
+function viewJournal(v){const es=Store.list('j_').sort((a,b)=>(b.date||0)-(a.date||0));
+  v.innerHTML=`<div class="hero"><h2>Journal</h2><p>S.O.A.P. devotions, sermon notes, prayer requests and reflections.</p></div>
+  <div class="toolgrid" style="margin:12px 0">${Object.entries(JTYPES).map(([k,t])=>`<button class="tool" data-act="newJournal" data-t="${k}"><span class="e">${t.icon}</span><div><b>New ${esc(t.name)}</b><span>${k==='soap'?'Scripture · Observation · Application · Prayer':k==='sermon'?'Points, quotes, takeaway':k==='prayer'?'Track requests & answers':'Free writing'}</span></div></button>`).join('')}</div>
+  ${es.length?es.map(journalItem).join(''):'<div class="empty">Your journal is empty. Start with a S.O.A.P. entry on today’s reading.</div>'}`}
+function journalItem(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const title=f.title||(f.ref?codeToLabel(f.ref):'')||t.name;
+  const snippet=t.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean).join(' · ').slice(0,180);
+  return `<div class="item" data-act="editJournal" data-k="${e.key}" style="cursor:pointer"><div class="h"><span>${t.icon}</span><span class="grow">${esc(title)}</span>${e.type==='prayer'?`<span class="tag">${f.answered?'✓ answered':'praying'}</span>`:''}</div>
+   <div class="small muted">${esc(t.name)} · ${fmtDate(e.date)}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>${snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}</div>`}
+function journalForm(type,key){const t=JTYPES[type];const e=key?Store.get(key):null;const f=(e&&e.fields)||{};
+  if(!e&&type==='soap'&&S.sel.size){const s=settings();f.ref=refLabel(s.book,s.ch,selVerses());f.scripture=selText()}
+  else if(!e&&(type==='soap'||type==='reflect')){const s=settings();f.ref=refLabel(s.book,s.ch,[])}
+  openSheet(`<h3>${t.icon} ${esc(t.name)}</h3>
+   ${t.fields.map(([k,l,kind])=>kind==='check'?`<label class="row" style="margin:12px 2px"><input type="checkbox" data-f="${k}" ${f[k]?'checked':''} style="width:20px;height:20px"> <b>${esc(l)}</b></label>`:
+     `<label class="l">${esc(l)}</label>${kind==='ta'?`<textarea class="f" data-f="${k}">${esc(f[k]||'')}</textarea>`:`<input class="f" data-f="${k}" value="${esc(f[k]||'')}">`}`).join('')}
+   ${type==='soap'?'<div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="genSoap">✨ Generate S.O.A.P. for me</button><button class="btn sm" data-act="soapHelp">💡 Just give me ideas</button></div><div id="soapHelp" class="out small"></div>':''}
+   <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="saveJournal" data-t="${type}" data-k="${key||''}">Save</button>${key?`<button class="btn" data-act="delItem" data-k="${key}">Delete</button>`:''}</div>`)}
+
+/* ---------- MY NOTES ---------- */
+function viewNotes(v){
+  v.innerHTML=`<p class="small muted" style="margin:4px 2px">Every note, highlight, bookmark and journal entry in your Online Bible.</p>
+  <div class="row" style="margin:12px 0 4px"><input class="f grow" id="noteQ" placeholder="Search your notes…" value="${esc(S.q)}"></div>
+  <div class="chips">${[['all','All'],['notes','✎ Notes'],['hl','🖍 Highlights'],['bm','🔖 Bookmarks'],['journal','📓 Journal']].map(([k,l])=>`<button class="chip ${S.notesFilter===k?'on':''}" data-act="notesFilter" data-f="${k}">${l}</button>`).join('')}</div>
+  ${S.notesFilter==='hl'?`<div class="chips"><button class="chip ${!S.notesColor?'on':''}" data-act="notesColor" data-c="">All colors</button>${COLORS.map(([c])=>`<button class="chip ${S.notesColor===c?'on':''}" data-act="notesColor" data-c="${c}"><span class="swatch sw-${c}"></span> ${esc(colorLabel(c))}</button>`).join('')}</div>`:''}
+  <div id="noteList"></div>
+  <div class="row" style="justify-content:center;margin-top:14px"><button class="btn sm" data-act="copyAll">⧉ Copy everything as text (backup)</button></div>`;
+  $('#noteQ').oninput=e=>{S.q=e.target.value;renderNoteList()};renderNoteList()}
+function allEntries(){const out=[];
+  Store.list('n_').forEach(n=>out.push({kind:'notes',t:n.updated||n.created,key:n.key,ref:n.ref,title:n.title,text:n.text,vt:n.verseText,md:n.md}));
+  Store.list('h_').forEach(h=>out.push({kind:'hl',t:h.at,key:h.key,ref:h.ref,text:'',vt:h.text,color:h.color}));
+  Store.list('b_').forEach(b=>out.push({kind:'bm',t:b.at,key:b.key,ref:b.ref,text:'',vt:b.text}));
+  Store.list('j_').forEach(j=>{const f=j.fields||{};const T=JTYPES[j.type]||JTYPES.reflect;out.push({kind:'journal',t:j.date,key:j.key,ref:f.ref?(parseRef(f.ref)?f.ref:''):'',title:(T.icon+' '+(f.title||T.name)),text:T.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean).join('\n\n'),jt:j.type})});
+  return out.sort((a,b)=>(b.t||0)-(a.t||0))}
+function renderNoteList(){const el=$('#noteList');if(!el)return;const q=S.q.toLowerCase().trim();
+  let es=allEntries().filter(e=>S.notesFilter==='all'||e.kind===S.notesFilter);
+  if(S.notesFilter==='hl'&&S.notesColor)es=es.filter(e=>e.color===S.notesColor);
+  if(q)es=es.filter(e=>[e.ref&&codeToLabel(e.ref),e.title,e.text,e.vt].join(' ').toLowerCase().includes(q));
+  if(!es.length){el.innerHTML=`<div class="empty">${q?'Nothing matches that search.':'Nothing here yet. In Read, tap a verse to highlight it, bookmark it or add a note.'}</div>`;return}
+  el.innerHTML=es.map(e=>{const lbl=e.ref?codeToLabel(e.ref):'';
+    const tag={notes:'Note',hl:'Highlight',bm:'Bookmark',journal:'Journal'}[e.kind];
+    return `<div class="item"><div class="h">${e.color?`<span class="swatch sw-${e.color}"></span>`:''}${lbl?`<a class="ref grow" data-act="openRef" data-ref="${esc(e.ref)}">${esc(lbl)}</a>`:`<span class="grow">${esc(e.title||'')}</span>`}<span class="tag">${tag}</span></div>
+     ${e.title&&lbl?`<div style="font-weight:700;margin-top:4px">${esc(e.title)}</div>`:''}
+     ${e.vt?`<div class="vt">${esc(e.vt.length>260?e.vt.slice(0,260)+'…':e.vt)}</div>`:''}
+     ${e.color?`<div class="small muted" style="margin-top:4px">${esc(colorLabel(e.color))}</div>`:''}
+     ${e.text?(e.md?`<div class="out" style="font-size:14.5px">${md(e.text)}</div>`:`<div class="txt">${esc(e.text)}</div>`):''}
+     <div class="row" style="margin-top:8px;justify-content:flex-end">${e.kind==='notes'?`<button class="btn sm" data-act="editNote" data-k="${e.key}">Edit</button>`:''}${e.kind==='journal'?`<button class="btn sm" data-act="editJournal" data-k="${e.key}">Open</button>`:''}<button class="btn sm ghost" data-act="delItem" data-k="${e.key}">Delete</button></div></div>`}).join('')}
+
+/* ---------- notes sheet ---------- */
+function noteSheet(key,preset){const n=key?Store.get(key):preset;
+  openSheet(`<h3>✎ ${key?'Edit note':'New note'}</h3>
+   <label class="l">Reference</label><input class="f" id="nRef" value="${esc(n.ref?codeToLabel(n.ref):'')}" placeholder="e.g. John 3:16">
+   ${n.verseText?`<div class="vt" style="font-family:var(--serif);font-size:17px;color:var(--muted);margin:8px 2px;max-height:130px;overflow:auto">${esc(n.verseText)}</div>`:''}
+   <label class="l">Title (optional)</label><input class="f" id="nTitle" value="${esc(n.title||'')}" placeholder="e.g. Born again">
+   <div class="row" style="margin-top:10px"><button class="btn sm pri" data-act="genNote">✨ Write a note for me</button></div><label class="l">Note</label><textarea class="f" id="nText" style="min-height:150px" placeholder="What stands out? What does it mean? How will you live it?">${esc(n.text||'')}</textarea>
+   <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="saveNote" data-k="${key||''}">Save note</button>${key?`<button class="btn" data-act="delItem" data-k="${key}">Delete</button>`:''}</div>`);
+  S._notePreset=n}
+function saveNoteFromSheet(key){const refIn=$('#nRef').value.trim();const p=parseRef(refIn);const base=key?Store.get(key):S._notePreset||{};
+  const text=$('#nText').value.trim(),title=$('#nTitle').value.trim();if(!text&&!title){toast('Write something first');return}
+  let vs=base.vs||[];if(p){vs=p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[]}
+  const n=Object.assign({},base,{ref:p?refCode(p.b,p.c,vs):refIn,b:p?p.b:null,c:p?p.c:null,vs,title,text,updated:Date.now(),created:base.created||Date.now()});
+  Store.set(key||('n_'+newId()),n);S.sel.clear();closeSheet();changed();toast('Note saved')}
+
+/* ---------- sheet ---------- */
+function openSheet(html){$('#sheet').innerHTML='<div class="grab"></div><button class="iconbtn sheetx" data-act="closeSheet" aria-label="Close">✕</button>'+html;$('#sheetWrap').classList.add('show');$('#sheet').scrollTop=0}
+function closeSheet(){$('#sheetWrap').classList.remove('show');$('#sheet').innerHTML=''}
+function confirmSheet(msg,yes,onYes){S._confirm=onYes;openSheet(`<h3>${esc(msg)}</h3><div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="confirmYes">${esc(yes)}</button><button class="btn grow" data-act="closeSheet">Cancel</button></div>`)}
+async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){openSheet(`<h3>Copy</h3><p class="small muted">Select the text and copy it.</p><textarea class="f" style="min-height:240px">${esc(t)}</textarea>`)}}
+
+function bookPicker(sel){const s=settings();
+  if(sel){const b=BM[sel];openSheet(`<div class="row"><button class="btn sm" data-act="pickBook">‹ Books</button><h3 class="grow" style="margin:0">${esc(b.name)}</h3></div><p class="small muted">${esc(b.theme)}</p>
+   <div class="chgrid">${Array.from({length:b.chapters},(_,i)=>`<button class="${isRead(sel,i+1)?'read':''}" data-act="openCh" data-b="${sel}" data-c="${i+1}">${i+1}</button>`).join('')}</div>`);return}
+  let h='<h3>Choose a book</h3>';let g=null;
+  BOOKS.forEach(b=>{if(b.genre!==g){if(g)h+='</div>';g=b.genre;h+=`<div class="glabel" style="--gc:${GENRES[g][1]}"><i></i>${GENRES[g][0]}</div><div class="bookgrid">`}
+    h+=`<button class="bk-btn" style="--gc:${GENRES[b.genre][1]};${b.abbr===s.book?'outline:2px solid var(--accent)':''}" data-act="pickChapter" data-b="${b.abbr}">${esc(b.name)}</button>`});
+  openSheet(h+'</div>')}
+
+/* ---------- markdown ---------- */
+const NAME_ALT=[...BOOKS.map(b=>b.name),'Psalm','Song of Songs'].sort((a,b)=>b.length-a.length).map(n=>n.replace(/ /g,'\\s')).join('|');
+const REF_RE=new RegExp(`(^|[^A-Za-z])(${NAME_ALT})\\s+(\\d{1,3})(?::(\\d{1,3})(?:\\s?[-–]\\s?(\\d{1,3}))?)?`,'g');
+function linkRefs(s){return s.replace(REF_RE,(m,pre,n,c,v1,v2)=>{const b=findBook(n);if(!b||+c>b.chapters)return m;const code=`${b.abbr} ${c}${v1?':'+v1+(v2?'-'+v2:''):''}`;return `${pre}<a class="ref" data-act="openRef" data-ref="${code}">${m.slice(pre.length)}</a>`})}
+function inline(s){s=linkRefs(esc(s));return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/(^|[^*\w])\*([^*\n]+?)\*(?!\w)/g,'$1<em>$2</em>').replace(/(^|\s)_([^_\n]+?)_(?=\s|[.,;:!?]|$)/g,'$1<em>$2</em>')}
+function md(src){const lines=String(src||'').replace(/\r/g,'').split('\n');let h='',list=null,para=[];
+  const fp=()=>{if(para.length){h+='<p>'+inline(para.join(' '))+'</p>';para=[]}},fl=()=>{if(list){h+=`</${list}>`;list=null}};
+  for(const raw of lines){const l=raw.trimEnd();let m;
+    if(!l.trim()){fp();fl();continue}
+    if(m=l.match(/^(#{1,6})\s+(.*)/)){fp();fl();const n=Math.min(4,Math.max(2,m[1].length+1));h+=`<h${n}>${inline(m[2])}</h${n}>`;continue}
+    if(m=l.match(/^\s*[-*•]\s+(.*)/)){fp();if(list!=='ul'){fl();h+='<ul>';list='ul'}h+=`<li>${inline(m[1])}</li>`;continue}
+    if(m=l.match(/^\s*\d+[.)]\s+(.*)/)){fp();if(list!=='ol'){fl();h+='<ol>';list='ol'}h+=`<li>${inline(m[1])}</li>`;continue}
+    if(m=l.match(/^>\s?(.*)/)){fp();fl();h+=`<blockquote>${inline(m[1])}</blockquote>`;continue}
+    if(/^\s*(-{3,}|\*{3,})\s*$/.test(l)){fp();fl();h+='<hr>';continue}
+    fl();para.push(l.trim())}
+  fp();fl();return h}
+const plain=src=>String(src||'').replace(/^#+\s*/gm,'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/\*(.+?)\*/g,'$1');
+
+/* ---------- actions ---------- */
+const A={
+  tab:el=>setTab(el.dataset.tab),
+  onlineSub:el=>{S.onlineSub=el.dataset.s;renderView()},
+  closeSheet,
+  confirmYes:()=>{const f=S._confirm;closeSheet();f&&f()},
+  pickBook:()=>bookPicker(),
+  pickChapter:el=>bookPicker(el.dataset.b),
+  openCh:el=>{closeSheet();goTo(el.dataset.b,+el.dataset.c)},
+  openRef:el=>openRefCode(el.dataset.ref),
+  prevCh:()=>{const s=settings();const b=BM[s.book];if(s.ch>1)goTo(s.book,s.ch-1);else if(b.idx>0){const p=BOOKS[b.idx-1];goTo(p.abbr,p.chapters)}},
+  nextCh:()=>{const s=settings();const b=BM[s.book];if(s.ch<b.chapters)goTo(s.book,s.ch+1);else if(b.idx<65)goTo(BOOKS[b.idx+1].abbr,1)},
+  font:el=>{const f=Math.max(15,Math.min(30,settings().font+2*(+el.dataset.d)));saveSettings({font:f});const a=$('#scripture');if(a)a.style.fontSize=f+'px'},
+  reloadCh:()=>{const s=settings();Cache.drop('chapters',chKey());S.verses=null;loadChapter(true)},
+  verse:el=>{const n=+el.dataset.v;S.sel.has(n)?S.sel.delete(n):S.sel.add(n);el.classList.toggle('sel');renderSelbar()},
+  clearSel:()=>{S.sel.clear();renderVerses();renderSelbar()},
+  hl:el=>{const s=settings();const c=el.dataset.c;selVerses().forEach(n=>{const k=`h_${s.book}.${s.ch}.${n}`;
+      if(!c)Store.items.has(k)&&Store.del(k);else Store.set(k,{b:s.book,c:s.ch,v:n,ref:refCode(s.book,s.ch,[n]),color:c,text:S.verses?.[n-1]||'',at:Date.now()})});
+    S.sel.clear();changed();if(c)toast('Highlighted · '+colorLabel(c))},
+  bookmark:()=>{const s=settings();const vs=selVerses();const k0=`b_${s.book}.${s.ch}.${vs[0]}`;const on=!Store.get(k0);
+    vs.forEach(n=>{const k=`b_${s.book}.${s.ch}.${n}`;on?Store.set(k,{b:s.book,c:s.ch,v:n,ref:refCode(s.book,s.ch,[n]),text:S.verses?.[n-1]||'',at:Date.now()}):Store.items.has(k)&&Store.del(k)});
+    S.sel.clear();changed();toast(on?'Bookmarked':'Bookmark removed')},
+  addNote:()=>{const s=settings();const vs=selVerses();noteSheet(null,{ref:refCode(s.book,s.ch,vs),b:s.book,c:s.ch,vs,verseText:selText()})},
+  verseNotes:el=>{const s=settings();const n=+el.dataset.v;const ns=chapterNotes(s.book,s.ch).filter(x=>(x.vs||[]).includes(n));
+    openSheet(`<h3>Notes on ${esc(refLabel(s.book,s.ch,[n]))}</h3>${ns.map(x=>`<div class="item"><div class="h"><span class="grow">${esc(x.title||codeToLabel(x.ref))}</span><button class="btn sm" data-act="editNote" data-k="${x.key}">Edit</button></div>${x.md?`<div class="out" style="font-size:14.5px">${md(x.text)}</div>`:`<div class="txt">${esc(x.text)}</div>`}</div>`).join('')}
+     <button class="btn pri" data-act="addNoteFor" data-v="${n}">＋ Add another note</button>`)},
+  addNoteFor:el=>{const s=settings();const n=+el.dataset.v;noteSheet(null,{ref:refCode(s.book,s.ch,[n]),b:s.book,c:s.ch,vs:[n],verseText:S.verses?.[n-1]||''})},
+  editNote:el=>noteSheet(el.dataset.k),
+  saveNote:el=>saveNoteFromSheet(el.dataset.k),
+  copySel:el=>{const s=settings();copyText(`"${selVerses().map(n=>S.verses?.[n-1]||'').join(' ')}" — ${refLabel(s.book,s.ch,selVerses())} (${s.trans})`)},
+  studySel:()=>{const s=settings();S.studyRef=refLabel(s.book,s.ch,selVerses());S.sel.clear();S.study=null;setTab('study')},
+  studyChapter:()=>{const s=settings();S.studyRef=refLabel(s.book,s.ch,[]);S.study=null;setTab('study')},
+  markRead:()=>{const s=settings();toggleRead(s.book,s.ch);toast(isRead(s.book,s.ch)?'Marked as read ✓':'Unmarked')},
+  addToTab:()=>{const s=settings();const vs=selVerses();const code=refCode(s.book,s.ch,[vs[0]].concat(vs.length>1&&vs[vs.length-1]-vs[0]===vs.length-1?[vs[vs.length-1]]:[]));
+    const code2=vs.length>1&&vs[vs.length-1]-vs[0]===vs.length-1?`${s.book} ${s.ch}:${vs[0]}-${vs[vs.length-1]}`:`${s.book} ${s.ch}:${vs[0]}`;
+    S._tabRef=code2;openSheet(`<h3>Add ${esc(codeToLabel(code2))} to a topic tab</h3>${topicData().map(t=>`<button class="item row" style="width:100%;text-align:left" data-act="addToTopic" data-t="${t.id}"><span>${esc(t.ic)}</span><b class="grow">${esc(t.name)}</b><span class="tag">${t.refs.length}</span></button>`).join('')}
+     <label class="l">Or create a new tab</label><div class="row"><input class="f grow" id="newTabName" placeholder="e.g. Marriage, Courage, Faith"><button class="btn pri" data-act="addToNewTopic">Create</button></div>`)},
+  addToTopic:el=>{topicAddRef(el.dataset.t,S._tabRef);closeSheet();S.sel.clear();changed();toast('Added to topic tab')},
+  addToNewTopic:()=>{const n=$('#newTabName').value.trim();if(!n)return;const id='u'+newId();Store.set('t_'+id,{name:n,ic:'🏷️',refs:[S._tabRef]});closeSheet();S.sel.clear();changed();toast('New tab created')},
+  /* study */
+  useCurrent:()=>{const s=settings();S.studyRef=S.sel.size?refLabel(s.book,s.ch,selVerses()):refLabel(s.book,s.ch,[]);$('#studyRef').value=S.studyRef},
+  study:el=>runStudy(el.dataset.tool,$('#studyRef').value),
+  ask:()=>{const q=$('#askQ').value.trim();if(!q){toast('Type a question');return}runStudy(null,$('#studyRef').value||'the Bible',q)},
+  stopStudy:()=>{S.studyCtrl&&S.studyCtrl.abort()},
+  redoStudy:()=>{const st=S.study;if(!st)return;if(st.question)runStudy(null,st.refLabel,st.question);else{Cache.drop('studies',st.tool+'__'+st.refCode.replace(/[^A-Za-z0-9:\-]/g,'_'));runStudy(st.tool,st.refLabel,null,true)}},
+  saveStudy:()=>{const st=S.study;const p=parseRef(st.refCode);const vs=p&&p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[];
+    Store.set('n_'+newId(),{ref:p?st.refCode:'',b:p?p.b:null,c:p?p.c:null,vs,title:st.question?('Q: '+st.question):st.title,text:st.text,md:true,created:Date.now(),updated:Date.now()});toast('Saved to My Notes')},
+  insertStudy:()=>{const st=S.study;Store.set('i_'+newId(),{title:`${st.title} — ${st.refLabel}`,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,updated:Date.now()});toast('Insert card created (Loaded Bible → Inserts)')},
+  copyStudy:()=>copyText(`${S.study.title} — ${S.study.refLabel}\n\n${plain(S.study.text)}`),
+  /* loaded */
+  loadedSub:el=>{S.loadedSub=el.dataset.s;renderView()},
+  bookCard:el=>bookCard(el.dataset.b),
+  bookIntro:el=>loadIntro(el.dataset.b,!!S.bookIntro[el.dataset.b]?.text),
+  introInsert:el=>{const b=BM[el.dataset.b];Store.set('i_'+newId(),{title:`${b.name} — book overview`,ref:`${b.abbr} 1`,body:S.bookIntro[b.abbr].text,md:true,updated:Date.now()});toast('Saved as insert card')},
+  introNote:el=>{const b=BM[el.dataset.b];Store.set('n_'+newId(),{ref:`${b.abbr} 1`,b:b.abbr,c:1,vs:[],title:`${b.name} introduction`,text:S.bookIntro[b.abbr].text,md:true,created:Date.now(),updated:Date.now()});toast('Saved to My Notes')},
+  newTopic:()=>openSheet(`<h3>New topic tab</h3><label class="l">Name</label><input class="f" id="tName" placeholder="e.g. Marriage, Courage, Leadership"><label class="l">Emoji (optional)</label><input class="f" id="tIc" placeholder="🏷️" maxlength="4"><div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="createTopic">Create tab</button></div>`),
+  createTopic:()=>{const n=$('#tName').value.trim();if(!n)return;const id='u'+newId();Store.set('t_'+id,{name:n,ic:$('#tIc').value.trim()||'🏷️',refs:[]});S.openTopic=id;closeSheet();renderView()},
+  topicAdd:el=>{const id=el.dataset.t;const inp=$('#tadd_'+id);const p=parseRef(inp.value);if(!p){toast('Try a reference like "Psalm 27:1"');return}
+    topicAddRef(id,`${p.b} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`);S.openTopic=id;inp.value='';renderView()},
+  topicRemove:el=>{const k='t_'+el.dataset.t;const t=Store.get(k);if(!t)return;S.openTopic=el.dataset.t;Store.set(k,Object.assign({},t,{refs:(t.refs||[]).filter(r=>r!==el.dataset.r)}))},
+  topicDelete:el=>confirmSheet('Delete this topic tab?','Delete',()=>Store.del('t_'+el.dataset.t)),
+  topicStudy:el=>{const t=topicData().find(x=>x.id===el.dataset.t);S.studyRef=t.refs.map(codeToLabel).join('; ');runStudy(null,S.studyRef,`Give a short topical Bible study on "${t.name}" using these passages: ${S.studyRef}. Show what they teach together, then give practical application.`)},
+  colorView:el=>{S.notesFilter='hl';S.notesColor=el.dataset.c;S.onlineSub='notes';setTab('online')},
+  copyKey:()=>copyText('My highlight key\n'+COLORS.map(([c])=>`${COLOR_NAMES[c][0].toUpperCase()+COLOR_NAMES[c].slice(1)} = ${colorLabel(c)}`).join('\n')),
+  loadBookPaper:el=>{Object.assign(S.build,{mode:'book',bookOnly:el.dataset.b,planKey:null,err:''});closeSheet();setTab('load');runBuild()},
+  loadTopicPaper:el=>{Object.assign(S.build,{mode:'topic',topic:el.dataset.n,planKey:null,err:''});setTab('load');runBuild()},
+  resetColors:()=>{saveSettings({labels:{}});renderView()},
+  newInsert:el=>{const i=+el.dataset.i;const t=INSERT_TEMPLATES[i];insertSheet(null,{title:t?t[0]:'',body:t?t[1]:'',ref:''})},
+  editInsert:el=>insertSheet(el.dataset.k),
+  saveInsert:el=>{const k=el.dataset.k;const p=parseRef($('#iRef').value);const base=k?Store.get(k):{};
+    Store.set(k||('i_'+newId()),Object.assign({},base,{title:$('#iTitle').value.trim(),ref:p?`${p.b} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`:'',body:$('#iBody').value,md:base.md&&base.body===$('#iBody').value,updated:Date.now()}));closeSheet();toast('Insert saved')},
+  copyInsert:el=>{const x=Store.get(el.dataset.k);copyText(`${x.title}${x.ref?' ('+codeToLabel(x.ref)+')':''}\n\n${x.md?plain(x.body):x.body}`)},
+  delItem:el=>confirmSheet('Delete this?','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
+  /* journal */
+  newJournal:el=>journalForm(el.dataset.t),
+  editJournal:el=>{const e=Store.get(el.dataset.k);if(e)journalForm(e.type,el.dataset.k)},
+  saveJournal:el=>{const f={};$$('[data-f]',$('#sheet')).forEach(i=>f[i.dataset.f]=i.type==='checkbox'?i.checked:i.value.trim());
+    const k=el.dataset.k;const base=k?Store.get(k):{type:el.dataset.t,date:Date.now()};
+    const pr=f.ref&&parseRef(f.ref);if(pr)f.ref=`${pr.b} ${pr.c}${pr.v1?':'+pr.v1+(pr.v2?'-'+pr.v2:''):''}`;
+    Store.set(k||('j_'+newId()),Object.assign({},base,{fields:f,updated:Date.now()}));closeSheet();toast('Journal saved')},
+  soapHelp:async()=>{const ref=$('[data-f="ref"]',$('#sheet')).value.trim();const sc=$('[data-f="scripture"]',$('#sheet')).value.trim();const out=$('#soapHelp');if(!ref&&!sc){toast('Add the Scripture first');return}
+    out.innerHTML='<div class="loadingline"></div>';
+    try{const r=await ai(SYS.replace('450','250')+`Help me with a S.O.A.P. devotion on ${ref||'this passage'}${sc?`: "${sc}"`:''}. Give 3 short observations and 3 short application ideas as bullet lists, then one-sentence prayer starter. Keep it brief — I will write my own words.`,t=>{out.innerHTML=md(t)},null,'quick');out.innerHTML=md(r.text)}catch(e){out.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`}},
+  /* notes */
+  notesFilter:el=>{S.notesFilter=el.dataset.f;S.notesColor='';renderView()},
+  notesColor:el=>{S.notesColor=el.dataset.c;renderView()},
+  copyAll:()=>{const lines=allEntries().map(e=>{const lbl=e.ref?codeToLabel(e.ref):'';const tag={notes:'NOTE',hl:'HIGHLIGHT',bm:'BOOKMARK',journal:'JOURNAL'}[e.kind];
+      return `[${tag}] ${lbl}${e.title?' — '+e.title:''}${e.color?' ('+colorLabel(e.color)+')':''}\n${e.vt?e.vt+'\n':''}${e.text?plain(e.text)+'\n':''}`});
+    copyText(`My Loaded Bible — exported ${new Date().toLocaleDateString()}\n\n`+lines.join('\n'))},
+};
+function topicAddRef(id,ref){const k='t_'+id;const cur=Store.get(k);const builtin=TOPICS.find(t=>t[0]===id);
+  const t=cur?Object.assign({},cur):{name:builtin?builtin[2]:'Topic',ic:builtin?builtin[1]:'🏷️',refs:[]};t.refs=(t.refs||[]).slice();if(!t.refs.includes(ref))t.refs.push(ref);Store.set(k,t)}
+function insertSheet(key,preset){const x=key?Store.get(key):preset;
+  openSheet(`<h3>🗂️ ${key?'Edit':'New'} insert card</h3><label class="l">Title</label><input class="f" id="iTitle" value="${esc(x.title||'')}">
+   <label class="l">Reference (optional)</label><input class="f" id="iRef" value="${esc(x.ref?codeToLabel(x.ref):'')}" placeholder="e.g. Romans 8">
+   <label class="l">Card text</label><textarea class="f" id="iBody" style="min-height:220px;font-family:var(--serif);font-size:17px">${esc(x.body||'')}</textarea>
+   <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="saveInsert" data-k="${key||''}">Save card</button></div>`)}
+
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-act]');if(!el)return;const f=A[el.dataset.act];if(!f)return;
+  if(el.tagName==='A'||el.tagName==='BUTTON')ev.preventDefault();ev.stopPropagation();f(el,ev)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();
+  if(e.key==='Enter'&&e.target.id&&e.target.id.startsWith('tadd_')){A.topicAdd({dataset:{t:e.target.id.slice(5)}})}
+  if(e.key==='Enter'&&e.target.id==='studyRef'){e.preventDefault()}});
+
+/* ---------- LOAD: guide for marking up a physical Bible ---------- */
+const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depression','Doubt','Shame & guilt','Temptation','Joy','Gratitude','Hope','Patience','Rejection','Stress','Forgiving others','Waiting on God','Courage','Purpose','Marriage','Parenting','Friendship','Money','Sickness','Peace','Salvation','Prayer'];
+const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['soap','📖 S.O.A.P.']];
+S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
+function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
+function colorKeyText(){return COLORS.map(([c])=>`${c} = ${colorLabel(c)}`).join('; ')}
+const okColor=c=>COLORS.some(x=>x[0]===c)?c:'y';
+const COLOR_NAMES={y:'yellow',g:'green',b:'blue',p:'pink',o:'orange',v:'purple'};
+const colorWord=c=>COLOR_NAMES[okColor(c)];
+function parseJSON(t){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw {message:'The answer came back incomplete — tap Generate again.'};
+  try{return JSON.parse(t.slice(a,b+1))}catch(e){throw {message:'The answer came back incomplete — tap Generate again.'}}}
+const JSYS='You are a careful, warm Bible study helper. You are helping someone mark up ("load") their own PRINTED paper Bible at home with highlighters and a pen, so every note must be short enough to hand-write in a margin. Be faithful to the text and accurate about history; avoid speculation, keep to mainstream Christian understanding and briefly note real disagreements. Write in simple, encouraging English. Reply with ONLY one valid JSON object — no markdown fences, no text before or after.\n\n';
+function verseText(b,c,v){const s=settings();if(s.trans==='KJV'&&KJV&&KJV[b]&&KJV[b][c]&&KJV[b][c][v-1])return plainV(KJV[b][c][v-1]);if(s.book===b&&s.ch===c&&S.verses&&S.verses[v-1])return S.verses[v-1];const m=Cache.mem.get('chapters:'+`${s.trans}_${b}_${c}`);return m&&m.verses&&m.verses[v-1]||''}
+function applyHL(b,c,vs,color,quote){vs.forEach((v,i)=>{Store.set(`h_${b}.${c}.${v}`,{b,c,v,ref:refCode(b,c,[v]),color:okColor(color),text:verseText(b,c,v)||(i===0?quote||'':''),at:Date.now()})})}
+function addNote(b,c,vs,title,text,isMd){Store.set('n_'+newId(),{ref:refCode(b,c,vs),b,c,vs,title,text,md:!!isMd,created:Date.now(),updated:Date.now()})}
+const rc=p=>p?`${p.b} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`:'';
+const refA=(code,label)=>`<a class="ref" data-act="openRef" data-ref="${esc(code)}">${esc(label)}</a>`;
+const sw=c=>`<span class="swatch sw-${okColor(c)}" style="vertical-align:-2px"></span>`;
+const SHORT={Genesis:'Gen',Exodus:'Ex',Leviticus:'Lev',Numbers:'Num',Deuteronomy:'Deut',Joshua:'Josh',Judges:'Judg',Samuel:'Sam',Kings:'Kgs',Chronicles:'Chr',Nehemiah:'Neh',Esther:'Est',Psalms:'Ps',Proverbs:'Prov',Ecclesiastes:'Eccl','Song of Solomon':'Song',Isaiah:'Isa',Jeremiah:'Jer',Lamentations:'Lam',Ezekiel:'Ezek',Daniel:'Dan',Hosea:'Hos',Obadiah:'Obad',Micah:'Mic',Nahum:'Nah',Habakkuk:'Hab',Zephaniah:'Zeph',Haggai:'Hag',Zechariah:'Zech',Malachi:'Mal',Matthew:'Mt',Mark:'Mk',Luke:'Lk',John:'Jn',Romans:'Rom',Corinthians:'Cor',Galatians:'Gal',Ephesians:'Eph',Philippians:'Phil',Colossians:'Col',Thessalonians:'Thess',Timothy:'Tim',Titus:'Tit',Philemon:'Phlm',Hebrews:'Heb',James:'Jas',Peter:'Pet',Jude:'Jude',Revelation:'Rev'};
+const shortRef=r=>{const p=parseRef(r);if(!p)return r;const m=BM[p.b].name.match(/^(\d )?(.+)$/);return `${m[1]?m[1].trim():''}${SHORT[m[2]]||m[2]} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`};
+
+/* Turn a generated plan into a checklist of things to do in the paper Bible */
+function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,text)=>items.push({group,id,html,text});
+  if(pl.kind==='chapter'){const b=pl.b,c=pl.c,nm=`${BM[b].name} ${c}`;const vr=v=>refA(`${b} ${c}:${v}`,'v. '+v);
+    if(d.context){const x=d.context;
+      add('✍️ Top of the chapter','top',`Write above chapter ${c}: <b>“${esc(x.heading||'')}”</b>${x.summary?`<div class="small muted">Optional one-liner: ${esc(x.summary)}</div>`:''}`,`Top of ${nm}: "${x.heading}"`);
+      add('✍️ Top of the chapter','ctx',`Write a small context box by verse 1: <b>${[x.author&&'By '+x.author,x.audience&&'to '+x.audience].filter(Boolean).map(esc).join(' ')}</b>${x.setting?` · ${esc(x.setting)}`:''}${(x.background||[]).length?`<ul class="small" style="margin:6px 0 0">${x.background.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}`,`Context box by v.1: ${[x.author&&'By '+x.author,x.audience&&'to '+x.audience,x.setting].filter(Boolean).join(' · ')}`)}
+    (d.highlights||[]).forEach((x,i)=>add('🖍 Highlight','hl'+i,`${sw(x.color)} Highlight ${vr(x.v)} in <b>${colorWord(x.color)}</b> <span class="small muted">(${esc(colorLabel(okColor(x.color)))})</span>${x.quote?`<div style="font-family:var(--serif);font-size:16.5px">“${esc(x.quote)}”</div>`:''}<div class="small">${esc(x.why||'')}</div>`,`Highlight v.${x.v} ${colorWord(x.color)} — ${x.why||''}`));
+    (d.margin||[]).forEach((x,i)=>add('✎ Write in the margin','mg'+i,`Next to ${vr(x.v)} write:<div class="hand">${esc(x.note||'')}</div>`,`Margin v.${x.v}: ${x.note}`));
+    (d.xrefs||[]).forEach((x,i)=>add('🔗 Cross-references','xr'+i,`Next to ${vr(x.v)} write: <span class="hand" style="display:inline">${(x.refs||[]).map(y=>esc(y.ref)).join('; ')}</span><div class="small muted">${(x.refs||[]).map(y=>{const p=parseRef(y.ref);return (p?refA(rc(p),y.ref):esc(y.ref))+' — '+esc(y.why||'')}).join('<br>')}</div>`,`v.${x.v} → ${(x.refs||[]).map(y=>y.ref).join('; ')}`));
+    (d.words||[]).forEach((x,i)=>add('🔤 Word meanings','wd'+i,`Above <b>“${esc(x.word)}”</b> in ${vr(x.v)} write: <span class="hand" style="display:inline">${esc(x.original||'')} = ${esc(x.meaning||'')}</span>`,`v.${x.v} "${x.word}": ${x.original} = ${x.meaning}`));
+    if(d.soap){const x=d.soap;add('📖 S.O.A.P. for your journal','soap',`Copy this into your paper journal (or save it to the app Journal):<p style="margin:6px 0"><b>S</b> ${vr(x.v)} — <span style="font-family:var(--serif)">${esc(x.scripture||'')}</span></p><p style="margin:6px 0"><b>O</b> ${esc(x.observation||'')}</p><p style="margin:6px 0"><b>A</b> ${esc(x.application||'')}</p><p style="margin:6px 0"><b>P</b> <i>${esc(x.prayer||'')}</i></p><button class="btn sm" data-act="bSoap">Save to app Journal</button>`,`S.O.A.P. on v.${x.v}\nS: ${x.scripture}\nO: ${x.observation}\nA: ${x.application}\nP: ${x.prayer}`)}
+  }else if(pl.kind==='topic'){const vs=(d.verses||[]).filter(x=>parseRef(x.ref));const col=d.color;const title=`${d.title||pl.topic} ${d.emoji||''}`.trim();
+    if(vs[0])add('🏷️ Make the tab','tab',`Put a sticky tab on the page of ${refA(rc(parseRef(vs[0].ref)),vs[0].ref)} and write on it: <b>${esc(title)}</b>`,`Tab at ${vs[0].ref}: "${title}"`);
+    vs.forEach((x,i)=>{const nx=vs[i+1];add('🖍 Highlight & link the verses','tv'+i,`${sw(col)} Highlight ${refA(rc(parseRef(x.ref)),x.ref)} in <b>${colorWord(col)}</b>${x.quote?`<div style="font-family:var(--serif);font-size:16.5px">“${esc(x.quote)}”</div>`:''}<div class="small"><b>Why:</b> ${esc(x.why||'')}${x.use?`<br><b>When:</b> ${esc(x.use)}`:''}</div>
+      <div class="small" style="margin-top:4px">Then write in the margin: <span class="hand" style="display:inline">${esc(title)} → ${nx?esc(shortRef(nx.ref)):'back to '+esc(shortRef(vs[0].ref))}</span></div>`,`Highlight ${x.ref} ${colorWord(col)}; margin: "${title} → ${nx?nx.ref:'back to '+vs[0].ref}"`)});
+    add('🗂️ Index it','index',`Write the list on your Bible's inside cover or an insert card: <span class="hand" style="display:inline">${esc(title)}: ${vs.map(x=>esc(shortRef(x.ref))).join(', ')}</span><div class="row" style="margin-top:6px"><button class="btn sm" data-act="bTopicIns">Save as insert card</button></div>`,`Inside cover: ${title}: ${vs.map(x=>x.ref).join(', ')}`);
+  }else{const b=BM[pl.b];
+    add('📑 Book tab','btab',`Put a book tab on the first page of <b>${esc(b.name)}</b>${S.tabColors?'':''} — tip: use <b>${GENRES[b.genre][0]}</b> color <span class="swatch" style="background:${GENRES[b.genre][1]};vertical-align:-2px"></span> for all ${esc(GENRES[b.genre][0])} books.`,`Book tab on ${b.name}`);
+    add('✍️ Book title page','intro',`On the blank space before chapter 1 write:<div class="hand">${esc(d.tagline||'')}${(d.themes||[]).length?'<br>Themes: '+d.themes.map(esc).join(', '):''}</div>`,`${b.name} intro: ${d.tagline} Themes: ${(d.themes||[]).join(', ')}`);
+    (d.key_verses||[]).forEach((x,i)=>{const p=parseRef(x.ref);add('🖍 Key verses','kv'+i,`${sw('y')} Highlight ${p?refA(rc(p),x.ref):esc(x.ref)} <span class="small muted">— ${esc(x.why||'')}</span>`,`Highlight ${x.ref} — ${x.why||''}`)});
+    (d.chapters||[]).forEach(x=>add('✍️ Chapter headings','ch'+x.c,`Above chapter ${refA(`${b.abbr} ${x.c}`,String(x.c))} write <b>“${esc(x.title||'')}”</b> <span class="small muted">${esc(x.summary||'')}</span>`,`Ch ${x.c}: ${x.title}`));
+  }
+  return items}
+
+function loadPlans(){return Store.list('k_').sort((a,b)=>(b.at||0)-(a.at||0))}
+function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
+
+function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.book;B.ch=s.ch}if(!B.bookOnly)B.bookOnly=s.book;
+  const bookOpts=sel=>BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===sel?'selected':''}>${esc(b.name)}</option>`).join('');
+  let form='';
+  if(B.mode==='chapter')form=`<label class="l">Which chapter are you loading?</label>
+    <div class="row"><select class="f grow" id="bBook">${bookOpts(B.book)}</select><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div>
+    <label class="l">What do you want to add?</label>
+    <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
+    <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}</button>`;
+  else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
+    <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
+    <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
+    <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Find verses${B.topic?' for '+esc(B.topic.toLowerCase()):''}</button>
+    <p class="small muted">You'll get verses to highlight (with why), where to put a tab, and a chain to write in the margins so you can flip from one verse to the next.</p>`;
+  else form=`<label class="l">Which book?</label><select class="f" id="bBookOnly">${bookOpts(B.bookOnly)}</select>
+    <p class="small muted">Get a heading for the top of every chapter, what to write on the book's first page, its key verses to highlight, and where to put the book tab.</p>
+    <button class="btn pri" style="width:100%;justify-content:center" data-act="bGo">✨ Show me how to load ${esc(BM[B.bookOnly].name)}</button>`;
+  const plans=loadPlans();
+  v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
+  <div class="card">
+    <div class="chips">${[['chapter','📖 A chapter'],['topic','💭 A feeling / topic'],['book','📚 A whole book']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    ${form}</div>
+  <div id="buildOut"></div>
+  ${loadingListHtml(plans)}
+  <details class="guide"><summary>🖊️ What you need & tips</summary><div class="body">
+   <b>Supplies:</b> Bible-safe highlighters (gel or dry highlighters don't bleed through thin pages), a fine-tip archival pen (e.g. 0.2–0.3 mm), sticky or adhesive Bible tabs, a small ruler.<br><br>
+   <b>Before you start:</b> test pens on a blank page at the back. Set your color meanings in <b>Tabs & Key</b> and copy the key onto your inside cover.<br><br>
+   <b>Chain references:</b> write the next verse's reference in the margin by each verse on a topic, so you can flip from one to the next — the topic tool does this for you.<br><br>
+   <b>Keep it readable:</b> write small, use abbreviations (Jn, Rom, Ps), and leave room for future notes.</div></details>`;
+  const bb=$('#bBook',v);if(bb)bb.onchange=()=>{B.book=bb.value;B.ch=1;renderView()};
+  const bc=$('#bCh',v);if(bc)bc.onchange=()=>{B.ch=+bc.value;renderView()};
+  const bo=$('#bBookOnly',v);if(bo)bo.onchange=()=>{B.bookOnly=bo.value;renderView()};
+  const bt=$('#bTopic',v);if(bt)bt.oninput=()=>{B.topic=bt.value};
+  $$('details.grp>summary',v).forEach(sm=>sm.addEventListener('click',()=>{const d=sm.parentElement;S.grpState[d.dataset.g]=!d.open}));
+  renderBuildOut()}
+
+function planProg(pl){const it=planItems(pl),ch=pl.checks||{};const dn=it.filter(x=>ch[x.id]).length;return {it,dn,total:it.length,pct:it.length?Math.round(dn/it.length*100):0,done:it.length>0&&dn===it.length}}
+const KIND={chapter:['📖','Chapter'],topic:['💭','Feeling / topic'],book:['📚','Whole book']};
+function planHead(pl,pp,open){const k=KIND[pl.kind]||KIND.chapter;const title=pl.kind==='topic'?planTitle(pl).replace(/^\S+\s/,''):pl.kind==='book'?BM[pl.b].name:planTitle(pl);
+  const status=pp.done?'<span class="pstat done">✓ Done</span>':pp.dn?`<span class="pstat">${pp.pct}%</span>`:'<span class="pstat new">New</span>';
+  return `<div class="planhead" data-act="togglePlan" data-k="${pl.key}" role="button" aria-expanded="${open}">
+    <span class="pico">${pl.kind==='topic'&&pl.data&&pl.data.emoji?esc(pl.data.emoji):k[0]}</span>
+    <div class="grow" style="min-width:0"><div class="ptitle">${esc(title)}</div>
+      <div class="small muted">${k[1]} · ${pp.dn} of ${pp.total} steps${pl.at?' · '+new Date(pl.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}</div>
+      <div class="prog" style="margin-top:7px"><i style="width:${pp.pct}%"></i></div></div>
+    ${status}<span class="chev">${open?'▴':'▾'}</span></div>`}
+function planBody(pl,pp){const ch=pl.checks||{};const groups=[];pp.it.forEach(x=>{let g=groups.find(g=>g.name===x.group);if(!g)groups.push(g={name:x.group,items:[]});g.items.push(x)});
+  let h='';
+  if(pp.done)h+=`<div class="donebanner"><div style="font-size:30px">🎉</div><div class="grow"><b>All done!</b><div class="small">${esc(planTitle(pl).replace(/^(\p{Extended_Pictographic}\S*)\s/u,''))} is loaded in your Bible.</div></div><button class="btn sm pri" data-act="delPlan" data-k="${pl.key}">🗑 Remove</button></div>`;
+  if(pl.kind==='topic'&&pl.data.intro)h+=`<p style="margin:4px 2px 10px">${esc(pl.data.intro)}</p>`;
+  groups.forEach(g=>{const gd=g.items.filter(x=>ch[x.id]).length;const sk=pl.key+'|'+g.name;const open=S.grpState[sk]!=null?S.grpState[sk]:gd<g.items.length;
+    h+=`<details class="grp" data-g="${esc(sk)}" ${open?'open':''}><summary><span class="grow">${esc(g.name)}</span><span class="tag ${gd===g.items.length?'ok':''}">${gd}/${g.items.length}</span></summary>
+     ${g.items.map(it=>`<div class="item step ${ch[it.id]?'done':''}"><button class="tick" data-act="tick" data-k="${pl.key}" data-i="${esc(it.id)}" aria-label="Mark done">${ch[it.id]?'✓':''}</button><div class="grow">${it.html}</div></div>`).join('')}</details>`});
+  if(pl.kind==='topic'&&pl.data.prayer)h+=`<div class="card" style="margin:10px 0"><b>A prayer</b><p style="font-family:var(--serif);font-size:17px;margin:6px 0 0"><i>${esc(pl.data.prayer)}</i></p></div>`;
+  h+=`<div class="row planfoot">${pl.kind!=='topic'?`<button class="btn sm" data-act="openCh" data-b="${pl.b}" data-c="${pl.c||1}">📖 Read it</button>`:''}<button class="btn sm" data-act="copyPlan" data-k="${pl.key}">📋 Copy checklist</button><button class="btn sm" data-act="planOnline" data-k="${pl.key}">💻 Add to Online Bible</button><button class="btn sm" data-act="redoPlan" data-k="${pl.key}">↻ New ideas</button><button class="btn sm danger" data-act="delPlan" data-k="${pl.key}">🗑 Delete</button><button class="btn sm ghost" data-act="togglePlan" data-k="${pl.key}">▴ Close</button></div>
+   <p class="small muted" style="margin:6px 2px 0">Written by Claude — read the verses yourself and only mark what you agree with.</p>`;
+  return h}
+function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
+  const rows=plans.map(pl=>({pl,pp:planProg(pl)}));const act=rows.filter(r=>!r.pp.done),fin=rows.filter(r=>r.pp.done);
+  const card=r=>{const open=B.planKey===r.pl.key;return `<div class="plan ${open?'open':''} ${r.pp.done?'isdone':''}" id="plan-${esc(r.pl.key)}">${planHead(r.pl,r.pp,open)}${open?`<div class="planbody">${planBody(r.pl,r.pp)}</div>`:''}</div>`};
+  return `<div class="row" style="margin:18px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">My loading list</h2><span class="small muted">${act.length} in progress · ${fin.length} done</span></div>
+   <p class="small muted" style="margin:0 2px 8px">Tap a loading to open or close it.</p>
+   ${act.length?act.map(card).join(''):'<div class="notice">Nothing in progress — pick a chapter or feeling above to start loading.</div>'}
+   ${fin.length?`<div class="row" style="margin:16px 2px 4px"><h3 class="grow" style="margin:0;font-size:20px">✓ Finished</h3><button class="btn sm ghost" data-act="clearDone">🗑 Clear all finished</button></div>${fin.map(card).join('')}`:''}`}
+function renderBuildOut(){const o=$('#buildOut');if(!o)return;const B=S.build;
+  if(B.loading){o.innerHTML=`<div class="card" style="text-align:center"><span class="spin"></span><p><b>Preparing your steps…</b><br><span class="small muted">${B.prog?`Writing (${Math.round(B.prog/100)/10}k characters)`:'Reading the passage and its context'}</span></p><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div>`;return}
+  o.innerHTML=B.err?`<div class="card"><p class="muted">${esc(B.err)}</p></div>`:''}
+function scrollToPlan(k){setTimeout(()=>{const el=document.getElementById('plan-'+k);if(el){const y=el.getBoundingClientRect().top+window.scrollY-70;window.scrollTo({top:y,behavior:'smooth'})}},60)}
+function archivePlan(pl){const pp=planProg(pl);const st=Object.assign({},Store.get('stats')||{});const ar=Object.assign({loaded:0,topics:0,books:0,psalms:0,steps:0},st.arch||{});
+  ar.steps+=pp.dn;if(pp.done){if(pl.kind==='chapter'){ar.loaded++;if(pl.b==='PSA')ar.psalms++}else if(pl.kind==='topic')ar.topics++;else ar.books++}st.arch=ar;Store.set('stats',st)}
+function removePlan(k){const pl=Store.get(k);if(!pl)return;archivePlan(pl);Store.del(k);if(S.build.planKey===k)S.build.planKey=null}
+async function runBuild(){const B=S.build;const s=settings();let prompt,meta,key;
+  if(B.mode==='chapter'){const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
+    const name=`${BM[B.book].name} ${B.ch}`;const keys=[];
+    if(B.parts.context)keys.push('"context": {"heading": "short title to write above the chapter (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "who it was first written to (few words)", "setting": "when/where and what is happening (max 15 words)", "background": ["2-4 short historical or cultural facts a modern reader would miss (max 15 words each)"]}');
+    if(B.parts.hl)keys.push(`"highlights": [{"v": "verse number or range like 3-5", "color": "one letter from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}] — the 5-10 most important verses`);
+    if(B.parts.margin)keys.push('"margin": [{"v": "verse number or range", "note": "margin note, max 15 words, handwritable"}] — 5-10 notes across the chapter');
+    if(B.parts.xrefs)keys.push('"xrefs": [{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}] — 4-8 verses with 1-3 well-known cross-references each');
+    if(B.parts.words)keys.push('"words": [{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}] — 2-4 key words');
+    if(B.parts.soap)keys.push(`"soap": {"v": "key verse number or range", "scripture": "text of that verse in the ${s.trans}", "observation": "2-3 sentences", "application": "2-3 practical, personal sentences", "prayer": "1-2 sentence prayer"}`);
+    prompt=JSYS+`Show me how to load ${name} in my paper Bible (${TRANS[s.trans]}).\nMy highlighter color key: ${colorKeyText()}.\nReturn a JSON object with exactly these keys:\n${keys.join(',\n')}`;
+    key=`k_${B.book}.${B.ch}`;meta={kind:'chapter',b:B.book,c:B.ch};}
+  else if(B.mode==='topic'){const t=(B.topic||'').trim();if(!t){toast('Type or pick a feeling or topic');return}
+    prompt=JSYS+`I want to make a topic tab in my paper Bible for "${t}" — verses to highlight in one color and chain together in the margins.\nMy highlighter color key: ${colorKeyText()}.\nReturn JSON: {"title": "tab label (1-2 words)", "emoji": "one emoji", "color": "best color letter from my key", "intro": "2 sentences on what the Bible says about ${t}, gently and honestly", "verses": [{"ref": "Book chapter:verse or chapter:verse-verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}] (7-10 verses in Bible order, Old and New Testament, never ripped out of context), "prayer": "a short prayer"}`;
+    key='k_t-'+t.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40);meta={kind:'topic',topic:t};}
+  else{const b=BM[B.bookOnly];
+    prompt=JSYS+`Show me how to load the book of ${b.name} (${b.chapters} chapters) in my paper Bible.\nReturn JSON: {"tagline": "one sentence on what the book is about (max 20 words)", "themes": ["3-5 big themes, 1-3 words each"], "key_verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}] (4-8), "chapters": [{"c": chapter number, "title": "heading to write above the chapter, max 5 words", "summary": "max 10 words"}] (one for EVERY chapter 1-${b.chapters})}`;
+    key='k_b-'+b.abbr;meta={kind:'book',b:b.abbr};}
+  B.loading=true;B.err='';B.prog=0;B.planKey=null;renderBuildOut();$('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'});
+  try{const res=await ai(prompt,t=>{B.prog=t.length;if(B.prog%400<60)renderBuildOut()},null,'default');
+    const data=parseJSON(res.text);Store.set(key,Object.assign({data,checks:{},at:Date.now()},meta));B.planKey=key;}
+  catch(e){B.err=aiErr(e)}
+  B.loading=false;if(S.tab==='load')renderView();if(B.planKey)scrollToPlan(B.planKey);else setTimeout(()=>$('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'}),50)}
+
+function planOnline(pl){const d=pl.data;
+  if(pl.kind==='chapter'){const b=pl.b,c=pl.c,V=v=>vrange(parseRef(`${b} ${c}:${v}`));
+    if(d.context){const x=d.context;addNote(b,c,[],'Context: '+(x.heading||''),[x.author&&'Author: '+x.author,x.audience&&'Written to: '+x.audience,x.setting&&'Setting: '+x.setting,x.summary,(x.background||[]).map(t=>'• '+t).join('\n')].filter(Boolean).join('\n\n'))}
+    (d.highlights||[]).forEach(x=>applyHL(b,c,V(x.v),x.color,x.quote));
+    (d.margin||[]).forEach(x=>addNote(b,c,V(x.v),'Margin note',x.note));
+    (d.xrefs||[]).forEach(x=>addNote(b,c,V(x.v),'Cross-references',(x.refs||[]).map(y=>`${y.ref} — ${y.why||''}`).join('\n')));
+    (d.words||[]).forEach(x=>addNote(b,c,V(x.v),`Word: ${x.word} (${x.original||''})`,x.meaning||''));}
+  else if(pl.kind==='topic'){const refs=(d.verses||[]).map(x=>parseRef(x.ref)).filter(Boolean);
+    Store.set('t_u'+newId(),{name:d.title||pl.topic,ic:d.emoji||'🏷️',refs:refs.map(rc)});(d.verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),d.color,x.quote)})}
+  else{const b=BM[pl.b];Store.set('i_'+newId(),{title:`${b.name} — chapter by chapter`,ref:`${b.abbr} 1`,body:(d.tagline?d.tagline+'\n\n':'')+(d.chapters||[]).map(x=>`${x.c}. ${x.title}${x.summary?' — '+x.summary:''}`).join('\n'),updated:Date.now()});
+    (d.key_verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),'y','')})}
+  toast('Added to your Online Bible')}
+
+Object.assign(A,{
+  bMode:el=>{S.build.mode=el.dataset.m;S.build.planKey=null;S.build.err='';renderView()},
+  bPart:el=>{const p=el.dataset.p;S.build.parts[p]=!S.build.parts[p];el.classList.toggle('on')},
+  bFeel:el=>{S.build.topic=el.dataset.f;renderView()},
+  bGo:()=>runBuild(),
+  openPlan:el=>{S.build.planKey=el.dataset.k;renderView();scrollToPlan(el.dataset.k)},
+  togglePlan:el=>{const k=el.dataset.k;const was=S.build.planKey===k;S.build.planKey=was?null:k;S.build.err='';renderView();scrollToPlan(k)},
+  redoPlan:el=>{const pl=Store.get(el.dataset.k);if(!pl)return;S.build.mode=pl.kind;if(pl.kind==='chapter'){S.build.book=pl.b;S.build.ch=pl.c}else if(pl.kind==='topic')S.build.topic=pl.topic;else S.build.bookOnly=pl.b;
+    confirmSheet('Replace this checklist with new ideas? Your ticks will be cleared.','Get new ideas',()=>runBuild())},
+  clearDone:()=>{const fin=loadPlans().filter(pl=>planProg(pl).done);confirmSheet(`Remove ${fin.length} finished loading${fin.length===1?'':'s'} from your list? Your badges and stats are kept.`,'Remove',()=>{fin.forEach(pl=>removePlan(pl.key));toast('Finished loadings removed');renderView()})},
+  tick:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const ch=Object.assign({},pl.checks);ch[el.dataset.i]=!ch[el.dataset.i];if(ch[el.dataset.i])touch();
+    if(pl.kind==='chapter'){const it=planItems(pl);if(it.every(x=>ch[x.id])&&!isRead(pl.b,pl.c))toggleRead(pl.b,pl.c)}
+    Store.set(k,Object.assign({},pl,{checks:ch}))},
+  copyPlan:el=>{const pl=Store.get(el.dataset.k||S.build.planKey);const it=planItems(pl);let g=null;
+    copyText(`Load my Bible — ${planTitle(pl).replace(/^\S+\s/,m=>/\p{Emoji}/u.test(m)?'':m)}\n`+it.map(x=>{let s='';if(x.group!==g){g=x.group;s+=`\n${g.replace(/^\S+\s/,'')}\n`}return s+`${(pl.checks||{})[x.id]?'[x]':'[ ]'} ${x.text}`}).join('\n'))},
+  planOnline:el=>planOnline(Store.get(el.dataset.k||S.build.planKey)),
+  delPlan:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const done=planProg(pl).done;
+    confirmSheet(done?`Remove “${planTitle(pl)}” from your list? It stays counted in your badges and stats.`:`Delete “${planTitle(pl)}”? You haven\u2019t finished it yet.`,done?'Remove':'Delete',()=>{removePlan(k);toast(done?'Removed — well done! 🎉':'Deleted');renderView()})},
+  bSoap:()=>{const pl=Store.get(S.build.planKey),x=pl.data.soap;Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref:`${pl.b} ${pl.c}:${x.v}`,scripture:x.scripture||'',obs:x.observation||'',app:x.application||'',prayer:x.prayer||''}});toast('S.O.A.P. saved to Journal')},
+  bTopicIns:()=>{const pl=Store.get(S.build.planKey),d=pl.data;Store.set('i_'+newId(),{title:`${d.emoji||''} ${d.title||pl.topic}`.trim(),ref:'',body:(d.intro?d.intro+'\n\n':'')+(d.verses||[]).map(x=>`${x.ref} — ${x.why||''}`).join('\n')+(d.prayer?'\n\nPrayer: '+d.prayer:''),updated:Date.now()});toast('Insert card saved (Tabs & Key → Inserts)')},
+  loadThisChapter:()=>{const s=settings();Object.assign(S.build,{mode:'chapter',book:s.book,ch:s.ch,planKey:null,err:''});setTab('load');runBuild()},
+  genSoap:async()=>{const sh=$('#sheet');const ref=$('[data-f="ref"]',sh).value.trim();if(!ref){toast('Add a Scripture reference first');return}
+    const btn=$('[data-act="genSoap"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Writing…';const s=settings();
+    try{const r=await ai(JSYS+`Write a S.O.A.P. devotion on ${ref} (${TRANS[s.trans]}). Return JSON: {"scripture": "the verse text", "observation": "3-4 sentences including its context", "application": "3-4 practical, personal sentences", "prayer": "2-3 sentence prayer"}`,null,null,'default');
+      const d=parseJSON(r.text);const set=(k,v)=>{const i=$(`[data-f="${k}"]`,sh);if(i&&v&&!i.value.trim())i.value=v};set('scripture',d.scripture);set('obs',d.observation);set('app',d.application);set('prayer',d.prayer);toast('Filled in — edit it into your own words')}
+    catch(e){toast(aiErr(e))}btn.disabled=false;btn.innerHTML='✨ Generate S.O.A.P. for me'},
+  genNote:async()=>{const sh=$('#sheet');const ref=$('#nRef').value.trim();if(!ref){toast('Add a reference first');return}const btn=$('[data-act="genNote"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Writing…';
+    try{const r=await ai(JSYS+`Write a short margin note on ${ref}. Return JSON: {"title": "max 5 words", "note": "2-3 short sentences: what it means in context and one way to apply it"}`,null,null,'default');const d=parseJSON(r.text);
+      if(!$('#nTitle').value.trim())$('#nTitle').value=d.title||'';const t=$('#nText');t.value=(t.value.trim()?t.value.trim()+'\n\n':'')+(d.note||'')}
+    catch(e){toast(aiErr(e))}btn.disabled=false;btn.innerHTML='✨ Write a note for me'},
+});
+
+/* ---------- ACCOUNT, LOGIN & DONATE ---------- */
+const CFG=window.LB_CONFIG||null;const STANDALONE=!!CFG;
+const DONATE_EMAIL='shengcremers@gmail.com';          // receives "Send with PayPal" payments
+const DONATE_EMAIL_ALT='shengcremers4@gmail.com';     // receives PayPal Donate payments (backup option)
+const PAYPAL_ME=(CFG&&CFG.paypalMe)||'';               // optional PayPal.Me name, e.g. "shengcremers" — most reliable when set
+const BANNERS=[['','linear-gradient(135deg,#8b2e24,#5a1c16)'],['sunrise','linear-gradient(135deg,#f6b26b,#e06c4c 55%,#8b2e24)'],['olive','linear-gradient(135deg,#46562a,#a7955a)'],['sea','linear-gradient(135deg,#123a63,#2a8f8f)'],['dusk','linear-gradient(135deg,#3b2457,#b0567a)'],['night','radial-gradient(circle at 75% 25%,#56679a,#141b2d 70%)'],['dawn','linear-gradient(180deg,#fbe3c2,#f3a683 60%,#c0614b)'],['field','linear-gradient(160deg,#c9d77e,#6a8b3a 60%,#3d5422)']];
+const DONATE_CUR=(CFG&&CFG.currency)||'USD';const CUR_SYM={USD:'$',EUR:'€',GBP:'£'}[DONATE_CUR]||'$';
+const FB_V='10.12.2';
+const Auth={user:null,fb:null,guest:false,ready:false};
+const BOOK_SVG='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--accent)"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>';
+const GOOGLE_SVG='<svg width="19" height="19" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+const TIKTOK_SVG='<svg width="19" height="19" viewBox="0 0 24 24"><path fill="currentColor" d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.3 7.3 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6z"/></svg>';
+const AVATARS=['🙂','😇','🕊️','🦁','🐑','🌿','⭐','🔥','📖','✝️','🌸','☀️','🌊','🏔️','🎵','💛','🌻','🐟','🍞','👑'];
+const VOTD=['JHN 3:16','PSA 23:1','PRO 3:5-6','ISA 40:31','PHP 4:13','ROM 8:28','JER 29:11','MAT 11:28','PSA 46:10','JOS 1:9','2CO 5:17','GAL 5:22-23','EPH 2:8-9','HEB 11:1','1PE 5:7','PSA 119:105','MAT 6:33','ROM 12:2','LAM 3:22-23','ISA 41:10','JHN 14:6','PSA 37:4','COL 3:23','1CO 13:4','MIC 6:8','PSA 34:8','ROM 5:8','JAS 1:5','PHP 4:6-7','2TI 1:7','PSA 139:14','JHN 16:33','MAT 5:16','PSA 121:1-2','ISA 26:3','1JN 4:19','ZEP 3:17','NUM 6:24-26','HEB 12:1-2','REV 21:4'];
+const LEVELS=['Seeker','Listener','Learner','Student','Disciple','Scribe','Servant','Teacher','Shepherd','Elder','Sage','Pillar'];
+const AUTH_ERR={'auth/invalid-email':'That email address doesn’t look right.','auth/user-not-found':'No account with that email — create one?','auth/wrong-password':'Wrong password. Try again or tap “Forgot password?”','auth/invalid-credential':'Email or password is incorrect.','auth/invalid-login-credentials':'Email or password is incorrect.','auth/email-already-in-use':'There’s already an account with this email — sign in instead.','auth/weak-password':'Choose a password with at least 6 characters.','auth/too-many-requests':'Too many tries. Wait a few minutes and try again.','auth/network-request-failed':'No internet connection.','auth/popup-closed-by-user':'The sign-in window was closed.','auth/requires-recent-login':'For safety, sign out, sign in again, then try once more.','auth/account-exists-with-different-credential':'This email already uses another sign-in method — sign in with that one.','auth/missing-email':'Enter your email first.','auth/unauthorized-domain':'This website isn’t added to the login settings yet (Firebase → Authentication → Authorized domains).','auth/operation-not-allowed':'This sign-in method isn’t switched on yet in Firebase.'};
+
+const profile=()=>Object.assign({name:'',avatar:'🙂',fav:'',goal:5,theme:''},Store.get('profile')||{});
+function saveProfile(p){Store.set('profile',Object.assign(profile(),p))}
+function displayName(){const p=profile();return p.name||(Auth.user&&Auth.user.displayName)||(Auth.user&&Auth.user.email&&Auth.user.email.split('@')[0])||'Friend'}
+function applyTheme(){const t=profile().theme;if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
+function avatarHtml(){const ph=Store.get('pic_avatar');return ph&&ph.data?`<img src="${ph.data}" alt="">`:esc(profile().avatar)}
+function bannerStyle(){const ph=Store.get('pic_banner');const pf=profile();if(pf.banner==='photo'&&ph&&ph.data)return `background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),url(${ph.data}) center/cover`;const b=BANNERS.find(x=>x[0]===pf.banner)||BANNERS[0];return 'background:'+b[1]}
+function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}}
+async function fileToJpeg(file,w,h,maxLen){const url=URL.createObjectURL(file);try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('That file isn\u2019t a picture I can open.'));i.src=url});
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');const sr=Math.max(w/img.naturalWidth,h/img.naturalHeight);const sw=w/sr,sh=h/sr;
+  x.drawImage(img,(img.naturalWidth-sw)/2,(img.naturalHeight-sh)/2,sw,sh,0,0,w,h);let q=.86,d;do{d=c.toDataURL('image/jpeg',q);q-=.08}while(d.length>maxLen&&q>.3);return d}finally{URL.revokeObjectURL(url)}}
+function wirePicInput(kind){const i=$('#picIn');if(!i)return;i.addEventListener('change',async()=>{const f=i.files&&i.files[0];if(!f)return;const lab=$('#picLab');if(lab)lab.innerHTML='<span class="spin"></span> Preparing photo…';
+  try{const d=kind==='avatar'?await fileToJpeg(f,320,320,90000):await fileToJpeg(f,1200,440,190000);Store.set('pic_'+kind,{data:d,at:Date.now()});if(kind==='banner')saveProfile({banner:'photo'});closeSheet();renderView();updateAvatar();toast(kind==='avatar'?'Profile photo saved':'Banner saved')}
+  catch(e){toast(e.message||'Couldn\u2019t use that photo');if(lab)lab.innerHTML='📷 Choose a photo'}})}
+function todayStr(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function touch(n=1){const st=Object.assign({},Store.get('stats')||{});const days=Object.assign({},st.days||{});const t=todayStr();days[t]=(days[t]||0)+n;
+  const keys=Object.keys(days).sort();while(keys.length>400)delete days[keys.shift()];st.days=days;Store.set('stats',st)}
+
+function computeStats(){const plans=Store.list('k_');let steps=0,loaded=0,topics=0,books=0,psL=0;
+  plans.forEach(pl=>{const it=planItems(pl);const dn=it.filter(x=>(pl.checks||{})[x.id]).length;steps+=dn;if(it.length&&dn===it.length){if(pl.kind==='chapter'){loaded++;if(pl.b==='PSA')psL++}else if(pl.kind==='topic')topics++;else books++}});
+  const ar=(Store.get('stats')||{}).arch||{};steps+=ar.steps||0;loaded+=ar.loaded||0;topics+=ar.topics||0;books+=ar.books||0;psL+=ar.psalms||0;
+  const pr=progress();const read=Object.values(pr).reduce((a,x)=>a+x.length,0);
+  const gospels=['MAT','MRK','LUK','JHN'].every(b=>(pr[b]||[]).length>=BM[b].chapters);
+  const ntRead=BOOKS.filter(b=>b.nt).reduce((a,b)=>a+(pr[b.abbr]||[]).length,0);
+  const hl=Store.list('h_').length,notes=Store.list('n_').length,journal=Store.list('j_').length,tabs=Store.list('t_').length,ins=Store.list('i_').length;
+  const days=(Store.get('stats')||{}).days||{};let streak=0;const d=new Date();if(!days[todayStr(d)])d.setDate(d.getDate()-1);while(days[todayStr(d)]){streak++;d.setDate(d.getDate()-1)}
+  const today=days[todayStr()]||0;let best=0,run=0,prev=null;Object.keys(days).sort().forEach(k=>{const dt=new Date(k+'T12:00');run=prev&&(dt-prev)<36*3600e3?run+1:1;prev=dt;best=Math.max(best,run)});
+  const xp=steps*5+hl*2+notes*3+journal*10+read*5+loaded*25+topics*25+books*60+Math.min(streak,60)*5;
+  return {steps,loaded,topics,books,psalms:Math.max(psL,(pr.PSA||[]).length),read,gospels,ntRead,hl,notes,journal,tabs,ins,streak,best,today,xp,activeDays:Object.keys(days).length}}
+function levelOf(xp){const n=Math.floor(Math.sqrt(xp/40))+1;const lo=40*(n-1)**2,hi=40*n**2;return {n,title:LEVELS[Math.min(n-1,LEVELS.length-1)],pct:Math.round((xp-lo)/(hi-lo)*100),toNext:hi-xp}}
+const BADGES=[
+ ['first','🖍','First mark','Tick your first step or make a highlight',s=>s.steps+s.hl>=1],
+ ['loaded1','📖','Loaded!','Fully load one chapter',s=>s.loaded>=1],
+ ['loaded10','🔥','On fire','Fully load 10 chapters',s=>s.loaded>=10],
+ ['loaded50','🏆','Well-loaded','Fully load 50 chapters',s=>s.loaded>=50],
+ ['topic','🏷️','Tab maker','Finish a topic tab',s=>s.topics>=1],
+ ['book','📚','Whole book','Finish loading a whole book',s=>s.books>=1],
+ ['journal1','✍️','Journaler','Write a journal entry',s=>s.journal>=1],
+ ['journal10','📓','Faithful writer','10 journal entries',s=>s.journal>=10],
+ ['notes25','🗒️','Note taker','25 notes',s=>s.notes>=25],
+ ['streak3','⚡','3-day streak','Study 3 days in a row',s=>s.best>=3],
+ ['streak7','🌟','Week strong','7 days in a row',s=>s.best>=7],
+ ['streak30','👑','Month of faithfulness','30 days in a row',s=>s.best>=30],
+ ['psalms','🎵','Psalm singer','Read or load 5 Psalms',s=>s.psalms>=5],
+ ['read100','📜','Century','Read 100 chapters',s=>s.read>=100],
+ ['gospels','✝️','Gospel walker','Read all four Gospels',s=>s.gospels],
+ ['nt','🕊️','New Testament','Read the whole New Testament',s=>s.ntRead>=260],
+];
+
+function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);const got=BADGES.filter(b=>b[4](st));
+  const goal=pf.goal||5;const vi=(Math.floor(Date.now()/864e5)+(S.votdOff||0))%VOTD.length;const vref=VOTD[(vi+VOTD.length)%VOTD.length];const vp=parseRef(vref);
+  const vtxt=KJV&&vp?vrange(vp).map(n=>plainV((KJV[vp.b]&&KJV[vp.b][vp.c]||[])[n-1]||'')).join(' '):'';
+  const prov=!STANDALONE?'Claude account':Auth.guest?'Guest (this device only)':!Auth.user?'':Auth.user.uid.startsWith('tiktok:')?'TikTok':(Auth.user.providerData[0]||{}).providerId==='google.com'?'Google':'Email & password';
+  v.innerHTML=`<div class="profilecard"><div class="banner" style="${bannerStyle()}"><button class="bannerbtn" data-act="pickBanner">🖼 Change banner</button></div>
+     <div class="pc-body"><div class="avwrap"><button class="bigavatar" data-act="pickAvatar" aria-label="Change profile picture">${avatarHtml()}</button><button class="camdot" data-act="pickAvatar" aria-label="Change profile picture">📷</button></div>
+     <div class="pc-info"><h2>${esc(displayName())}</h2><p class="small muted" style="margin:0">Level ${lv.n} · ${lv.title} · ${st.xp} XP</p><div class="prog" style="margin-top:8px"><i style="width:${lv.pct}%"></i></div><p class="small muted" style="margin:4px 0 0">${lv.toNext} XP to level ${lv.n+1}</p></div></div></div>
+   <div class="tiles">
+     <div class="tile"><b>🔥 ${st.streak}</b><span>day streak</span></div>
+     <div class="tile"><b>📖 ${st.loaded}</b><span>chapters loaded</span></div>
+     <div class="tile"><b>✅ ${st.steps}</b><span>steps done</span></div>
+     <div class="tile"><b>🏅 ${got.length}</b><span>of ${BADGES.length} badges</span></div></div>
+   <div class="card"><div class="row"><b class="grow">🎯 Today's goal</b><span class="small muted">${Math.min(st.today,goal)}/${goal}</span></div>
+     <div class="prog" style="margin:8px 0"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div>
+     <p class="small muted" style="margin:0 0 6px">${st.today>=goal?'Goal reached today — well done! 🎉':'Every ticked step, highlight, note or journal entry counts.'}</p>
+     <div class="chips">${[3,5,10,20].map(g=>`<button class="chip ${goal===g?'on':''}" data-act="setGoal" data-g="${g}">${g} a day</button>`).join('')}</div></div>
+   <div class="card votd"><div class="row"><span class="tag">☀️ Verse of the day</span><span class="grow"></span><button class="btn sm ghost" data-act="votdNext">🎲 Another</button></div>
+     <h3 style="margin:8px 0 4px;font-size:22px">${refA(vref,codeToLabel(vref))}</h3>
+     ${vtxt?`<p style="font-family:var(--serif);font-size:19px;line-height:1.5;margin:4px 0">${esc(vtxt)}</p>`:`<button class="btn sm" data-act="votdShow">Show the verse</button>`}
+     <div class="row" style="margin-top:8px"><button class="btn sm pri" data-act="votdLoad" data-r="${vref}">✨ Load it in my Bible</button>${vtxt?`<button class="btn sm" data-act="votdCopy">⧉ Copy</button>`:''}</div></div>
+   <h2 class="sec">Badges</h2>
+   <div class="badges">${BADGES.map(b=>{const ok=b[4](st);return `<div class="badge ${ok?'got':''}" title="${esc(b[3])}"><span>${ok?b[1]:'🔒'}</span><b>${esc(b[2])}</b><small>${esc(b[3])}</small></div>`}).join('')}</div>
+   <div class="card donatecard"><div class="row"><span style="font-size:30px">❤️</span><div class="grow"><b>Support Loaded Bible</b><div class="small muted">Help keep it free and growing.</div></div><button class="btn pri" data-act="donate">Donate</button></div></div>
+   <h2 class="sec">My profile</h2>
+   <div class="card"><label class="l" style="margin-top:0">Name</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
+     <label class="l">Favorite verse</label><input class="f" id="pfFav" value="${esc(pf.fav?codeToLabel(pf.fav):'')}" placeholder="e.g. Psalm 46:10">
+     ${pf.fav&&parseRef(pf.fav)?`<p class="small" style="margin:6px 2px 0">${refA(pf.fav,'Open '+codeToLabel(pf.fav))}</p>`:''}
+     <label class="l">Look</label><div class="chips">${[['','Auto'],['light','☀️ Light'],['sepia','📜 Sepia'],['dark','🌙 Dark']].map(([k,l])=>`<button class="chip ${pf.theme===k?'on':''}" data-act="setTheme" data-t="${k}">${l}</button>`).join('')}</div>
+     <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div>
+   <h2 class="sec">Account</h2>
+   <div class="card"><p style="margin:0"><b>Signed in with:</b> ${esc(prov)}${STANDALONE&&Auth.user&&Auth.user.email?`<br><span class="small muted">${esc(Auth.user.email)}</span>`:''}</p>
+     ${!STANDALONE?'<p class="small muted">You’re using Loaded Bible inside Claude, so your progress saves to your Claude account automatically. Logging in with email, Google or TikTok happens on your own website version — Claude’s preview can’t connect to Google.</p><button class="btn sm" data-act="authPreview">👀 Preview the login screen</button>':''}
+     ${STANDALONE&&Auth.guest?'<p class="small muted">Your progress is only saved on this device. Create a free account to keep it safe and use it on your phone and computer.</p><button class="btn pri" data-act="goSignup">Create an account</button>':''}
+     ${STANDALONE&&Auth.user?`<div class="row" style="margin-top:10px">${prov==='Email & password'?'<button class="btn sm" data-act="acctReset">🔑 Change password</button>':''}<button class="btn sm" data-act="signOut">Sign out</button><button class="btn sm ghost" data-act="deleteAcct">Delete account</button></div>`:''}
+     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="copyAll">⧉ Back up all my notes as text</button></div></div>
+   <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
+  const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
+  const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
+  updateAvatar()}
+
+function donAmount(){const a=S.donCustom?parseFloat(String(S.donCustomVal||'').replace(',','.')):S.donAmt;return a>0&&a<100000?Math.round(a*100)/100:0}
+function sendUrl(){const a=donAmount();
+  if(PAYPAL_ME)return `https://www.paypal.me/${encodeURIComponent(PAYPAL_ME)}${a?'/'+a.toFixed(2)+DONATE_CUR:''}`;
+  const p=new URLSearchParams({cmd:'_xclick',business:DONATE_EMAIL,item_name:'Gift for Loaded Bible',currency_code:DONATE_CUR,no_shipping:'1'});if(a)p.set('amount',a.toFixed(2));
+  return 'https://www.paypal.com/cgi-bin/webscr?'+p}
+function donateUrl(){const a=donAmount();const p=new URLSearchParams({business:DONATE_EMAIL_ALT,no_recurring:'0',item_name:'Support Loaded Bible',currency_code:DONATE_CUR});if(a)p.set('amount',a.toFixed(2));return 'https://www.paypal.com/donate?'+p}
+function donLabel(){const a=donAmount();return a?`Send ${CUR_SYM}${a%1?a.toFixed(2):a} with PayPal`:'Send with PayPal'}
+function donateSheet(){if(S.donAmt==null)S.donAmt=5;
+  openSheet(`<div style="text-align:center"><div style="font-size:44px;line-height:1">❤️</div><h3 style="margin-top:6px">Support Loaded Bible</h3><p class="muted" style="margin-top:0">Loaded Bible is free. If it helps you grow, a gift keeps it running and growing. Thank you!</p></div>
+   <div class="amts">${[1,5,10,15,20].map(a=>`<button class="amt ${!S.donCustom&&S.donAmt===a?'on':''}" data-act="donAmt" data-a="${a}">${CUR_SYM}${a}</button>`).join('')}<button class="amt ${S.donCustom?'on':''}" data-act="donCustom">Other</button></div>
+   <div id="donBox" style="display:${S.donCustom?'block':'none'}"><label class="l">Choose your own amount (${DONATE_CUR})</label><div class="row"><b style="font-size:22px">${CUR_SYM}</b><input class="f grow" id="donIn" type="text" inputmode="decimal" placeholder="e.g. 25" value="${esc(S.donCustomVal||'')}"></div></div>
+   <a class="btn pri wide paypal" id="donLink" href="${esc(sendUrl())}" target="_blank" rel="noopener noreferrer">${esc(donLabel())}</a>
+   <p class="small muted" style="text-align:center;margin:8px 0 4px">Opens PayPal, where you can pay with your PayPal account or a card.</p>
+   <details class="guide" style="margin-top:10px"><summary>Link not working?</summary><div class="body">
+     <a class="btn wide" id="donAlt" href="${esc(donateUrl())}" target="_blank" rel="noopener noreferrer">Try PayPal Donate instead</a>
+     <p class="small" style="margin:12px 0 6px">Or send it yourself: open the PayPal app → <b>Send</b> → paste this email:</p>
+     <div class="row"><code class="grow" style="font-size:14px;background:var(--soft);padding:8px 10px;border-radius:8px">${esc(DONATE_EMAIL)}</code><button class="btn sm" data-act="copyPayEmail">⧉ Copy</button></div></div></details>`);
+  const i=$('#donIn');if(i)i.addEventListener('input',()=>{S.donCustomVal=i.value;const l=$('#donLink');l.href=sendUrl();l.textContent=donLabel();$('#donAlt').href=donateUrl()})}
+
+/* ----- login (website version only) ----- */
+async function loadFirebase(){if(Auth.fb)return Auth.fb;const base=`https://www.gstatic.com/firebasejs/${FB_V}/`;
+  const [app,auth,fs]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
+  const a=app.initializeApp(CFG.firebase);const au=auth.getAuth(a);let db;try{db=fs.initializeFirestore(a,{localCache:fs.persistentLocalCache()})}catch(e){db=fs.getFirestore(a)}
+  Auth.fb={auth:au,A:auth,F:fs,db};return Auth.fb}
+const isGuestFlag=()=>{try{return localStorage.getItem('lb1:guest')==='1'}catch(e){return false}};
+function startGuest(){Auth.guest=true;Auth.user=null;hideAuth();Store.useNamespace('guest');applyTheme();updateAvatar();renderView()}
+function hideAuth(){$('#auth').classList.remove('show')}
+function authMsg(m,ok){const e=$('#authMsg');if(e){e.textContent=m;e.className='authmsg '+(ok?'ok':'bad')}}
+function authErr(e){console.warn(e);authMsg(AUTH_ERR[e&&e.code]||(e&&e.message)||'Something went wrong. Please try again.')}
+function authBusy(on){$$('#auth button').forEach(b=>b.disabled=on)}
+function showAuth(mode){S.authMode=mode||S.authMode||'signin';const el=$('#auth');el.classList.add('show');const m=S.authMode;const C=CFG||{tiktok:true};
+  if(m==='loading'){el.innerHTML=`<div class="authbox" style="text-align:center"><div class="brand" style="justify-content:center;font-size:30px">${BOOK_SVG}Loaded Bible</div><p><span class="spin"></span></p></div>`;return}
+  el.innerHTML=`<div class="authbox">${STANDALONE?'':'<div class="previewbar"><span class="grow">👀 Preview — logins work on your website version</span><button class="btn sm" data-act="closePreview">✕ Close</button></div>'}
+   <div class="brand" style="justify-content:center;font-size:30px">${BOOK_SVG}Loaded Bible</div>
+   <p class="muted" style="text-align:center;margin:6px 0 18px">Load your paper Bible with highlights, notes, tabs and context — and keep your progress safe.</p>
+   ${m==='forgot'?`<h3>Reset your password</h3><p class="small muted">Enter your email and we'll send you a link to choose a new password.</p>
+     <input class="f" id="aEmail" type="email" autocomplete="email" placeholder="Email" value="${esc(S.authEmail||'')}">
+     <button class="btn pri wide" data-act="authReset">Send reset link</button>
+     <button class="linkbtn" data-act="authMode" data-m="signin">← Back to sign in</button>`:
+   `<div class="seg"><button class="${m==='signin'?'on':''}" data-act="authMode" data-m="signin">Sign in</button><button class="${m==='signup'?'on':''}" data-act="authMode" data-m="signup">Create account</button></div>
+    ${m==='signup'?'<input class="f" id="aName" autocomplete="name" placeholder="Your name" maxlength="40">':''}
+    <input class="f" id="aEmail" type="email" autocomplete="email" placeholder="Email" value="${esc(S.authEmail||'')}">
+    <div class="pw"><input class="f" id="aPass" type="password" autocomplete="${m==='signup'?'new-password':'current-password'}" placeholder="Password${m==='signup'?' (6+ characters)':''}"><button class="eye" data-act="authEye" aria-label="Show password">👁</button></div>
+    <button class="btn pri wide" data-act="${m==='signup'?'authSignup':'authSignin'}">${m==='signup'?'Create my account':'Sign in'}</button>
+    ${m==='signin'?'<button class="linkbtn" data-act="authMode" data-m="forgot">Forgot password?</button>':''}
+    <div class="or"><span>or</span></div>
+    <button class="btn wide social" data-act="authGoogle">${GOOGLE_SVG} Continue with Google</button>
+    ${C.tiktok?`<a class="btn wide social tt" href="${STANDALONE?esc(C.tiktokStart||'/api/tiktok/start'):'#'}" ${STANDALONE?'':'data-act="previewOnly"'}>${TIKTOK_SVG} Continue with TikTok</a>`:''}`}
+   <div id="authMsg" class="authmsg"></div>
+   <button class="linkbtn muted" data-act="authGuest">Continue without an account</button>
+   <p class="small muted" style="text-align:center">By continuing you agree to the <a href="/terms.html" target="_blank">Terms</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a>.</p></div>`;
+  if(S.authNote){authMsg(S.authNote.m,S.authNote.ok);S.authNote=null}}
+async function initAuth(){showAuth('loading');Store.readyResolve();
+  if(!CFG.firebase||!CFG.firebase.apiKey){Auth.noFirebase=true;startGuest();toast('Accounts aren’t set up yet (see config.js) — using guest mode');return}
+  try{const fb=await loadFirebase();const h=new URLSearchParams(location.hash.slice(1));
+    if(h.get('tterr')){S.authNote={m:h.get('tterr')};history.replaceState(null,'',location.pathname+'#load')}
+    if(h.get('tt')){const tok=h.get('tt'),nm=h.get('n'),av=h.get('a');history.replaceState(null,'',location.pathname+'#load');
+      try{const c=await fb.A.signInWithCustomToken(fb.auth,tok);if(nm&&!c.user.displayName)await fb.A.updateProfile(c.user,{displayName:nm,photoURL:av||null})}catch(e){S.authNote={m:AUTH_ERR[e.code]||'TikTok sign-in failed. Please try again.'}}}
+    fb.A.getRedirectResult(fb.auth).catch(e=>{S.authNote={m:AUTH_ERR[e.code]||e.message}});
+    fb.A.onAuthStateChanged(fb.auth,u=>{Auth.user=u;Auth.ready=true;
+      if(u){Auth.guest=false;try{localStorage.removeItem('lb1:guest')}catch(e){}hideAuth();const moved=Store.useNamespace(u.uid,true);Store.connectFire(u.uid);
+        if(S.pendingName){saveProfile({name:S.pendingName});S.pendingName=null}if(moved)toast('Your guest progress was added to your account');}
+      else if(isGuestFlag())startGuest();
+      else{Store.disconnect();Store.useNamespace('none');showAuth(S.authMode==='loading'?'signin':S.authMode)}
+      applyTheme();updateAvatar();renderView()});
+  }catch(e){console.warn(e);Auth.noFirebase=true;startGuest();toast('Couldn’t reach the login service — using guest mode')}}
+async function aiServer(prompt,onText,signal,tier){
+  if(!Auth.user)throw {code:'need_account',message:'Create a free account (or sign in) to use the ✨ features.'};
+  const tok=await Auth.user.getIdToken();
+  const r=await fetch(CFG.aiEndpoint||'/api/ai',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
+  if(!r.ok){let m='The AI helper isn’t available right now.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:r.status===429?'rate_limited':'server',message:m}}
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf='',text='',stop=null;
+  for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
+    while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;let ev;try{ev=JSON.parse(line.slice(5))}catch(e){continue}
+      if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){text+=ev.delta.text;onText&&onText(text)}
+      else if(ev.type==='message_delta'&&ev.delta)stop=ev.delta.stop_reason;
+      else if(ev.type==='error')throw {message:(ev.error&&ev.error.message)||'The AI helper had a problem.'}}}
+  return {text,truncated:stop==='max_tokens'}}
+
+Object.assign(A,{
+  donate:()=>donateSheet(),
+  donAmt:el=>{S.donCustom=false;S.donAmt=+el.dataset.a;donateSheet()},
+  donCustom:()=>{S.donCustom=true;donateSheet();setTimeout(()=>$('#donIn')?.focus(),50)},
+  pickAvatar:()=>{const has=Store.get('pic_avatar');openSheet(`<h3>Profile picture</h3>
+    <label class="btn pri wide" id="picLab" style="cursor:pointer">📷 Choose a photo<input type="file" accept="image/*" id="picIn" hidden></label>
+    ${has?'<button class="btn wide danger" data-act="removePic" data-k="avatar">Remove photo</button>':''}
+    <label class="l" style="margin-top:16px">Or pick an emoji</label><div class="avgrid">${AVATARS.map(a=>`<button data-act="setAvatar" data-a="${a}">${a}</button>`).join('')}</div>`);wirePicInput('avatar')},
+  pickBanner:()=>{const pf=profile();const has=Store.get('pic_banner');openSheet(`<h3>Banner</h3>
+    <label class="btn pri wide" id="picLab" style="cursor:pointer">📷 Upload a banner photo<input type="file" accept="image/*" id="picIn" hidden></label>
+    <p class="small muted" style="margin:6px 2px">Wide photos look best — a sunrise, mountains, your church, the sea.</p>
+    ${has?`<button class="bannerpick ${pf.banner==='photo'?'on':''}" data-act="setBanner" data-b="photo" style="background:url(${has.data}) center/cover"><span>My photo</span></button>`:''}
+    <label class="l">Or choose a color banner</label><div class="bannergrid">${BANNERS.map(([k,g])=>`<button class="bannerpick ${(pf.banner||'')===k?'on':''}" data-act="setBanner" data-b="${k}" style="background:${g}"></button>`).join('')}</div>
+    ${has?'<button class="btn wide danger" data-act="removePic" data-k="banner">Remove banner photo</button>':''}`);wirePicInput('banner')},
+  setBanner:el=>{saveProfile({banner:el.dataset.b});closeSheet();renderView()},
+  removePic:el=>{const k=el.dataset.k;Store.del('pic_'+k);if(k==='banner'&&profile().banner==='photo')saveProfile({banner:''});closeSheet();renderView();updateAvatar();toast('Photo removed')},
+  copyPayEmail:()=>copyText(DONATE_EMAIL),
+  authPreview:()=>{S.authEmail='';showAuth('signin')},
+  closePreview:()=>hideAuth(),
+  previewOnly:()=>authMsg('This is a preview. TikTok login works on your website version after TikTok approves your app.'),
+  setAvatar:el=>{Store.del('pic_avatar');saveProfile({avatar:el.dataset.a});closeSheet();renderView();updateAvatar()},
+  setGoal:el=>{saveProfile({goal:+el.dataset.g});renderView()},
+  setTheme:el=>{saveProfile({theme:el.dataset.t});applyTheme();renderView()},
+  setTrans:el=>{saveSettings({trans:el.dataset.t});S.verses=null;renderView();toast('Translation: '+el.dataset.t)},
+  votdNext:()=>{S.votdOff=(S.votdOff||0)+1;renderView()},
+  votdShow:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Loading…';await loadKJV();if(!KJV)toast('Couldn’t load the Bible text');renderView()},
+  votdLoad:el=>{const p=parseRef(el.dataset.r);Object.assign(S.build,{mode:'chapter',book:p.b,ch:p.c,planKey:null,err:''});setTab('load');runBuild()},
+  votdCopy:()=>{const t=$('.votd p');copyText(`"${t?t.textContent:''}" — ${$('.votd h3').textContent} (KJV)`)},
+  goSignup:()=>{try{localStorage.removeItem('lb1:guest')}catch(e){}Auth.guest=false;showAuth('signup')},
+  authMode:el=>{S.authEmail=($('#aEmail')||{}).value||S.authEmail;showAuth(el.dataset.m)},
+  authEye:()=>{const p=$('#aPass');p.type=p.type==='password'?'text':'password'},
+  authSignin:async()=>{if(!STANDALONE)return authMsg('This is a preview. Email, Google and TikTok login work on your website version after setup (see SETUP.md).');const e=$('#aEmail').value.trim(),p=$('#aPass').value;if(!e||!p)return authMsg('Enter your email and password.');authBusy(true);
+    try{await Auth.fb.A.signInWithEmailAndPassword(Auth.fb.auth,e,p)}catch(x){authErr(x)}authBusy(false)},
+  authSignup:async()=>{if(!STANDALONE)return authMsg('This is a preview. Email, Google and TikTok login work on your website version after setup (see SETUP.md).');const n=$('#aName').value.trim(),e=$('#aEmail').value.trim(),p=$('#aPass').value;if(!e||!p)return authMsg('Enter your email and a password.');if(p.length<6)return authMsg('Choose a password with at least 6 characters.');
+    authBusy(true);S.pendingName=n||null;try{const c=await Auth.fb.A.createUserWithEmailAndPassword(Auth.fb.auth,e,p);if(n)await Auth.fb.A.updateProfile(c.user,{displayName:n});Auth.fb.A.sendEmailVerification(c.user).catch(()=>{});toast('Welcome, '+(n||'friend')+'! 🎉')}catch(x){S.pendingName=null;authErr(x)}authBusy(false)},
+  authReset:async()=>{if(!STANDALONE)return authMsg('This is a preview. Email, Google and TikTok login work on your website version after setup (see SETUP.md).');const e=$('#aEmail').value.trim();if(!e)return authMsg('Enter your email first.');authBusy(true);
+    try{await Auth.fb.A.sendPasswordResetEmail(Auth.fb.auth,e);authMsg('Check your inbox (and spam folder) — we sent you a link to reset your password.',true)}catch(x){authErr(x)}authBusy(false)},
+  authGoogle:async()=>{if(!STANDALONE)return authMsg('This is a preview. Email, Google and TikTok login work on your website version after setup (see SETUP.md).');const fb=Auth.fb;const pr=new fb.A.GoogleAuthProvider();authBusy(true);
+    try{await fb.A.signInWithPopup(fb.auth,pr)}catch(x){if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test(x.code||''))return fb.A.signInWithRedirect(fb.auth,pr);authErr(x)}authBusy(false)},
+  authGuest:()=>{if(!STANDALONE){hideAuth();return}try{localStorage.setItem('lb1:guest','1')}catch(e){}startGuest()},
+  acctReset:async()=>{try{await Auth.fb.A.sendPasswordResetEmail(Auth.fb.auth,Auth.user.email);toast('We emailed you a link to change your password')}catch(x){toast(AUTH_ERR[x.code]||'Couldn’t send the email')}},
+  signOut:()=>confirmSheet('Sign out?','Sign out',async()=>{try{localStorage.removeItem('lb1:guest')}catch(e){}if(Auth.fb&&Auth.user)await Auth.fb.A.signOut(Auth.fb.auth);else{Auth.guest=false;Store.useNamespace('none');showAuth('signin')}setTab('load')}),
+  deleteAcct:()=>confirmSheet('Delete your account and everything in it? This can’t be undone.','Delete forever',async()=>{
+    try{const keys=[...Store.items.keys()];if(Store.col)for(const k of keys){try{await Store.col.doc(k).delete()}catch(e){}}
+      await Auth.fb.A.deleteUser(Auth.user);Store.items.clear();toast('Your account was deleted')}catch(x){toast(AUTH_ERR[x.code]||'Couldn’t delete the account')}}),
+});
+
+/* ---------- boot ---------- */
+if(STANDALONE){Store.LS='lb1:none:d:';setTab((location.hash||'#load').slice(1));initAuth()}
+else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
+Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});
+</script>
+<script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));</script>
+</body>
+</html>

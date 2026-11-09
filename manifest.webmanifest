@@ -1,0 +1,17 @@
+{
+  "name": "Loaded Bible",
+  "short_name": "Loaded Bible",
+  "description": "Load your paper Bible: what to highlight and why, margin notes, context, tabs and S.O.A.P.",
+  "start_url": "/#load",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6efe2",
+  "theme_color": "#8b2e24",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
