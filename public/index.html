@@ -343,6 +343,7 @@ details.grp[open]>summary::after{content:"▴"}
 .goalstep{gap:10px;padding:4px 0;cursor:pointer}.goalstep input{width:20px;height:20px;flex:none}.goaldone{opacity:.8}
 .snotecard{margin-top:12px;padding:14px;border-radius:14px;background:var(--card);border:2px dashed var(--gold)}
 .snotecard .out{font-family:var(--serif);font-size:18px;line-height:1.55}
+.inspath{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:14px}.inspath span{padding:3px 8px;border-radius:8px;background:var(--soft)}.inspath b{padding:3px 8px;border-radius:8px;background:var(--accent);color:var(--accent-ink)}.inspath i{font-style:normal;color:var(--muted)}
 .jhead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:0 0 10px;border-radius:16px;background:var(--soft)}
 .jhead b{font-family:var(--serif);font-size:19px}.jhi{font-size:26px;line-height:1}
 .jitem{cursor:pointer}.jitem .h .iconbtn{min-width:32px;height:30px;padding:0 6px;font-size:13px}
@@ -554,7 +555,7 @@ const GUIDES=[
  ['S.O.A.P. method','<b>S</b>cripture — read slowly and write out a verse that stands out.<br><b>O</b>bservation — what do you notice? Who, what, where, repeated words, commands, promises.<br><b>A</b>pplication — what does this mean for your life today? Be specific.<br><b>P</b>rayer — talk to God about what you read. Use the Journal tab to save a S.O.A.P. entry.'],
  ['Inductive study (Observe → Interpret → Apply)','<b>Observe:</b> what does it say? Ask who, what, when, where, why, how. Mark repeated words and contrasts.<br><b>Interpret:</b> what did it mean to the first readers? Check context (the paragraph, chapter and book), cross-references and word meanings.<br><b>Apply:</b> what timeless truth is here, and how will you obey it this week?'],
  ['Reading in context — 5 questions','1. Who wrote it, and to whom?<br>2. What kind of writing is it (law, history, poetry, prophecy, gospel, letter, apocalyptic)?<br>3. What comes right before and after?<br>4. What did it mean to the original readers?<br>5. How does it fit the whole story of the Bible and point to Jesus?'],
- ['Color-coding your Bible','Pick one meaning per color and stick to it — see <b>Loaded Bible → Color Key</b>, where you can rename every color. Tap any verse in Read, then tap a color to highlight it.'],
+ ['Color-coding your Bible','Pick one meaning per color and stick to it — see <b>Bible Kit → Tabs → Topics</b>, where you can rename every color. Tap any verse in Read, then tap a color to highlight it.'],
  ['Making a "loaded" Bible','A loaded Bible is your personal study Bible: highlights, margin notes, cross-references, book tabs, topic tabs and inserts. Use <b>Loaded Bible</b> for book & topic tabs and printable-style insert cards, <b>Read</b> to highlight and note verses, and <b>Study</b> for context and word studies you can save straight into your notes.'],
 ];
 
@@ -881,14 +882,18 @@ function loadedColors(el){const hs=Store.list('h_');
   <div class="row"><button class="btn sm pri" data-act="copyKey">📋 Copy key for my inside cover</button><button class="btn sm ghost" data-act="resetColors">Reset to suggested meanings</button></div>
   <p class="small muted">Tip: draw a small color key on the inside cover of your Bible so you remember what each color means.</p>`;
   $$('input[data-label]',el).forEach(i=>i.addEventListener('change',()=>{const l=Object.assign({},settings().labels);l[i.dataset.label]=i.value.trim();saveSettings({labels:l});toast('Color key saved')}))}
-function insKindOf(x){return x.kind&&INS_TYPES.some(t=>t[0]===x.kind)&&x.kind!=='custom'?x.kind:'own'}
-const INS_KINDS=()=>INS_TYPES.filter(t=>t[0]!=='custom').map(t=>[t[0],t[1],({book:'Book overviews',chapter:'Chapter summaries',memory:'Memory verses',topic:'Topic studies',person:'Characters',timeline:'Timelines',gospel:'Gospel',prayer:'Prayer guides',qa:'Tough questions'})[t[0]]||t[2]]).concat([['own','✍️','My own & other']]);
+function insKindOf(x){return x.kind==='study'?'study':x.kind&&INS_TYPES.some(t=>t[0]===x.kind)&&x.kind!=='custom'?x.kind:'own'}
+function insSavedSheet(kind,title){const kk=INS_KINDS().find(x=>x[0]===kind)||['own','✍️','My own & other'];
+  openSheet(`<div style="text-align:center"><div style="font-size:44px">🗂️</div><h3 style="margin:4px 0">Saved as an insert!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
+   <div class="card"><div class="small muted" style="margin-bottom:6px">You can find it here:</div><div class="inspath"><span>🧰 Bible Kit</span><i>›</i><span>🏷️ Tabs</span><i>›</i><span>🗂️ Inserts</span><i>›</i><b>${kk[1]} ${esc(kk[2])}</b></div></div>
+   <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" data-act="insOpenKind" data-k="${kind}">Open it now →</button></div>`)}
+const INS_KINDS=()=>INS_TYPES.filter(t=>t[0]!=='custom').map(t=>[t[0],t[1],({book:'Book overviews',chapter:'Chapter summaries',memory:'Memory verses',topic:'Topic studies',person:'Characters',timeline:'Timelines',gospel:'Gospel',prayer:'Prayer guides',qa:'Tough questions'})[t[0]]||t[2]]).concat([['study','🔎','From Study'],['own','✍️','My own & other']]);
 function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)-(a.updated||0));const K=S.insKind||'all';const kinds=INS_KINDS();
   const cnt=k=>all.filter(x=>insKindOf(x)===k).length;const ins=K==='all'?all:all.filter(x=>insKindOf(x)===K);const kk=kinds.find(x=>x[0]===K);
   el.innerHTML=`<p class="small muted">Insert cards are the notes you'd tuck inside your Bible — book summaries, memory verses, sermon notes, prayer lists. Copy any card to print or share it.</p>
   <div class="inskinds"><button class="inskind ${K==='all'?'on':''}" data-act="insKind" data-k="all"><span>🗂️</span><b>All</b><small>${all.length}</small></button>${kinds.map(([k,e,n])=>`<button class="inskind ${K===k?'on':''} ${cnt(k)?'':'zero'}" data-act="insKind" data-k="${k}"><span>${e}</span><b>${esc(n)}</b><small>${cnt(k)}</small></button>`).join('')}</div>
   ${K!=='all'?`<h3 style="font-size:22px;margin:14px 2px 4px">${kk[1]} ${esc(kk[2])}</h3>`:''}
-  <button class="btn pri wide" style="margin:4px 0 10px" data-act="goMakeInsert" data-k="${K}">✨ Generate ${K==='all'||K==='own'?'a new insert':'a new '+esc(kk[2].toLowerCase().replace(/s$/,'').replace(/ie$/,'y'))}</button>
+  ${K==='study'?`<button class="btn pri wide" style="margin:4px 0 10px" data-act="tab" data-tab="study">🔎 Do a study, then tap “🗂️ Make insert”</button>`:`<button class="btn pri wide" style="margin:4px 0 10px" data-act="goMakeInsert" data-k="${K}">✨ Generate ${K==='all'||K==='own'?'a new insert':'a new '+esc(kk[2].toLowerCase().replace(/s$/,'').replace(/ie$/,'y'))}</button>`}
   <div class="chips">${INSERT_TEMPLATES.map((t,i)=>`<button class="chip" data-act="newInsert" data-i="${i}">＋ ${esc(t[0])}</button>`).join('')}<button class="chip" data-act="newInsert" data-i="-1">＋ Blank card</button></div>
   ${ins.length?ins.map(x=>`<div class="insert" style="--gc:${x.ref&&parseRef(x.ref)?GENRES[BM[parseRef(x.ref).b].genre][1]:'var(--gold)'}"><div class="row"><h4 class="grow">${esc(x.title||'Untitled')}</h4>${x.ref?`<a class="ref small" data-act="openRef" data-ref="${esc(x.ref)}">${esc(codeToLabel(x.ref))}</a>`:''}</div>
     <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
@@ -1201,7 +1206,8 @@ const A={
   redoStudy:()=>{const st=S.study;if(!st)return;if(st.question)runStudy(null,st.refLabel,st.question);else{Cache.drop('studies',st.tool+'__'+st.refCode.replace(/[^A-Za-z0-9:\-]/g,'_'));runStudy(st.tool,st.refLabel,null,true)}},
   saveStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const p=parseRef(st.refCode);const vs=p&&p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[];
     Store.set('n_'+newId(),{ref:p?st.refCode:'',b:p?p.b:null,c:p?p.c:null,vs,title:st.question?('Q: '+st.question):st.title,text:st.text,md:true,created:Date.now(),updated:Date.now()});toast('Saved to My Notes')},
-  insertStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;Store.set('i_'+newId(),{title:`${st.title} — ${st.refLabel}`,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,updated:Date.now()});toast('Insert card created (Loaded Bible → Inserts)')},
+  insertStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const title=`${st.title} — ${st.refLabel}`;Store.set('i_'+newId(),{title,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,kind:'study',updated:Date.now()});insSavedSheet('study',title)},
+  insOpenKind:el=>{closeSheet();S.loadedSub='inserts';S.insKind=el.dataset.k;setTab('tabs');window.scrollTo(0,0)},
   copyStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;copyText(`${st.title} — ${st.refLabel}\n\n${plain(st.text)}`)},
   toggleStudy:el=>{const k=el.dataset.k;S.openStudy=S.openStudy===k?null:k;const l=$('#studyList');if(l)l.innerHTML=studyListHtml();wireStudyList();const c=document.getElementById('st-'+k);if(c&&S.openStudy)c.scrollIntoView({behavior:'smooth',block:'start'})},
   studyFilter:el=>{S.studyFilter=el.dataset.f;const l=$('#studyList');if(l)l.innerHTML=studyListHtml();wireStudyList()},
@@ -1563,12 +1569,12 @@ function insertForm(){const I=S.ins;const T=INS_TYPES.find(t=>t[0]===I.type)||IN
    ${T[5].length?`<div class="chips" style="flex-wrap:wrap;margin-top:6px">${T[5].map(x=>`<button class="chip ${I.subject===x?'on':''}" data-act="insSubj" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>`:''}
    <label class="l">Size</label><div class="chips">${INS_SIZES.map(z=>`<button class="chip ${I.size===z[0]?'on':''}" data-act="insSize" data-z="${z[0]}">${z[1]}</button>`).join('')}</div>
    <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Make my insert</button>
-   <p class="small muted">Inserts are cards and pages you tuck into your Bible. Save the ones you like — they go to <b>Bible Kit → Inserts</b>.</p>`}
+   <p class="small muted">Inserts are cards and pages you tuck into your Bible. Save the ones you like — they go to <b>Bible Kit → Tabs → Inserts</b>.</p>`}
 function insertOutHtml(){const I=S.ins;const n=Store.list('i_').length;const kept=Store.list('g_').sort((a,b)=>(b.at||0)-(a.at||0));const live=I.drafts.filter(d=>d.loading||d.err);
   if(!kept.length&&!live.length)return '';
   const kn=t=>(INS_TYPES.find(x=>x[0]===t)||INS_TYPES[INS_TYPES.length-1]);
   return `<div class="row" style="margin:18px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">🗂️ My generated inserts</h2><button class="btn sm ghost" data-act="insGoSaved">Bible Kit (${n})</button></div>
-   <p class="small muted" style="margin:0 2px 8px">Everything you generate is kept here. Tap <b>💾 Save to my inserts</b> on the ones you want in Bible Kit → Inserts.</p>
+   <p class="small muted" style="margin:0 2px 8px">Everything you generate is kept here. Tap <b>💾 Save to my inserts</b> on the ones you want in Bible Kit → Tabs → Inserts.</p>
    ${live.map(d=>`<div class="insert" style="--gc:var(--gold)">${d.err?`<p class="muted">${esc(d.err)}</p><button class="btn sm ghost" data-act="insDropLive">✕</button>`:d.text?`<div class="b">${md(d.text)}</div>`:'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>'}</div>`).join('')}
    ${kept.map(g=>{const open=S.openIns===g.key;const T=kn(g.type);return `<div class="plan ${open?'open':''}" id="gi-${g.key}"><div class="planhead" data-act="insToggle" data-k="${g.key}" role="button"><span class="pico">${T[1]}</span>
       <div class="grow" style="min-width:0"><div class="ptitle">${esc(insTitle(g.text))}</div><div class="small muted">${esc(T[2])}${g.subject?' · '+esc(g.subject):''} · ${new Date(g.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div></div>${g.saved?'<span class="pstat done">✓ Saved</span>':''}<span class="chev">${open?'▴':'▾'}</span></div>
@@ -1658,7 +1664,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   insType:el=>{S.ins.type=el.dataset.t;S.ins.subject='';renderView()},
   insSubj:el=>{S.ins.subject=el.dataset.v;renderView()},
   insSize:el=>{S.ins.size=el.dataset.z;renderView()},
-  insSave:el=>{const g=Store.get(el.dataset.k);const p=parseRef(g.subject||'');Store.set('i_'+newId(),{title:insTitle(g.text),ref:p?rc(p):'',body:g.text,md:true,kind:g.type,updated:Date.now()});Store.set(el.dataset.k,Object.assign({},g,{saved:true}));const kn=(INS_KINDS().find(x=>x[0]===(g.type==='custom'?'own':g.type))||[])[2];toast(`Saved to Bible Kit → Inserts → ${kn||'Inserts'} 🗂️`)},
+  insSave:el=>{const g=Store.get(el.dataset.k);const p=parseRef(g.subject||'');Store.set('i_'+newId(),{title:insTitle(g.text),ref:p?rc(p):'',body:g.text,md:true,kind:g.type,updated:Date.now()});Store.set(el.dataset.k,Object.assign({},g,{saved:true}));insSavedSheet(g.type==='custom'?'own':g.type,insTitle(g.text))},
   insAgain:el=>{const g=Store.get(el.dataset.k);runInsert({type:g.type,size:g.size,subject:g.subject})},
   insCopy:el=>{copyText(plain(Store.get(el.dataset.k).text))},
   insDel:el=>confirmSheet('Delete this generated insert? (Copies you saved in Bible Kit stay.)','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
@@ -1715,7 +1721,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   delPlan:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const done=planProg(pl).done;
     confirmSheet(done?`Remove “${planTitle(pl)}” from your list? It stays counted in your badges and stats.`:`Delete “${planTitle(pl)}”? You haven\u2019t finished it yet.`,done?'Remove':'Delete',()=>{removePlan(k);toast(done?'Removed — well done! 🎉':'Deleted');renderView()})},
   bSoap:()=>{const pl=Store.get(S.build.planKey),x=pl.data.soap;Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref:`${pl.b} ${pl.c}:${x.v}`,scripture:x.scripture||'',obs:x.observation||'',app:x.application||'',prayer:x.prayer||''}});toast('S.O.A.P. saved to Journal')},
-  bTopicIns:()=>{const pl=Store.get(S.build.planKey),d=pl.data;Store.set('i_'+newId(),{title:`${d.emoji||''} ${d.title||pl.topic}`.trim(),ref:'',body:(d.intro?d.intro+'\n\n':'')+(d.verses||[]).map(x=>`${x.ref} — ${x.why||''}`).join('\n')+(d.prayer?'\n\nPrayer: '+d.prayer:''),updated:Date.now()});toast('Insert card saved (Bible Kit → Inserts)')},
+  bTopicIns:()=>{const pl=Store.get(S.build.planKey),d=pl.data;Store.set('i_'+newId(),{title:`${d.emoji||''} ${d.title||pl.topic}`.trim(),ref:'',body:(d.intro?d.intro+'\n\n':'')+(d.verses||[]).map(x=>`${x.ref} — ${x.why||''}`).join('\n')+(d.prayer?'\n\nPrayer: '+d.prayer:''),kind:'topic',updated:Date.now()});insSavedSheet('topic',`${d.emoji||''} ${d.title||pl.topic}`.trim())},
   loadThisChapter:()=>{const s=settings();Object.assign(S.build,{mode:'chapter',book:s.book,ch:s.ch,planKey:null,err:''});setTab('load');runBuild()},
   genSoap:async()=>{const sh=$('#sheet');const ref=$('[data-f="ref"]',sh).value.trim();if(!ref){toast('Add a Scripture reference first');return}
     const btn=$('[data-act="genSoap"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Writing…';const s=settings();
