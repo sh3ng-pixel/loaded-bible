@@ -344,6 +344,9 @@ details.grp[open]>summary::after{content:"▴"}
 .snotecard{margin-top:12px;padding:14px;border-radius:14px;background:var(--card);border:2px dashed var(--gold)}
 .snotecard .out{font-family:var(--serif);font-size:18px;line-height:1.55}
 .inspath{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:14px}.inspath span{padding:3px 8px;border-radius:8px;background:var(--soft)}.inspath b{padding:3px 8px;border-radius:8px;background:var(--accent);color:var(--accent-ink)}.inspath i{font-style:normal;color:var(--muted)}
+.praytext{font-family:var(--serif);font-size:17px;line-height:1.55;margin-top:6px;max-height:4.8em;overflow:hidden;position:relative;cursor:pointer;-webkit-mask-image:linear-gradient(#000 55%,transparent)}
+.praytext.open{max-height:none;-webkit-mask-image:none}.praytext p{margin:0 0 .5em}
+.prayitem.fav{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
 .jhead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:0 0 10px;border-radius:16px;background:var(--soft)}
 .jhead b{font-family:var(--serif);font-size:19px}.jhi{font-size:26px;line-height:1}
 .jitem{cursor:pointer}.jitem .h .iconbtn{min-width:32px;height:30px;padding:0 6px;font-size:13px}
@@ -993,17 +996,23 @@ const prayStyle=()=>Object.assign({open:'',close:'',notes:''},settings().prayerS
 function jStreak(){const days=new Set(Store.list('j_').map(e=>new Date(e.date).toDateString()));let n=0;const d=new Date();if(!days.has(d.toDateString()))d.setDate(d.getDate()-1);while(days.has(d.toDateString())){n++;d.setDate(d.getDate()-1)}return n}
 const jHead=(icon,title,desc,btn='')=>`<div class="jhead"><span class="jhi">${icon}</span><div class="grow"><b>${title}</b><div class="small muted">${desc}</div></div>${btn}</div>`;
 const newBtn=(act,extra)=>`<button class="btn sm pri" data-act="${act}" ${extra||''}>＋ New</button>`;
-const JGROUPS=[['journal','📓','Journal',[['all','📚 Timeline'],['write','✍️ Write'],['cal','📆 Calendar']]],['prayer','🙏','Prayer',[['pray','✨ Pray'],['list','📋 Requests'],['grat','🙌 Thanks']]],['grow','🌱','Growth',[['goals','🎯 Goals'],['testi','💬 Stories'],['sermon','⛪ Sermons']]]];
+const JGROUPS=[['prayer','🙏','Prayer',[['pray','✨ Pray'],['prayers','🕊️ Prayers'],['list','📋 Requests'],['grat','🙌 Thanks']]],['journal','📓','Journal',[['all','📚 Timeline'],['write','✍️ Write'],['writings','📝 Writings'],['cal','📆 Calendar']]],['grow','🌱','Growth',[['goals','🎯 Goals'],['testi','💬 Stories'],['sermon','⛪ Sermons']]]];
+const JTYPE_SUB={prayed:'prayers',prayer:'list',grat:'grat',reflect:'writings',soap:'all',testimony:'testi',goal:'goals',sermon:'sermon'};
+function jSaved(type,title){const sub=JTYPE_SUB[type]||'all';if(S.tab==='journal'&&S.jSub===sub){toast('Saved ✓ (also in your Timeline)');return}
+  const G=jGroupOf(sub);const L=G[3].find(x=>x[0]===sub)[1];
+  openSheet(`<div style="text-align:center"><div style="font-size:44px">✅</div><h3 style="margin:4px 0">Saved!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
+   <div class="card"><div class="small muted" style="margin-bottom:6px">You can find it in the ✏️ Journal tab, under:</div><div class="inspath"><span>${G[1]} ${G[2]}</span><i>›</i><b>${L}</b></div><div class="small muted" style="margin-top:8px">It\u2019s also in 📓 Journal › 📚 Timeline.</div></div>
+   <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" data-act="jOpen" data-s="${sub}">Open it now →</button></div>`)}
 const jGroupOf=sub=>JGROUPS.find(g=>g[3].some(x=>x[0]===sub))||JGROUPS[0];
-function viewJournal(v){const sub=S.jSub||'all';const G=jGroupOf(sub);
+function viewJournal(v){const sub=S.jSub||'pray';const G=jGroupOf(sub);
   v.innerHTML=`<div class="jseg">${JGROUPS.map(([k,e,l])=>`<button class="${G[0]===k?'on':''}" data-act="jGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
   <div class="subtabs">${G[3].map(([k,l])=>`<button class="${sub===k?'on':''}" data-act="jSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="jBody"></div>`;
-  const el=$('#jBody',v);({all:jTimeline,write:jWrite,pray:jPray,list:jList,sermon:jSermons,grat:jGrat,testi:jTesti,goals:jGoals,cal:jCal})[sub](el)}
+  const el=$('#jBody',v);({all:jTimeline,write:jWrite,writings:jWritings,pray:jPray,prayers:jPrayers,list:jList,sermon:jSermons,grat:jGrat,testi:jTesti,goals:jGoals,cal:jCal})[sub](el)}
 function jTimeline(el){const f=S.jFilter||'all';const groups={write:['reflect'],pray:['prayed','prayer'],grat:['grat'],testi:['testimony'],goal:['goal'],soap:['soap'],sermon:['sermon']};
   const all=Store.list('j_').sort((a,b)=>(b.date||0)-(a.date||0));const es=f==='all'?all:all.filter(e=>groups[f].includes(e.type));const st=jStreak();
   el.innerHTML=`${jHead('📚','Everything you wrote',`Newest first. Tap an entry to open it, or 🗑 to delete it.${st?` 🔥 ${st}-day streak!`:''}`)}
-   <div class="row" style="margin:0 2px 10px"><span class="small muted grow">${all.length} entr${all.length===1?'y':'ies'}</span><select class="f jsel" id="jFilterSel">${[['all','Show all'],['write','✍️ Writing'],['pray','🙏 Prayers'],['grat','🙌 Thanks'],['testi','💬 Stories'],['goal','🎯 Goals'],['soap','📖 S.O.A.P.'],['sermon','⛪ Sermons']].map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>${l}</option>`).join('')}</select></div>
+   <div class="row" style="margin:0 2px 10px"><span class="small muted grow">${all.length} entr${all.length===1?'y':'ies'}</span><select class="f jsel" id="jFilterSel">${[['all','Show all'],['write','📝 Writings'],['pray','🙏 Prayers'],['grat','🙌 Thanks'],['testi','💬 Stories'],['goal','🎯 Goals'],['soap','📖 S.O.A.P.'],['sermon','⛪ Sermons']].map(([k,l])=>`<option value="${k}" ${f===k?'selected':''}>${l}</option>`).join('')}</select></div>
    ${es.length?es.map(journalItem).join(''):'<div class="empty">Nothing here yet. Tap ✍️ Write to start. (S.O.A.P. studies you save in Study show up here too.)</div>'}`;
   $('#jFilterSel',el).onchange=e=>{S.jFilter=e.target.value;renderView()}}
 function jWrite(el){const d=S.jDraft||(S.jDraft={title:'',ref:'',body:'',mood:'',prompt:JPROMPTS[Math.floor(Math.random()*JPROMPTS.length)],key:''});
@@ -1027,7 +1036,7 @@ function jPray(el){const P=S.pray||(S.pray={topics:[],words:'',ref:'',who:'',sty
      <div class="small muted" style="margin:0 2px">${P.style==='mine'&&hasPs?`Starts with \u201c${esc(ps.open||'…')}\u201d · ends with \u201c${esc(ps.close||'…')}\u201d`:esc((PRAY_STYLES.find(x=>x[0]===P.style)||PRAY_STYLES[0])[2])}${hasPs&&P.style!=='mine'?' · uses your start and end':''}</div></div>
    <button class="btn pri wide" data-act="prGo" ${P.busy?'disabled':''}>${P.busy?'<span class="spin"></span> Writing your prayer…':P.out?'🔁 Write a new one':'✨ Write my prayer'}</button>
    ${P.out||P.busy?`<div class="card prayercard"><div id="prOut">${P.edit?`<textarea class="f" id="prEdit" style="min-height:260px">${esc(P.out)}</textarea>`:`<div class="out">${md(P.out)}</div>`}</div>
-     ${P.out&&!P.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="prSave">💾 Save</button><button class="btn sm grow" data-act="prReq">📋 To requests</button><button class="iconbtn" data-act="prEditT" title="Edit">${P.edit?'✓':'✏️'}</button><button class="iconbtn" data-act="prCopy" title="Copy">⧉</button></div>`:''}</div>`:''}`;
+     ${P.out&&!P.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="prSave">💾 Save</button><button class="btn sm grow" data-act="prReq">📋 To requests</button><button class="iconbtn" data-act="prEditT" title="Edit">${P.edit?'✓':'✏️'}</button><button class="iconbtn" data-act="prCopy" title="Copy">⧉</button><button class="iconbtn" data-act="prDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`;
   const bind=(id,k)=>{const i=$('#'+id,el);if(i)i.addEventListener('input',e=>{P[k]=e.target.value})};bind('prWords','words');bind('prWho','who');bind('prRef','ref');bind('prEdit','out')}
 function jList(el){const all=Store.list('j_').filter(e=>e.type==='prayer');const open=all.filter(e=>!(e.fields||{}).answered).sort((a,b)=>b.date-a.date);const done=all.filter(e=>(e.fields||{}).answered).sort((a,b)=>(b.fields.answeredAt||b.updated||0)-(a.fields.answeredAt||a.updated||0));
   const row=e=>{const f=e.fields||{};return `<div class="item"><div class="h"><span>${f.answered?'🎉':'🙏'}</span><span class="grow" data-act="editJournal" data-k="${e.key}" style="cursor:pointer">${esc(f.title||'Prayer request')}</span>${f.answered?'':`<button class="iconbtn" data-act="prAnswered" data-k="${e.key}" title="Mark answered">✓ Answered</button>`}<button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
@@ -1066,6 +1075,16 @@ function goalSheet(key){const e=key?Store.get(key):null;const f=(e&&e.fields)||{
    <label class="l">Small steps (one per line)</label><textarea class="f" id="gSteps" style="min-height:110px" placeholder="Set an alarm 10 minutes earlier\nPick a quiet place\nUse the prayer list">${esc((f.steps||[]).map(x=>x.t).join('\n'))}</textarea>
    <button class="btn sm" data-act="goalAI" style="margin-top:8px">✨ Fill in for me</button>
    <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="goalSave" data-k="${key||''}">Save</button>${key?`<button class="btn" data-act="delItem" data-k="${key}">Delete</button>`:''}</div>`)}
+function jWritings(el){const es=Store.list('j_').filter(e=>e.type==='reflect').sort((a,b)=>b.date-a.date);
+  el.innerHTML=`${jHead('📝','My writings','Everything you wrote in ✍️ Write. Tap one to open it.',newBtn('jwFresh'))}
+   ${es.length?es.map(journalItem).join(''):'<div class="empty">Nothing written yet. Tap ＋ New to start.</div>'}`}
+function jPrayers(el){const es=Store.list('j_').filter(e=>e.type==='prayed').sort((a,b)=>((b.fields.fav?1:0)-(a.fields.fav?1:0))||b.date-a.date);
+  el.innerHTML=`${jHead('🕊️','My prayers','Prayers you saved. Pray them again and tap 🙏 each time you do. ⭐ keeps one at the top.',newBtn('jOpen','data-s="pray"'))}
+   ${es.length?es.map(e=>{const f=e.fields||{};const open=S.prOpen===e.key;return `<div class="item prayitem ${f.fav?'fav':''}"><div class="h"><span>🕊️</span><b class="grow" data-act="prToggle" data-k="${e.key}" style="cursor:pointer">${esc(f.title||'Prayer')}</b>
+       <button class="iconbtn" data-act="prFav" data-k="${e.key}" title="Keep at the top">${f.fav?'⭐':'☆'}</button><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
+     <div class="small muted">Saved ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}${f.prayed?` · prayed ${f.prayed}×${f.lastPrayed?', last '+fmtDate(f.lastPrayed):''}`:''}</div>
+     <div class="praytext ${open?'open':''}" data-act="prToggle" data-k="${e.key}">${md(f.body||'')}</div>
+     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div></div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
 function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sort((a,b)=>b.date-a.date);
   el.innerHTML=`${jHead('⛪','Sermon notes','Notes you write while listening to a sermon, at church or online.',newBtn('newJournal','data-t="sermon"'))}
    ${es.length?es.map(journalItem).join(''):'<div class="empty">No sermon notes yet.</div>'}`}
@@ -1246,7 +1265,7 @@ const A={
   jSub:el=>{S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView()},
   gratMore:()=>{const c=$('.gratin:last-of-type');const i=document.createElement('input');i.className='f gratin';i.placeholder='One more thing';i.style.marginTop='8px';const all=$$('.gratin');all[all.length-1].after(i);i.focus()},
   gratSave:()=>{const items=$$('.gratin').map(i=>i.value.trim()).filter(Boolean);const k='j_grat_'+todayStr();if(!items.length){toast('Write at least one thing');return}
-    const old=Store.get(k);Store.set(k,Object.assign({type:'grat',date:Date.now()},old||{},{fields:{body:items.join('\n')},updated:Date.now()}));if(!old)touch();toast('Thank You, Lord! 🙌')},
+    const old=Store.get(k);Store.set(k,Object.assign({type:'grat',date:Date.now()},old||{},{fields:{body:items.join('\n')},updated:Date.now()}));if(!old)touch();toast('Thank You, Lord! 🙌 Saved in Thanks and your Timeline')},
   goalNew:()=>goalSheet(),goalEdit:el=>goalSheet(el.dataset.k),
   goalSave:el=>{const t=$('#gTitle').value.trim();if(!t){toast('Give your goal a name');return}const k=el.dataset.k;const old=k?Store.get(k):null;const of=(old&&old.fields)||{};
     const prev=of.steps||[];const steps=$('#gSteps').value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>({t:x,d:!!(prev.find(p=>p.t===x)||{}).d}));const pr=parseRef($('#gRef').value.trim());
@@ -1274,7 +1293,7 @@ Fill ONLY the empty fields. Return JSON with these keys: {${fs.map(([k,l])=>`"${
     el.disabled=false;el.innerHTML='✨ Fill in for me'},
   testiShare:async()=>{const sh=$('#sheet');const g=k=>($(`[data-f="${k}"]`,sh)||{}).value||'';if(!g('god').trim()&&!g('before').trim()){toast('Write what happened first');return}
     const out=$('#testiOut');out.innerHTML='<div class="loadingline"></div>';
-    try{const r=await ai(`Turn these notes into a short, warm testimony (first person, 120 to 180 words) that this person could share with a friend or small group. Keep their facts, do not invent details, and end with one sentence of encouragement.${g('ref')?' Include the verse '+g('ref')+'.':''}\nWhat was going on: ${g('before')}\nWhat God did: ${g('god')}\nWhat changed: ${g('now')}`,t=>{out.innerHTML=md(t)},null,'default');out.innerHTML=md(r.text)+`<button class="btn sm" data-act="testiCopy">⧉ Copy to share</button>`;out.dataset.t=r.text}catch(e){out.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`}},
+    try{const r=await ai(`Turn these notes into a short, warm testimony (first person, 120 to 180 words) that this person could share with a friend or small group. Keep their facts, do not invent details, and end with one sentence of encouragement.${g('ref')?' Include the verse '+g('ref')+'.':''}\nWhat was going on: ${g('before')}\nWhat God did: ${g('god')}\nWhat changed: ${g('now')}`,t=>{out.innerHTML=md(t)},null,'default');out.innerHTML=md(r.text)+`<button class="btn sm" data-act="testiDiscard">🗑 Throw away</button> <button class="btn sm" data-act="testiCopy">⧉ Copy to share</button>`;out.dataset.t=r.text}catch(e){out.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`}},
   testiCopy:()=>copyText($('#testiOut').dataset.t||''),
   calMove:el=>{const m=S.calM;let mm=m.m+(+el.dataset.d),y=m.y;if(mm<0){mm=11;y--}if(mm>11){mm=0;y++}S.calM={y,m:mm};renderView()},
   calDay:el=>{const m=S.calM;S.calD={y:m.y,m:m.m,d:+el.dataset.d};renderView()},
@@ -1285,7 +1304,7 @@ Fill ONLY the empty fields. Return JSON with these keys: {${fs.map(([k,l])=>`"${
   jwSave:()=>{const d=S.jDraft;if(!d.body.trim()){toast('Write something first');return}const pr=d.ref&&parseRef(d.ref);
     const f={title:d.title.trim(),ref:pr?`${pr.b} ${pr.c}${pr.v1?':'+pr.v1+(pr.v2?'-'+pr.v2:''):''}`:'',body:d.body.trim(),mood:d.mood,prompt:d.prompt};
     const k=d.key||('j_'+newId());const base=d.key?Store.get(d.key):{type:'reflect',date:Date.now()};Store.set(k,Object.assign({},base,{fields:f,updated:Date.now()}));if(!d.key)touch();
-    S.jDraft=null;S.jSub='all';toast('Saved to your journal ✍️');renderView()},
+    const wasNew=!d.key;S.jDraft=null;renderView();if(wasNew)jSaved('reflect',f.title||f.body.split(/\s+/).slice(0,6).join(' '));else toast('Saved ✓');renderView()},
   prTopic:el=>{const P=S.pray,k=el.dataset.k;P.topics=P.topics.includes(k)?P.topics.filter(x=>x!==k):[...P.topics,k];renderView()},
   prStyle:el=>{S.pray.style=el.dataset.k;if(el.dataset.k==='mine'){const ps=prayStyle();if(!ps.open&&!ps.close&&!ps.notes){A.prStyleEdit();return}}renderView()},
   prStyleEdit:()=>{const ps=prayStyle();openSheet(`<h3>⭐ My prayer style</h3><p class="small muted">Write how you usually pray. Every prayer will start and end your way.</p>
@@ -1313,10 +1332,18 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     catch(e){P.out='';toast(aiErr(e))}P.busy=false;renderView()},
   prEditT:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;P.edit=!P.edit;renderView()},
   prCopy:()=>copyText(S.pray.out.replace(/\*\*/g,'')),
+  jOpen:el=>{closeSheet();S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0)},
+  jwFresh:()=>{S.jDraft=null;S.jSub='write';renderView()},
+  prDiscard:()=>confirmSheet('Throw away this prayer? (It isn’t saved.)','🗑 Throw away',()=>{S.pray.out='';S.pray.edit=false;closeSheet();renderView()}),
+  prToggle:el=>{S.prOpen=S.prOpen===el.dataset.k?null:el.dataset.k;renderView()},
+  prFav:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.fav=!e.fields.fav;Store.set(el.dataset.k,e)},
+  prPrayed:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.prayed=(e.fields.prayed||0)+1;e.fields.lastPrayed=Date.now();Store.set(el.dataset.k,e);touch();toast('Amen 🙏')},
+  prCopyK:el=>copyText(((Store.get(el.dataset.k)||{}).fields||{}).body||''),
+  testiDiscard:()=>{const o=$('#testiOut');if(o){o.innerHTML='';o.dataset.t=''}},
   prSave:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;const pr=P.ref&&parseRef(P.ref);const tl=P.topics.map(k=>PRAY_TOPICS.find(t=>t[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
-    Store.set('j_'+newId(),{type:'prayed',date:Date.now(),fields:{title:'Prayer'+(tl?': '+tl:P.who.trim()?' for '+P.who.trim():''),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,'')}});touch();toast('Prayer saved to your journal 🕊️')},
+    Store.set('j_'+newId(),{type:'prayed',date:Date.now(),fields:{title:'Prayer'+(tl?': '+tl:P.who.trim()?' for '+P.who.trim():''),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,'')}});touch();const tt='Prayer'+(tl?': '+tl:P.who.trim()?' for '+P.who.trim():'');P.out='';P.edit=false;renderView();jSaved('prayed',tt)},
   prReq:()=>{const P=S.pray;const pr=P.ref&&parseRef(P.ref);const tl=P.topics.map(k=>PRAY_TOPICS.find(t=>t[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
-    Store.set('j_'+newId(),{type:'prayer',date:Date.now(),fields:{title:(P.words.trim().slice(0,60)||tl||'Prayer request'),who:P.who.trim(),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,''),answer:'',answered:false}});toast('Added to your prayer list 🙏')},
+    Store.set('j_'+newId(),{type:'prayer',date:Date.now(),fields:{title:(P.words.trim().slice(0,60)||tl||'Prayer request'),who:P.who.trim(),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,''),answer:'',answered:false}});jSaved('prayer',(P.words.trim().slice(0,60)||tl||'Prayer request'))},
   prAnswered:el=>{const e=Store.get(el.dataset.k);openSheet(`<h3>🎉 Prayer answered!</h3><p><b>${esc((e.fields||{}).title||'')}</b></p><label class="l">How did God answer? (optional)</label><textarea class="f" id="ansTxt" placeholder="Write it down so you can remember it."></textarea>
     <button class="btn pri wide" data-act="prAnsSave" data-k="${el.dataset.k}" style="margin-top:12px">Mark as answered</button>`)},
   prAnsSave:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields=Object.assign({},e.fields,{answered:true,answeredAt:Date.now(),answer:$('#ansTxt').value.trim()||(e.fields||{}).answer||''});Store.set(el.dataset.k,e);closeSheet();toast('Praise God! 🎉')},
@@ -1328,7 +1355,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     const k=el.dataset.k;const base=k?Store.get(k):{type:el.dataset.t,date:Date.now()};
     const pr=f.ref&&parseRef(f.ref);if(pr)f.ref=`${pr.b} ${pr.c}${pr.v1?':'+pr.v1+(pr.v2?'-'+pr.v2:''):''}`;
     if(f.answered){const old=(base.fields||{});f.answeredAt=old.answeredAt||Date.now()}if(base.fields&&base.fields.mood)f.mood=base.fields.mood;
-    Store.set(k||('j_'+newId()),Object.assign({},base,{fields:f,updated:Date.now()}));closeSheet();toast('Journal saved')},
+    Store.set(k||('j_'+newId()),Object.assign({},base,{fields:f,updated:Date.now()}));closeSheet();if(!k){touch();jSaved(base.type,f.title||'')}else toast('Saved ✓')},
   soapHelp:async()=>{const ref=$('[data-f="ref"]',$('#sheet')).value.trim();const sc=$('[data-f="scripture"]',$('#sheet')).value.trim();const out=$('#soapHelp');if(!ref&&!sc){toast('Add the Scripture first');return}
     out.innerHTML='<div class="loadingline"></div>';
     try{const r=await ai(SYS.replace('450','250')+`Help me with a S.O.A.P. devotion on ${ref||'this passage'}${sc?`: "${sc}"`:''}. Give 3 short observations and 3 short application ideas as bullet lists, then one-sentence prayer starter. Keep it brief — I will write my own words.`,t=>{out.innerHTML=md(t)},null,'quick');out.innerHTML=md(r.text)}catch(e){out.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`}},
@@ -1418,7 +1445,7 @@ function snoteForm(){const N=S.snote||(S.snote={kind:'all',size:'card',v1:'',v2:
    <label class="l">How big?</label><div class="chips">${SN_SIZES.map(([k,l,d])=>`<button class="chip ${N.size===k?'on':''}" data-act="snSize" data-k="${k}">${l} <span class="muted small">· ${d}</span></button>`).join('')}</div>
    <button class="btn pri" style="width:100%;justify-content:center;margin-top:8px" data-act="snGo" ${N.busy?'disabled':''}>${N.busy?'<span class="spin"></span> Writing your note…':'✨ Write my study note'}</button>
    ${N.out||N.busy?`<div class="snotecard"><div class="small muted" style="margin-bottom:4px">📝 ${esc(snRefLabel())}</div><div id="snOut" class="out">${md(N.out)}</div>
-     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="snSave">💾 Save to my notes</button><button class="btn sm grow" data-act="snGo">🔁 New one</button><button class="iconbtn" data-act="snCopy" title="Copy">⧉</button></div>`:''}</div>`:''}`}
+     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="snSave">💾 Save to my notes</button><button class="btn sm grow" data-act="snGo">🔁 New one</button><button class="iconbtn" data-act="snCopy" title="Copy">⧉</button><button class="iconbtn" data-act="snDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`}
 function snRefLabel(){const B=S.build,N=S.snote;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);return `${BM[B.book].name} ${B.ch}${a?':'+a+(b>a?'–'+b:''):''}`}
 function bindSnote(v){const N=S.snote;[['snV1','v1'],['snV2','v2']].forEach(([id,k])=>{const i=$('#'+id,v);if(i)i.oninput=()=>{N[k]=i.value}})}
 function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.book;B.ch=s.ch}if(!B.bookOnly)B.bookOnly=s.book;
@@ -1648,6 +1675,7 @@ Object.assign(A,{
 Use easy, everyday words that a 12-year-old or someone new to the Bible understands. No hard church words; if one is needed (like "grace" or "covenant"), explain it in a few words. Short sentences. Be faithful to the text and accurate. No title, no intro, no extra comments: only the note itself.`;
     N.busy=true;N.out='';renderView();
     try{const r=await ai(prompt,t=>{const o=$('#snOut');if(o)o.innerHTML=md(t)},null,'default');N.out=(r.text||'').trim()}catch(e){toast(aiErr(e))}N.busy=false;renderView()},
+  snDiscard:()=>{S.snote.out='';renderView()},
   snCopy:()=>copyText(S.snote.out.replace(/\*\*/g,'')),
   snSave:()=>{const N=S.snote,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);const vs=a?Array.from({length:Math.min(b-a+1,60)},(_,i)=>a+i):[];
     Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'📝 Study note: '+snRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();toast('Saved to My Notes in the Online Bible 📝')},
