@@ -93,8 +93,8 @@ label.l{display:block;font-size:12px;font-weight:700;text-transform:uppercase;le
 .v sup{font-family:var(--sans);font-size:.55em;font-weight:700;color:var(--accent);margin-right:4px;vertical-align:.55em}
 .v.hl-y{background:var(--hl-y)}.v.hl-g{background:var(--hl-g)}.v.hl-b{background:var(--hl-b)}.v.hl-p{background:var(--hl-p)}.v.hl-o{background:var(--hl-o)}.v.hl-v{background:var(--hl-v)}
 .v.sel{outline:2px dashed var(--accent);outline-offset:1px}
-.v.flash{animation:vflash 3.8s cubic-bezier(.2,.7,.3,1);border-radius:8px;position:relative}
-@keyframes vflash{0%{background:transparent;box-shadow:0 0 0 0 transparent}6%{background:color-mix(in srgb,var(--accent) 48%,transparent);box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 48%,transparent)}12%,53%{background:color-mix(in srgb,var(--accent) 38%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 38%,transparent)}100%{background:transparent;box-shadow:0 0 0 4px transparent}}
+.v.flash{animation:vflash 7s ease-out;border-radius:8px;position:relative}
+@keyframes vflash{0%{background:transparent;box-shadow:0 0 0 0 transparent}4%{background:color-mix(in srgb,var(--accent) 48%,transparent);box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 48%,transparent)}8%,71.4%{background:color-mix(in srgb,var(--accent) 38%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 38%,transparent)}100%{background:transparent;box-shadow:0 0 0 4px transparent}}
 .v .mk{font-family:var(--sans);font-size:12px;border:0;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:1px 6px;margin-left:5px;vertical-align:2px;font-weight:700}
 .v .bm{color:var(--gold);font-size:.8em;margin-left:4px}
 .chap-end{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:22px 0 6px}
@@ -341,9 +341,11 @@ details.grp[open]>summary::after{content:"▴"}
 .calday{aspect-ratio:1;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--ink);font:inherit;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;padding:0}
 .calday i{font-style:normal;font-size:13px;line-height:1}.calday.has{background:var(--soft)}.calday.today{border-color:var(--gold)}.calday.on{background:var(--accent);color:var(--accent-ink)}
 .goalstep{gap:10px;padding:4px 0;cursor:pointer}.goalstep input{width:20px;height:20px;flex:none}.goaldone{opacity:.8}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;margin:10px 0 6px;background:var(--soft);border-radius:16px}
-.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:15px;padding:10px 4px;border-radius:12px;cursor:pointer}
-.seg button.on{background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.snotecard{margin-top:12px;padding:14px;border-radius:14px;background:var(--card);border:2px dashed var(--gold)}
+.snotecard .out{font-family:var(--serif);font-size:18px;line-height:1.55}
+.jseg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;margin:10px 0 6px;background:var(--soft);border-radius:16px}
+.jseg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:15px;padding:10px 4px;border-radius:12px;cursor:pointer}
+.jseg button.on{background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 10px rgba(0,0,0,.15)}
 .subtabs{display:flex;border-bottom:1.5px solid var(--line);margin:0 0 12px}
 .subtabs button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:600;padding:10px 2px 9px;border-bottom:3px solid transparent;margin-bottom:-1.5px;cursor:pointer}
 .subtabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
@@ -686,7 +688,7 @@ function renderVerses(){const box=$('#verses');if(!box)return;const s=settings()
       <p class="small muted" style="text-align:center">${esc(TRANS[s.trans])} · public domain${s.trans==='KJV'&&S.vIt?'':' · typed out by Claude, so compare with a printed Bible for important study'}</p>`}
   box.innerHTML=h;
   if(S.flashV){const F=typeof S.flashV==='object'?S.flashV:{a:S.flashV,b:S.flashV};const el=$('#v'+F.a);if(el){S.flashV=null;S.flashOn={a:F.a,b:F.b,t:Date.now()+400,key:chKey()};setTimeout(()=>{const e2=$('#v'+F.a);if(e2)e2.scrollIntoView({block:F.b-F.a>3?'start':'center',behavior:'smooth'})},60)}}
-  const FO=S.flashOn;if(FO&&FO.key===chKey()){const age=Date.now()-FO.t;if(age>3800)S.flashOn=null;else for(let n=FO.a;n<=FO.b;n++){const x=$('#v'+n);if(x){x.style.animationDelay=(-Math.max(0,age))/1000+'s';x.classList.add('flash')}}}}
+  const FO=S.flashOn;if(FO&&FO.key===chKey()){const age=Date.now()-FO.t;if(age>7000)S.flashOn=null;else for(let n=FO.a;n<=FO.b;n++){const x=$('#v'+n);if(x){x.style.animationDelay=(-Math.max(0,age))/1000+'s';x.classList.add('flash')}}}}
 
 /* ---------- KJV text (public domain, loaded from an npm data package) ---------- */
 let KJV=null,kjvP=null,kjvFailed=false;
@@ -980,7 +982,7 @@ function jStreak(){const days=new Set(Store.list('j_').map(e=>new Date(e.date).t
 const JGROUPS=[['journal','📓','Journal',[['all','📚 Timeline'],['write','✍️ Write'],['cal','📆 Calendar']]],['prayer','🙏','Prayer',[['pray','✨ Pray'],['list','📋 Requests'],['grat','🙌 Thanks']]],['grow','🌱','Growth',[['goals','🎯 Goals'],['testi','💬 Stories'],['sermon','⛪ Sermons']]]];
 const jGroupOf=sub=>JGROUPS.find(g=>g[3].some(x=>x[0]===sub))||JGROUPS[0];
 function viewJournal(v){const sub=S.jSub||'all';const G=jGroupOf(sub);
-  v.innerHTML=`<div class="seg">${JGROUPS.map(([k,e,l])=>`<button class="${G[0]===k?'on':''}" data-act="jGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
+  v.innerHTML=`<div class="jseg">${JGROUPS.map(([k,e,l])=>`<button class="${G[0]===k?'on':''}" data-act="jGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
   <div class="subtabs">${G[3].map(([k,l])=>`<button class="${sub===k?'on':''}" data-act="jSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="jBody"></div>`;
   const el=$('#jBody',v);({all:jTimeline,write:jWrite,pray:jPray,list:jList,sermon:jSermons,grat:jGrat,testi:jTesti,goals:jGoals,cal:jCal})[sub](el)}
@@ -1388,6 +1390,20 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
 function loadPlans(){return Store.list('k_').sort((a,b)=>(b.at||0)-(a.at||0))}
 function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
+const SN_KINDS=[['sum','📝 Summary','What happens, in short'],['explain','💡 Explanation','What it means, made simple'],['life','🌱 For my life','What it means for me today'],['all','✨ All three','Summary, meaning and life']];
+const SN_SIZES=[['margin','✎ Margin','2–3 short lines'],['card','🗒️ Sticky note','A small card'],['page','📄 Half page','An insert page']];
+function snoteForm(){const N=S.snote||(S.snote={kind:'all',size:'card',v1:'',v2:'',out:'',busy:false});const B=S.build;
+  return `<p class="small muted" style="margin:6px 2px 0">A clear note in easy words that you can write in your Bible, on a sticky note or on an insert page.</p>
+   <div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===B.book?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
+   <div class="row" style="align-items:flex-end"><div><label class="l">From verse</label><input class="f" id="snV1" type="number" inputmode="numeric" min="1" placeholder="all" value="${esc(N.v1)}" style="width:110px"></div><div><label class="l">To verse</label><input class="f" id="snV2" type="number" inputmode="numeric" min="1" placeholder="all" value="${esc(N.v2)}" style="width:110px"></div></div>
+   <p class="small muted" style="margin:4px 2px 0">Leave the verses empty for the whole chapter.</p>
+   <label class="l">What kind of note?</label><div class="chips">${SN_KINDS.map(([k,l])=>`<button class="chip ${N.kind===k?'on':''}" data-act="snKind" data-k="${k}">${l}</button>`).join('')}</div>
+   <label class="l">How big?</label><div class="chips">${SN_SIZES.map(([k,l,d])=>`<button class="chip ${N.size===k?'on':''}" data-act="snSize" data-k="${k}">${l} <span class="muted small">· ${d}</span></button>`).join('')}</div>
+   <button class="btn pri" style="width:100%;justify-content:center;margin-top:8px" data-act="snGo" ${N.busy?'disabled':''}>${N.busy?'<span class="spin"></span> Writing your note…':'✨ Write my study note'}</button>
+   ${N.out||N.busy?`<div class="snotecard"><div class="small muted" style="margin-bottom:4px">📝 ${esc(snRefLabel())}</div><div id="snOut" class="out">${md(N.out)}</div>
+     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="snSave">💾 Save to my notes</button><button class="btn sm grow" data-act="snGo">🔁 New one</button><button class="iconbtn" data-act="snCopy" title="Copy">⧉</button></div>`:''}</div>`:''}`}
+function snRefLabel(){const B=S.build,N=S.snote;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);return `${BM[B.book].name} ${B.ch}${a?':'+a+(b>a?'–'+b:''):''}`}
+function bindSnote(v){const N=S.snote;[['snV1','v1'],['snV2','v2']].forEach(([id,k])=>{const i=$('#'+id,v);if(i)i.oninput=()=>{N[k]=i.value}})}
 function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.book;B.ch=s.ch}if(!B.bookOnly)B.bookOnly=s.book;
   const bookOpts=sel=>BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===sel?'selected':''}>${esc(b.name)}</option>`).join('');
   let form='';
@@ -1403,6 +1419,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
   else if(B.mode==='inserts')form=insertForm();
+  else if(B.mode==='snote')form=snoteForm();
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
     <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
     <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
@@ -1412,9 +1429,10 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     <p class="small muted">Get a heading for the top of every chapter, what to write on the book's first page, its key verses to highlight, and where to put the book tab.</p>
     <button class="btn pri" style="width:100%;justify-content:center" data-act="bGo">✨ Show me how to load ${esc(BM[B.bookOnly].name)}</button>`;
   const plans=loadPlans();
+  if(B.mode==='snote'){setTimeout(()=>bindSnote(v),0)}
   v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
   <div class="card">
-    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verse(s)'],['topic','💭 A feeling / topic'],['book','📚 A whole book'],['inserts','🗂️ Inserts']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verse(s)'],['topic','💭 A feeling / topic'],['book','📚 A whole book'],['snote','📝 Study note'],['inserts','🗂️ Inserts']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
     ${form}</div>
   <div id="buildOut"></div>
   ${loadingListHtml(plans)}
@@ -1604,6 +1622,18 @@ function planOnline(pl){const d=pl.data;
   toast('Added to your Online Bible')}
 
 Object.assign(A,{
+  snKind:el=>{S.snote.kind=el.dataset.k;renderView()},
+  snSize:el=>{S.snote.size=el.dataset.k;renderView()},
+  snGo:async()=>{const N=S.snote,B=S.build;if(N.busy)return;const ref=snRefLabel();const s=settings();
+    const kind={sum:'a short summary of what happens or what is said',explain:'a simple explanation of what it means (with a little background or context if it helps)',life:'what it means for my life today, with one practical idea',all:'three short parts with bold labels: **What happens**, **What it means**, **For my life**'}[N.kind];
+    const size={margin:'VERY short: max 30 words in total, so it fits in a Bible margin. Short phrases are fine.',card:'short: 50 to 80 words, so it fits on a sticky note.',page:'about 150 to 220 words, for a half-page insert. Short paragraphs.'}[N.size];
+    const prompt=`Write a study note on ${ref} (${TRANS[s.trans]||s.trans}) that someone will hand-write in their paper Bible. Write ${kind}. Length: ${size}
+Use easy, everyday words that a 12-year-old or someone new to the Bible understands. No hard church words; if one is needed (like "grace" or "covenant"), explain it in a few words. Short sentences. Be faithful to the text and accurate. No title, no intro, no extra comments: only the note itself.`;
+    N.busy=true;N.out='';renderView();
+    try{const r=await ai(prompt,t=>{const o=$('#snOut');if(o)o.innerHTML=md(t)},null,'default');N.out=(r.text||'').trim()}catch(e){toast(aiErr(e))}N.busy=false;renderView()},
+  snCopy:()=>copyText(S.snote.out.replace(/\*\*/g,'')),
+  snSave:()=>{const N=S.snote,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);const vs=a?Array.from({length:Math.min(b-a+1,60)},(_,i)=>a+i):[];
+    Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'📝 Study note: '+snRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();toast('Saved to My Notes in the Online Bible 📝')},
   bMode:el=>{S.build.mode=el.dataset.m;S.build.planKey=null;S.build.err='';renderView()},
   bPart:el=>{const p=el.dataset.p;S.build.parts[p]=!S.build.parts[p];el.classList.toggle('on')},
   bFeel:el=>{S.build.topic=el.dataset.f;renderView()},
