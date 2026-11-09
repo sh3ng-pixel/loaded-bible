@@ -288,9 +288,24 @@ details.grp[open]>summary::after{content:"▴"}
 .inskind span{font-size:22px}.inskind b{font-size:12px;line-height:1.2}.inskind small{font-size:11px;color:var(--muted);font-weight:700}
 .inskind.on{border:2px solid var(--accent);background:var(--soft)}.inskind.zero{opacity:.55}
 .tool.method{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+:root[data-theme=blush]{--paper:#fdf1f3;--card:#fff8f9;--ink:#4a2a33;--muted:#9a6f7b;--line:#f2d3da;--soft:#fbe3e8;--accent:#d45d7f;--accent2:#a83a5f;--accent-ink:#fff;--gold:#c9877a;--hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff; --hl-r:#ffaba1; --hl-t:#93e0d8; --hl-l:#d6f28a; --hl-n:#e3c7a2; --hl-k:#d6d6d6; --hl-m:#f5a3e6; --hl-s:#b8e4ff; --hl-c:#ffb59a; --hl-d:#f2cf63; --hl-e:#bff2d6; --hl-f:#e3d9ff; --hl-h:#a9b6e8; --hl-i:#d2d39a; --hl-j:#ffc2c2; --hl-q:#ffd9b8; --hl-u:#a6f0f5; --hl-w:#e6a8b8; --hl-z:#efe3c2;}
+:root[data-theme=lavender]{--paper:#f5f1fb;--card:#fcfaff;--ink:#3a2f4d;--muted:#8a7ba3;--line:#e2d8f2;--soft:#ece4f8;--accent:#8a5cc7;--accent2:#5e3a96;--accent-ink:#fff;--gold:#b48ad6;--hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff; --hl-r:#ffaba1; --hl-t:#93e0d8; --hl-l:#d6f28a; --hl-n:#e3c7a2; --hl-k:#d6d6d6; --hl-m:#f5a3e6; --hl-s:#b8e4ff; --hl-c:#ffb59a; --hl-d:#f2cf63; --hl-e:#bff2d6; --hl-f:#e3d9ff; --hl-h:#a9b6e8; --hl-i:#d2d39a; --hl-j:#ffc2c2; --hl-q:#ffd9b8; --hl-u:#a6f0f5; --hl-w:#e6a8b8; --hl-z:#efe3c2;}
+:root[data-theme=forest]{--paper:#121b15;--card:#1a271e;--ink:#e6eee2;--muted:#9db39f;--line:#2f4434;--soft:#24352a;--accent:#7fae6d;--accent2:#3f6b34;--accent-ink:#0f1a12;--gold:#c8a85a;--hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78; --hl-r:#6e2a24; --hl-t:#1f5a55; --hl-l:#4b5a1a; --hl-n:#5a4330; --hl-k:#4a4a4a; --hl-m:#6b2860; --hl-s:#234f6b; --hl-c:#6e3526; --hl-d:#6a5418; --hl-e:#24533c; --hl-f:#463c6e; --hl-h:#283566; --hl-i:#4d4f22; --hl-j:#6b2f33; --hl-q:#6b4a2c; --hl-u:#1d5559; --hl-w:#5c2333; --hl-z:#5a5038;}
+:root[data-theme=navy]{--paper:#111827;--card:#1a2335;--ink:#e3e9f2;--muted:#94a3b8;--line:#2b3a50;--soft:#223047;--accent:#5b8fd6;--accent2:#2b4f86;--accent-ink:#0d1420;--gold:#c9a35a;--hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78; --hl-r:#6e2a24; --hl-t:#1f5a55; --hl-l:#4b5a1a; --hl-n:#5a4330; --hl-k:#4a4a4a; --hl-m:#6b2860; --hl-s:#234f6b; --hl-c:#6e3526; --hl-d:#6a5418; --hl-e:#24533c; --hl-f:#463c6e; --hl-h:#283566; --hl-i:#4d4f22; --hl-j:#6b2f33; --hl-q:#6b4a2c; --hl-u:#1d5559; --hl-w:#5c2333; --hl-z:#5a5038;}
+.pal.wheel{background:conic-gradient(red,orange,yellow,lime,cyan,blue,magenta,red);display:block;cursor:pointer;overflow:hidden}
+.pal.wheel[style*="--pick"]{background:var(--pick)}
+.pal.wheel input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.pal.wheel small{background:rgba(255,255,255,.85);border-radius:6px;left:4px;right:4px;color:#222}
+.codepill{font-family:ui-monospace,Menlo,monospace;font-weight:700;background:var(--soft);padding:1px 6px;border-radius:6px;white-space:nowrap}
+.bigcode{font-family:ui-monospace,Menlo,monospace;font-size:28px;font-weight:800;letter-spacing:.06em;text-align:center;background:var(--card);border:2px dashed var(--accent);border-radius:16px;padding:18px 10px;margin:14px 0;color:var(--accent);user-select:all;-webkit-user-select:all;word-break:break-all}
+.bigcode.small-code{font-size:22px;padding:12px 8px;margin:10px 0 4px}
+.warnbox{background:color-mix(in srgb,#e0a100 16%,var(--card));border:1px solid color-mix(in srgb,#e0a100 50%,var(--line));border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px}
+.codein2{font-family:ui-monospace,Menlo,monospace;font-size:22px;text-align:center;text-transform:uppercase;letter-spacing:.05em}
+.authbox .btn.wide+.btn.wide{margin-top:10px}
+.codecard{border:2px solid var(--gold)}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.hero{background:linear-gradient(135deg,var(--accent),#5a1c16);color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
+.hero{background:linear-gradient(135deg,var(--accent),var(--accent2,#5a1c16));color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
 .hero h2{font-size:26px;margin:0 0 4px}
 .hero p{margin:0;opacity:.9;font-size:14.5px}
 .notice{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13.5px;color:var(--muted);margin:10px 0}
@@ -599,7 +614,7 @@ function renderVerses(){const box=$('#verses');if(!box)return;const s=settings()
     `<div class="empty"><p>Ready to open <b>${esc(BM[s.book].name)} ${s.ch}</b> (${s.trans}).</p><button class="btn pri" data-act="reloadCh">Open chapter</button><p class="small">${s.trans==='KJV'?'':'This translation is typed out by Claude the first time, then saved so it opens instantly after that.'}</p></div>`;return}
   const notes=chapterNotes(s.book,s.ch);const nv={};notes.forEach(n=>(n.vs||[]).forEach(x=>nv[x]=(nv[x]||0)+1));
   let h='';S.verses.forEach((t,i)=>{const n=i+1;if(t==null)return;const hl=Store.get(`h_${s.book}.${s.ch}.${n}`);const bm=Store.get(`b_${s.book}.${s.ch}.${n}`);
-    h+=`<p class="v ${hl?'hl-'+hl.color:''} ${S.sel.has(n)?'sel':''}" id="v${n}" data-act="verse" data-v="${n}"><sup>${n}</sup>${S.vIt&&S.vIt[i]!=null?italV(S.vIt[i]):esc(t)}${bm?'<span class="bm">🔖</span>':''}${nv[n]?`<button class="mk" data-act="verseNotes" data-v="${n}">✎ ${nv[n]}</button>`:''}</p>`});
+    h+=`<p class="v ${hl?'hl-'+ck(hl.color):''} ${S.sel.has(n)?'sel':''}" id="v${n}" data-act="verse" data-v="${n}"><sup>${n}</sup>${S.vIt&&S.vIt[i]!=null?italV(S.vIt[i]):esc(t)}${bm?'<span class="bm">🔖</span>':''}${nv[n]?`<button class="mk" data-act="verseNotes" data-v="${n}">✎ ${nv[n]}</button>`:''}</p>`});
   if(S.loadingCh)h+='<div class="loadingline" style="width:70%"></div>';
   else{const b=BM[s.book];const read=isRead(s.book,s.ch);
     h+=`<div class="chap-end"><button class="btn" data-act="markRead">${read?'✓ Chapter read':'Mark chapter as read'}</button>
@@ -670,10 +685,10 @@ function selText(){return selVerses().map(n=>`${n} ${S.verses?.[n-1]||''}`).join
 function renderSelbar(){const bar=$('#selbar');if(!isReading()||!S.sel.size){bar.classList.remove('show');bar.innerHTML='';return}
   const s=settings();bar.classList.add('show');
   bar.innerHTML=`<div class="sb"><div class="top"><span class="grow">${esc(refLabel(s.book,s.ch,selVerses()))}</span><button class="iconbtn" style="width:32px;height:32px" data-act="clearSel" aria-label="Clear selection">✕</button></div>
-   <div class="dots" style="flex-wrap:wrap">${usedColors().map(c=>`<button class="dot ${c}" data-act="hl" data-c="${c}" title="${esc(colorLabel(c))}"></button>`).join('')}<button class="dot x" data-act="hl" data-c="" title="Remove highlight">⌫</button></div>
+   <div class="dots" style="flex-wrap:wrap">${usedColors().map(c=>`<button class="dot ${ck(c)}" data-act="hl" data-c="${c}" title="${esc(colorLabel(c))}"></button>`).join('')}<button class="dot x" data-act="hl" data-c="" title="Remove highlight">⌫</button></div>
    <div class="sbacts"><button data-act="addNote"><b>✎</b>Note</button><button data-act="bookmark"><b>🔖</b>Bookmark</button><button data-act="addToTab"><b>🏷️</b>Topic tab</button><button data-act="studySel"><b>🔍</b>Study</button><button data-act="copySel"><b>⧉</b>Copy</button></div></div>`}
 const colorLabel=c=>{const ts=mainSet().topics.filter(t=>t.color===c).map(t=>t.name);return ts.length?ts.join(' / '):((PALETTE.find(p=>p[0]===c)||[])[1]||'')};
-const usedColors=()=>{const u=[...new Set(mainSet().topics.map(t=>t.color))].filter(c=>PALETTE.some(p=>p[0]===c));return u.length?u:PALETTE.map(p=>p[0])};
+const usedColors=()=>{const u=[...new Set(mainSet().topics.map(t=>t.color))].filter(c=>okColor(c)===c);return u.length?u:PALETTE.map(p=>p[0])};
 
 /* ---------- STUDY ---------- */
 function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.book,s.ch,[]);
@@ -822,7 +837,7 @@ function viewNotes(v){
   v.innerHTML=`<p class="small muted" style="margin:4px 2px">Every note, highlight, bookmark and journal entry in your Online Bible.</p>
   <div class="row" style="margin:12px 0 4px"><input class="f grow" id="noteQ" placeholder="Search your notes…" value="${esc(S.q)}"></div>
   <div class="chips">${[['all','All'],['notes','✎ Notes'],['hl','🖍 Highlights'],['bm','🔖 Bookmarks'],['journal','📓 Journal']].map(([k,l])=>`<button class="chip ${S.notesFilter===k?'on':''}" data-act="notesFilter" data-f="${k}">${l}</button>`).join('')}</div>
-  ${S.notesFilter==='hl'?`<div class="chips"><button class="chip ${!S.notesColor?'on':''}" data-act="notesColor" data-c="">All colors</button>${[...new Set([...usedColors(),...Store.list('h_').map(h=>h.color)])].map(c=>`<button class="chip ${S.notesColor===c?'on':''}" data-act="notesColor" data-c="${c}"><span class="swatch sw-${c}"></span> ${esc(colorLabel(c))}</button>`).join('')}</div>`:''}
+  ${S.notesFilter==='hl'?`<div class="chips"><button class="chip ${!S.notesColor?'on':''}" data-act="notesColor" data-c="">All colors</button>${[...new Set([...usedColors(),...Store.list('h_').map(h=>h.color)])].map(c=>`<button class="chip ${S.notesColor===c?'on':''}" data-act="notesColor" data-c="${c}"><span class="swatch sw-${ck(c)}"></span> ${esc(colorLabel(c))}</button>`).join('')}</div>`:''}
   <div id="noteList"></div>
   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn sm" data-act="copyAll">⧉ Copy everything as text (backup)</button></div>`;
   $('#noteQ').oninput=e=>{S.q=e.target.value;renderNoteList()};renderNoteList()}
@@ -839,7 +854,7 @@ function renderNoteList(){const el=$('#noteList');if(!el)return;const q=S.q.toLo
   if(!es.length){el.innerHTML=`<div class="empty">${q?'Nothing matches that search.':'Nothing here yet. In Read, tap a verse to highlight it, bookmark it or add a note.'}</div>`;return}
   el.innerHTML=es.map(e=>{const lbl=e.ref?codeToLabel(e.ref):'';
     const tag={notes:'Note',hl:'Highlight',bm:'Bookmark',journal:'Journal'}[e.kind];
-    return `<div class="item"><div class="h">${e.color?`<span class="swatch sw-${e.color}"></span>`:''}${lbl?`<a class="ref grow" data-act="openRef" data-ref="${esc(e.ref)}">${esc(lbl)}</a>`:`<span class="grow">${esc(e.title||'')}</span>`}<span class="tag">${tag}</span></div>
+    return `<div class="item"><div class="h">${e.color?`<span class="swatch sw-${ck(e.color)}"></span>`:''}${lbl?`<a class="ref grow" data-act="openRef" data-ref="${esc(e.ref)}">${esc(lbl)}</a>`:`<span class="grow">${esc(e.title||'')}</span>`}<span class="tag">${tag}</span></div>
      ${e.title&&lbl?`<div style="font-weight:700;margin-top:4px">${esc(e.title)}</div>`:''}
      ${e.vt?`<div class="vt">${esc(e.vt.length>260?e.vt.slice(0,260)+'…':e.vt)}</div>`:''}
      ${e.color?`<div class="small muted" style="margin-top:4px">${esc(colorLabel(e.color))}</div>`:''}
@@ -956,7 +971,7 @@ const A={
   topicDelete:el=>confirmSheet('Delete this topic tab?','Delete',()=>Store.del('t_'+el.dataset.t)),
   topicStudy:el=>{const t=topicData().find(x=>x.id===el.dataset.t);S.studyRef=t.refs.map(codeToLabel).join('; ');runStudy(null,S.studyRef,`Give a short topical Bible study on "${t.name}" using these passages: ${S.studyRef}. Show what they teach together, then give practical application.`)},
   colorView:el=>{S.notesFilter='hl';S.notesColor=el.dataset.c;S.onlineSub='notes';setTab('online')},
-  copyKey:()=>copyText('My Bible key\n'+mainSet().topics.map(t=>`${t.emoji||''} ${COLOR_NAMES[okColor(t.color)][0].toUpperCase()+COLOR_NAMES[okColor(t.color)].slice(1)} = ${t.name}${t.verses&&t.verses.length?' ('+t.verses.map(v=>shortRef(v.ref)).join(', ')+')':''}`.trim()).join('\n')),
+  copyKey:()=>copyText('My Bible key\n'+mainSet().topics.map(t=>`${t.emoji||''} ${colorWord(t.color)[0].toUpperCase()+colorWord(t.color).slice(1)} = ${t.name}${t.verses&&t.verses.length?' ('+t.verses.map(v=>shortRef(v.ref)).join(', ')+')':''}`.trim()).join('\n')),
   loadBookPaper:el=>{Object.assign(S.build,{mode:'book',bookOnly:el.dataset.b,planKey:null,err:''});closeSheet();setTab('load');runBuild()},
   loadTopicPaper:el=>{Object.assign(S.build,{mode:'topic',topic:el.dataset.n,planKey:null,err:''});setTab('load');runBuild()},
   resetColors:()=>{saveSettings({labels:{}});renderView()},
@@ -1002,10 +1017,16 @@ const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depress
 const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['soap','📖 S.O.A.P.']];
 S.panel={};S.streams={};S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
 function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
-function colorKeyText(){const m=mainSet().topics;return m.map(t=>`${okColor(t.color)} (${COLOR_NAMES[okColor(t.color)]}) = ${t.name}${t.meaning?' — '+t.meaning:''}`).join('; ')+'. Only use these letters.'}
-const okColor=c=>PALETTE.some(x=>x[0]===c)?c:'y';
+function colorKeyText(){const m=mainSet().topics;return m.map(t=>`${okColor(t.color)} (${colorWord(t.color)}) = ${t.name}${t.meaning?' — '+t.meaning:''}`).join('; ')+'. In "color" fields use only these color codes, exactly as written.'}
+const okColor=c=>/^#[0-9a-fA-F]{6}$/.test(c||'')?String(c).toLowerCase():PALETTE.some(x=>x[0]===c)?c:'y';
+const PAL_HEX={y:'#ffe27a',g:'#a8e6a3',b:'#a9d0ff',p:'#ffbfd0',o:'#ffc98a',v:'#d6c2ff',r:'#ffaba1',t:'#93e0d8',l:'#d6f28a',n:'#e3c7a2',k:'#d6d6d6',m:'#f5a3e6',s:'#b8e4ff',c:'#ffb59a',d:'#f2cf63',e:'#bff2d6',f:'#e3d9ff',h:'#a9b6e8',i:'#d2d39a',j:'#ffc2c2',q:'#ffd9b8',u:'#a6f0f5',w:'#e6a8b8',z:'#efe3c2'};
+const _hexRgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+function nearestPal(hex){const a=_hexRgb(hex);let best='y',bd=1e9;for(const [k,h] of Object.entries(PAL_HEX)){const b=_hexRgb(h);const d=(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;if(d<bd){bd=d;best=k}}return best}
+const _ckDone=new Set();
+function ck(c){c=okColor(c);if(c[0]!=='#')return c;const t='h_'+c.slice(1);if(!_ckDone.has(t)){_ckDone.add(t);let st=document.getElementById('customColors');if(!st){st=document.createElement('style');st.id='customColors';document.head.appendChild(st)}
+  st.textContent+=`.sw-${t},.dot.${t},.v.hl-${t}{background:${c}}@media (prefers-color-scheme:dark){:root:not([data-theme]) .v.hl-${t}{background:color-mix(in srgb,${c} 45%,transparent)}}:root[data-theme=dark] .v.hl-${t},:root[data-theme=forest] .v.hl-${t},:root[data-theme=navy] .v.hl-${t}{background:color-mix(in srgb,${c} 45%,transparent)}`}return t}
 const COLOR_NAMES=Object.fromEntries(PALETTE);
-const colorWord=c=>COLOR_NAMES[okColor(c)];
+const colorWord=c=>{c=okColor(c);return c[0]==='#'?`custom (like ${COLOR_NAMES[nearestPal(c)]})`:COLOR_NAMES[c]};
 function parseJSON(t){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw {message:'The answer came back incomplete — tap Generate again.'};
   try{return JSON.parse(t.slice(a,b+1))}catch(e){throw {message:'The answer came back incomplete — tap Generate again.'}}}
 const JSYS='You are a careful, warm Bible study helper. You are helping someone mark up ("load") their own PRINTED paper Bible at home with highlighters and a pen, so every note must be short enough to hand-write in a margin. Be faithful to the text and accurate about history; avoid speculation, keep to mainstream Christian understanding and briefly note real disagreements. Write in simple, encouraging English. Reply with ONLY one valid JSON object — no markdown fences, no text before or after.\n\n';
@@ -1014,7 +1035,7 @@ function applyHL(b,c,vs,color,quote){vs.forEach((v,i)=>{Store.set(`h_${b}.${c}.$
 function addNote(b,c,vs,title,text,isMd){Store.set('n_'+newId(),{ref:refCode(b,c,vs),b,c,vs,title,text,md:!!isMd,created:Date.now(),updated:Date.now()})}
 const rc=p=>p?`${p.b} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`:'';
 const refA=(code,label)=>`<a class="ref" data-act="openRef" data-ref="${esc(code)}">${esc(label)}</a>`;
-const sw=c=>`<span class="swatch sw-${okColor(c)}" style="vertical-align:-2px"></span>`;
+const sw=c=>`<span class="swatch sw-${ck(c)}" style="vertical-align:-2px"></span>`;
 const SHORT={Genesis:'Gen',Exodus:'Ex',Leviticus:'Lev',Numbers:'Num',Deuteronomy:'Deut',Joshua:'Josh',Judges:'Judg',Samuel:'Sam',Kings:'Kgs',Chronicles:'Chr',Nehemiah:'Neh',Esther:'Est',Psalms:'Ps',Proverbs:'Prov',Ecclesiastes:'Eccl','Song of Solomon':'Song',Isaiah:'Isa',Jeremiah:'Jer',Lamentations:'Lam',Ezekiel:'Ezek',Daniel:'Dan',Hosea:'Hos',Obadiah:'Obad',Micah:'Mic',Nahum:'Nah',Habakkuk:'Hab',Zephaniah:'Zeph',Haggai:'Hag',Zechariah:'Zech',Malachi:'Mal',Matthew:'Mt',Mark:'Mk',Luke:'Lk',John:'Jn',Romans:'Rom',Corinthians:'Cor',Galatians:'Gal',Ephesians:'Eph',Philippians:'Phil',Colossians:'Col',Thessalonians:'Thess',Timothy:'Tim',Titus:'Tit',Philemon:'Phlm',Hebrews:'Heb',James:'Jas',Peter:'Pet',Jude:'Jude',Revelation:'Rev'};
 const shortRef=r=>{const p=parseRef(r);if(!p)return r;const m=BM[p.b].name.match(/^(\d )?(.+)$/);return `${m[1]?m[1].trim():''}${SHORT[m[2]]||m[2]} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`};
 
@@ -1133,7 +1154,7 @@ function grpActs(pl,g){const sec=idSec(g.items[0].id);if(!sec)return '';const ar
     <button class="btn sm ghost" data-act="secPart" data-k="${pl.key}" data-s="${sec}" data-m="section" ${bk?'disabled':''}>${bk&&S.secMode==='section'?'<span class="spin"></span> Regenerating…':'🔄 Regenerate this section'}</button></div>`}
 function planPassage(pl){return pl.kind==='topic'?`a topic tab for "${pl.topic}"`:pl.kind==='book'?`the book of ${BM[pl.b].name}`:planTitle(pl)}
 function secSchema(pl,sec){const s=settings();const t=pl.topic||'';return ({
-  highlights:'[{"v": "verse number or range", "color": "one letter from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}]',
+  highlights:'[{"v": "verse number or range", "color": "one color code from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}]',
   margin:'[{"v": "verse number or range", "note": "margin note, max 15 words, handwritable"}]',
   xrefs:'[{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}]',
   words:'[{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}]',
@@ -1224,7 +1245,7 @@ async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert
   if(B.mode==='chapter'||B.mode==='verses'){const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
     const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;const keys=[];
     if(B.parts.context)keys.push('"context": {"heading": "short title to write above the chapter (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "who it was first written to (few words)", "setting": "when/where and what is happening (max 15 words)", "background": ["2-4 short historical or cultural facts a modern reader would miss (max 15 words each)"]}');
-    if(B.parts.hl)keys.push(`"highlights": [{"v": "verse number or range like 3-5", "color": "one letter from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}] — the 5-10 most important verses`);
+    if(B.parts.hl)keys.push(`"highlights": [{"v": "verse number or range like 3-5", "color": "one color code from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}] — the 5-10 most important verses`);
     if(B.parts.margin)keys.push('"margin": [{"v": "verse number or range", "note": "margin note, max 15 words, handwritable"}] — 5-10 notes across the chapter');
     if(B.parts.xrefs)keys.push('"xrefs": [{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}] — 4-8 verses with 1-3 well-known cross-references each');
     if(B.parts.words)keys.push('"words": [{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}] — 2-4 key words');
@@ -1232,7 +1253,7 @@ async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert
     prompt=JSYS+`Show me how to load ${name} in my paper Bible (${TRANS[s.trans]}).${isV?` Only cover verses ${v1}${v2>v1?'-'+v2:''} (use fewer items if the passage is short); the context may describe the surrounding chapter.`:''}\nMy highlighter color key: ${colorKeyText()}.\nReturn a JSON object with exactly these keys:\n${keys.join(',\n')}`;
     key=isV?`k_${B.book}.${B.ch}.${v1}-${v2}`:`k_${B.book}.${B.ch}`;meta=isV?{kind:'chapter',b:B.book,c:B.ch,v1,v2}:{kind:'chapter',b:B.book,c:B.ch};}
   else if(B.mode==='topic'){const t=(B.topic||'').trim();if(!t){toast('Type or pick a feeling or topic');return}
-    prompt=JSYS+`I want to make a topic tab in my paper Bible for "${t}" — verses to highlight in one color and chain together in the margins.\nMy highlighter color key: ${colorKeyText()}.\nReturn JSON: {"title": "tab label (1-2 words)", "emoji": "one emoji", "color": "best color letter from my key", "intro": "2 sentences on what the Bible says about ${t}, gently and honestly", "verses": [{"ref": "Book chapter:verse or chapter:verse-verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}] (7-10 verses in Bible order, Old and New Testament, never ripped out of context), "prayer": "a short prayer"}`;
+    prompt=JSYS+`I want to make a topic tab in my paper Bible for "${t}" — verses to highlight in one color and chain together in the margins.\nMy highlighter color key: ${colorKeyText()}.\nReturn JSON: {"title": "tab label (1-2 words)", "emoji": "one emoji", "color": "best color code from my key", "intro": "2 sentences on what the Bible says about ${t}, gently and honestly", "verses": [{"ref": "Book chapter:verse or chapter:verse-verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}] (7-10 verses in Bible order, Old and New Testament, never ripped out of context), "prayer": "a short prayer"}`;
     key='k_t-'+t.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40);meta={kind:'topic',topic:t};}
   else{const b=BM[B.bookOnly];
     prompt=JSYS+`Show me how to load the book of ${b.name} (${b.chapters} chapters) in my paper Bible.\nReturn JSON: {"tagline": "one sentence on what the book is about (max 20 words)", "themes": ["3-5 big themes, 1-3 words each"], "key_verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}] (4-8), "chapters": [{"c": chapter number, "title": "heading to write above the chapter, max 5 words", "summary": "max 10 words"}] (one for EVERY chapter 1-${b.chapters})}`;
@@ -1399,10 +1420,14 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
    <div class="card"><label class="l" style="margin-top:0">Name</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
      <label class="l">Favorite verse</label><input class="f" id="pfFav" value="${esc(pf.fav?codeToLabel(pf.fav):'')}" placeholder="e.g. Psalm 46:10">
      ${pf.fav&&parseRef(pf.fav)?`<p class="small" style="margin:6px 2px 0">${refA(pf.fav,'Open '+codeToLabel(pf.fav))}</p>`:''}
-     <label class="l">Look</label><div class="chips">${[['','Auto'],['light','☀️ Light'],['sepia','📜 Sepia'],['dark','🌙 Dark']].map(([k,l])=>`<button class="chip ${pf.theme===k?'on':''}" data-act="setTheme" data-t="${k}">${l}</button>`).join('')}</div>
+     <label class="l">Look</label><div class="chips">${[['','Auto'],['light','☀️ Light'],['sepia','📜 Sepia'],['dark','🌙 Dark'],['blush','🌸 Blush'],['lavender','💜 Lavender'],['forest','🌲 Forest'],['navy','⚓ Navy']].map(([k,l])=>`<button class="chip ${pf.theme===k?'on':''}" data-act="setTheme" data-t="${k}">${l}</button>`).join('')}</div>
      <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div>
    <h2 class="sec">My progress</h2>
-   <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved <b>on this device</b> (this phone or computer).':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
+   ${STANDALONE&&Code.value?`<div class="card codecard"><div class="row"><b class="grow">🔑 My Bible code</b><button class="btn sm ghost" data-act="codeShow">${S.codeShown?'🙈 Hide':'👁 Show'}</button></div>
+     <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
+     <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
+     <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">↪ Use a different code</button></div></div>`:''}
+   <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved online with your <b>Bible code</b>, and on this device.':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
      <p class="small muted" style="margin:6px 0 0">Want it in the other version too (Claude app ↔ your website)? Tap <b>Copy my progress</b> here, then <b>Import progress</b> in the other one.</p>
      <div class="row" style="margin-top:10px"><button class="btn sm pri" data-act="exportCopy">📋 Copy my progress</button><button class="btn sm" data-act="importSheet">📥 Import progress</button><button class="btn sm" data-act="copyAll">⧉ Back up notes as text</button></div>
      <textarea id="exportBox" class="f" style="display:none;margin-top:10px;min-height:110px;font-size:12px" readonly></textarea></div>
@@ -1478,7 +1503,7 @@ async function initAuth(){showAuth('loading');Store.readyResolve();
       applyTheme();updateAvatar();renderView()});
   }catch(e){console.warn(e);Auth.noFirebase=true;startGuest();toast('Couldn’t reach the login service — using guest mode')}}
 async function aiServer(prompt,onText,signal,tier){
-  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
+  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json','X-Code':Code.value||''},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
   if(!r.ok){let m='The AI helper isn’t available right now.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:r.status===429?'rate_limited':'server',message:m}}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf='',text='',stop=null;
   for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
@@ -1563,8 +1588,8 @@ function saveVerseToMain(topic,verse){let where='';updateSet('main',m=>{let t=m.
     if(!t){t={id:'t'+newId(),emoji:topic.emoji,name:topic.name,color:topic.color,meaning:topic.meaning||'',verses:[]};m.topics.push(t)}
     if(!t.verses.some(x=>x.ref===verse.ref))t.verses.push({ref:verse.ref,why:verse.why||''});where=t.name});
   toast(`⭐ Saved to your main key → ${where}`)}
-const swBig=(c,emoji)=>`<span class="kdot sw-${okColor(c)}">${esc(emoji||'')}</span>`;
-function keyLegend(s){return `<div class="legend">${(s.topics||[]).map(t=>`<span class="lg"><span class="swatch sw-${okColor(t.color)}"></span>${esc(t.name)}</span>`).join('')}</div>`}
+const swBig=(c,emoji)=>`<span class="kdot sw-${ck(c)}">${esc(emoji||'')}</span>`;
+function keyLegend(s){return `<div class="legend">${(s.topics||[]).map(t=>`<span class="lg"><span class="swatch sw-${ck(t.color)}"></span>${esc(t.name)}</span>`).join('')}</div>`}
 
 function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.keySet='main';const s=getSet(S.keySet);const isMain=s.id==='main';
   el.innerHTML=`<div class="chips settabs">${sets.map(x=>`<span class="chip settab ${x.id===s.id?'on':''}"><button data-act="keySet" data-s="${esc(x.id)}">${x.id==='main'?'⭐ ':x.id==='starter'?'🌱 ':'✨ '}${esc(x.name)}</button>${x.id==='main'?'':`<button class="x" data-act="keyDelSetId" data-s="${esc(x.id)}" aria-label="Delete ${esc(x.name)}">✕</button>`}</span>`).join('')}<button class="chip addchip" data-act="keyGenerate">＋ Generate a new set</button></div>
@@ -1596,12 +1621,13 @@ function topicSheet(tid){const s=getSet(S.keySet);const t=tid?findTopic(s,tid):{
    <label class="l">Name</label><input class="f" id="tkName" value="${esc(t.name)}" placeholder="e.g. Faith, Courage, Family" maxlength="40">
    <label class="l">What this color marks (optional)</label><input class="f" id="tkMeaning" value="${esc(t.meaning||'')}" placeholder="e.g. Verses about trusting God" maxlength="80">
    <label class="l">Emoji</label><input class="f" id="tkEmoji" value="${esc(t.emoji||'')}" maxlength="4" style="width:90px">
-   <label class="l">Highlighter color</label><div class="palette">${PALETTE.map(([c,n])=>`<button class="pal sw-${c} ${t.color===c?'on':''}" data-act="keyPickColor" data-c="${c}" title="${n}"><small>${n}</small></button>`).join('')}</div>
-   <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="keySaveTopicForm" data-t="${tid||''}">${tid?'Save':'Add topic'}</button></div>`)}
+   <label class="l">Highlighter color</label><div class="palette"><label class="pal wheel ${/^#/.test(t.color||'')?'on':''}" id="tkWheelLab" style="${/^#/.test(t.color||'')?'--pick:'+t.color:''}"><input type="color" id="tkWheel" value="${/^#/.test(t.color||'')?t.color:'#ff7a59'}"><small>🎨 Any color</small></label>${PALETTE.map(([c,n])=>`<button class="pal sw-${c} ${t.color===c?'on':''}" data-act="keyPickColor" data-c="${c}" title="${n}"><small>${n}</small></button>`).join('')}</div>
+   <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="keySaveTopicForm" data-t="${tid||''}">${tid?'Save':'Add topic'}</button></div>`);
+  const w=$('#tkWheel');w.addEventListener('input',()=>{S._tColor=w.value.toLowerCase();$$('.pal').forEach(b=>b.classList.remove('on'));const lab=$('#tkWheelLab');lab.classList.add('on');lab.style.setProperty('--pick',w.value)})}
 function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
   openSheet(`<h3>✨ Generate a new set</h3><p class="small muted">Get a fresh set of topics, each with a highlighter color and 5 verses. It opens as its own tab, so your main key stays safe.</p>
    <label class="l">How many topics / colors?</label>
-   <div class="row stepper"><button class="iconbtn" data-act="genStep" data-d="-1">−</button><b id="genN" style="font-size:28px;min-width:44px;text-align:center">${S.genN}</b><button class="iconbtn" data-act="genStep" data-d="1">＋</button><span class="small muted">(2–12)</span></div>
+   <div class="row stepper"><button class="iconbtn" data-act="genStep" data-d="-1">−</button><b id="genN" style="font-size:28px;min-width:44px;text-align:center">${S.genN}</b><button class="iconbtn" data-act="genStep" data-d="1">＋</button><span class="small muted">(2–25)</span></div>
    <label class="l">Focus (optional)</label><input class="f" id="genFocus" value="${esc(S.genFocus)}" placeholder="e.g. hard times, new believers, my marriage">
    <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FOCUS_IDEAS.map(f=>`<button class="chip" data-act="genFocusPick" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
    <button class="btn pri wide" id="genGo" data-act="genGo">✨ Generate ${S.genN} topics</button><div id="genMsg" class="small muted" style="text-align:center;margin-top:8px"></div>
@@ -1609,9 +1635,9 @@ function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
   $('#genFocus').addEventListener('input',e=>S.genFocus=e.target.value)}
 async function runGenerate(){const n=S.genN,focus=(S.genFocus||'').trim();const btn=$('#genGo');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generating your set…'}
   const pal=PALETTE.map(([c,nm])=>`${c}=${nm}`).join(', ');
-  try{const r=await ai(JSYS+`Create a set of ${n} topic tabs for marking up a paper Bible with highlighters${focus&&focus!=='General'?`, focused on: ${focus}`:''}. Give each topic one highlighter color from this palette: ${pal}. Use a different color for each topic where possible${n>PALETTE.length?' (reuse colors for related topics if needed)':''}.\nReturn JSON: {"name": "short set name (2-4 words)", "topics": [{"name": "1-3 words", "emoji": "one emoji", "color": "palette letter", "meaning": "what this color marks, max 10 words", "verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]}]} with exactly ${n} topics and exactly 5 well-known verses per topic, each true to its context.`,null,null,'default');
+  try{const r=await ai(JSYS+`Create a set of ${n} topic tabs for marking up a paper Bible with highlighters${focus&&focus!=='General'?`, focused on: ${focus}`:''}. Give each topic one highlighter color from this palette: ${pal}. Use a different color for each topic where possible${n>PALETTE.length?' (reuse colors for related topics if needed)':''}. Keep each "why" very short.\nReturn JSON: {"name": "short set name (2-4 words)", "topics": [{"name": "1-3 words", "emoji": "one emoji", "color": "palette letter", "meaning": "what this color marks, max 10 words", "verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]}]} with exactly ${n} topics and exactly 5 well-known verses per topic, each true to its context.`,null,null,'default');
     const d=parseJSON(r.text);const id='g'+newId();
-    const topics=(d.topics||[]).slice(0,12).map(t=>({id:'t'+newId(),emoji:t.emoji||'🏷️',name:String(t.name||'Topic').slice(0,40),color:okColor(t.color),meaning:t.meaning||'',verses:(t.verses||[]).map(v=>({ref:normRef(v.ref),why:v.why||''})).filter(v=>v.ref).slice(0,5)}));
+    const topics=(d.topics||[]).slice(0,25).map(t=>({id:'t'+newId(),emoji:t.emoji||'🏷️',name:String(t.name||'Topic').slice(0,40),color:okColor(t.color),meaning:t.meaning||'',verses:(t.verses||[]).map(v=>({ref:normRef(v.ref),why:v.why||''})).filter(v=>v.ref).slice(0,5)}));
     if(!topics.length)throw {message:'No topics came back — try again.'};
     Store.set('s_'+id,{name:String(d.name||'New set').slice(0,40),focus,at:Date.now(),topics});S.keySet=id;closeSheet();renderView();toast('New set ready ✨')}
   catch(e){const m=$('#genMsg');if(m)m.textContent=aiErr(e);if(btn){btn.disabled=false;btn.textContent='✨ Try again'}}}
@@ -1632,12 +1658,12 @@ async function refreshTopic(tid){const sid=S.keySet;const s=getSet(sid);const t=
 Object.assign(A,{
   keySet:el=>{S.keySet=el.dataset.s;S.openTopic=null;renderView()},
   keyGenerate:()=>genSheet(),
-  genStep:el=>{S.genN=Math.max(2,Math.min(12,(S.genN||6)+(+el.dataset.d)));$('#genN').textContent=S.genN;$('#genGo').textContent=`✨ Generate ${S.genN} topics`},
+  genStep:el=>{S.genN=Math.max(2,Math.min(25,(S.genN||6)+(+el.dataset.d)));$('#genN').textContent=S.genN;$('#genGo').textContent=`✨ Generate ${S.genN} topics`},
   genFocusPick:el=>{S.genFocus=el.dataset.f;$('#genFocus').value=el.dataset.f},
   genGo:()=>runGenerate(),
   keyAddTopic:()=>topicSheet(null),
   keyEditTopic:el=>topicSheet(el.dataset.t),
-  keyPickColor:el=>{S._tColor=el.dataset.c;$$('.pal').forEach(b=>b.classList.toggle('on',b.dataset.c===el.dataset.c))},
+  keyPickColor:el=>{S._tColor=el.dataset.c;$$('.pal').forEach(b=>b.classList.toggle('on',b.dataset.c===el.dataset.c));const lab=$('#tkWheelLab');if(lab)lab.style.removeProperty('--pick')},
   keySaveTopicForm:el=>{const name=$('#tkName').value.trim();if(!name){toast('Give the topic a name');return}const tid=el.dataset.t;
     const data={name,meaning:$('#tkMeaning').value.trim(),emoji:$('#tkEmoji').value.trim()||'🏷️',color:okColor(S._tColor)};
     updateSet(S.keySet,s=>{if(tid)Object.assign(findTopic(s,tid),data);else{const t=Object.assign({id:'t'+newId(),verses:[]},data);s.topics.push(t);S.openTopic=S.keySet+'|'+t.id}});closeSheet();renderView()},
@@ -1667,12 +1693,15 @@ function saveVerseToMainQuiet(topic,verse){updateSet('main',m=>{let t=m.topics.f
 const SITE_URL='https://loadmybible.shengcremers.workers.dev';
 const Lock={code:null};
 const LOCK_KEY='lb1:code';
-async function api(path,opts={}){const r=await fetch(path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','X-Code':Lock.code||''},opts.headers||{})}));
-  if(r.status===401||r.status===429){if(path!=='/api/login')lockOut('Please enter your code again.');throw {code:'locked',message:'Locked'}}
-  if(!r.ok){let m='Couldn’t reach your Loaded Bible.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:'server',message:m}}return r}
+const Code={KEY:'lb1:bcode',SAVED:'lb1:bcode-saved',get value(){try{return localStorage.getItem(this.KEY)}catch(e){return null}},set(v){try{localStorage.setItem(this.KEY,v)}catch(e){}},clear(){try{localStorage.removeItem(this.KEY);localStorage.removeItem(this.SAVED)}catch(e){}}};
+const normCode=c=>{c=String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');const m=c.match(/^([A-Z]{3,8})([A-Z2-9]{4})([A-Z2-9]{4})$/);return m?`${m[1]}-${m[2]}-${m[3]}`:c};
+async function api(path,opts={}){const r=await fetch(path,Object.assign({},opts,{headers:Object.assign({'Content-Type':'application/json','X-Code':Code.value||''},opts.headers||{})}));
+  if(r.status===401){codeLost();throw {code:'no_code',message:'Bible code not found'}}
+  if(r.status===429){let j={};try{j=await r.clone().json()}catch(e){}if(j.error==='too_many'){toast('Too many wrong codes — wait 15 minutes.');throw {code:'too_many',message:'Too many tries'}}}
+  if(!r.ok){let m='Couldn’t reach Loaded Bible.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:'server',message:m}}return r}
 Store.connectServer=function(){const col={
   doc:k=>({set:v=>api('/api/item/'+encodeURIComponent(k),{method:'PUT',body:JSON.stringify(v)}),delete:()=>api('/api/item/'+encodeURIComponent(k),{method:'DELETE'})}),
-  onSnapshot:(next,err)=>{let busy=false;const pull=async()=>{if(busy)return;busy=true;try{const j=await (await api('/api/data')).json();next({docs:Object.entries(j.items||{}).map(([id,v])=>({id,exists:true,data:()=>v})),metadata:{fromCache:false}})}catch(e){if(e.code!=='locked')setSync('Offline — saved on this device')}busy=false};
+  onSnapshot:(next,err)=>{let busy=false;const pull=async()=>{if(busy)return;busy=true;try{const j=await (await api('/api/data')).json();next({docs:Object.entries(j.items||{}).map(([id,v])=>({id,exists:true,data:()=>v})),metadata:{fromCache:false}})}catch(e){if(e.code==='server'||!e.code)setSync('Offline — will save when back online')}busy=false};
     pull();const iv=setInterval(()=>{if(!document.hidden)pull()},90000);const vis=()=>{if(!document.hidden)pull()};document.addEventListener('visibilitychange',vis);
     return ()=>{clearInterval(iv);document.removeEventListener('visibilitychange',vis)}}};
   this.subscribe(col)};
@@ -1719,8 +1748,55 @@ Object.assign(A,{
     try{await navigator.clipboard.writeText(t);toast(`Copied ${n} items — now tap Import progress in the other version`)}
     catch(e){const box=$('#exportBox');box.style.display='block';box.value=t;box.focus();box.select();toast('Select all and copy this text')}},
 });
+/* ---------- BIBLE CODE (no accounts) ---------- */
+const localCount=()=>{let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('lb1:me:d:')&&!/settings$/.test(k))n++}}catch(e){}return n};
+function clearLocal(){try{Object.keys(localStorage).filter(k=>k.startsWith('lb1:me:')).forEach(k=>localStorage.removeItem(k))}catch(e){}}
+function welcomeBox(inner){const el=$('#auth');el.classList.add('show');el.innerHTML=`<div class="authbox"><div class="brand" style="justify-content:center;font-size:30px">${BOOK_SVG}Loaded Bible</div>${inner}</div>`}
+function showWelcome(msg){welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">Welcome 👋</h3>
+   <p style="text-align:center;margin:0 0 16px">No accounts, no passwords. Your progress is saved with your own <b>Bible code</b>, a code like <span class="codepill">GRACE-7K4M-2QXT</span>.</p>
+   <div class="card small" style="margin:0 0 14px">🔑 Use your code on any phone or computer to get all your progress back.<br>📝 Keep it safe, like a key. Without it, nobody can get your progress back, not even us.</div>
+   <button class="btn pri wide" data-act="codeNew">✨ Start — give me my Bible code</button>
+   <button class="btn wide" data-act="codeHave">🔑 I already have a code</button>
+   <div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div>`)}
+function showNewCode(code){welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 4px">This is your Bible code</h3>
+   <div class="bigcode" id="bigCode">${esc(code)}</div>
+   <button class="btn wide" data-act="codeCopy" data-c="${esc(code)}">⧉ Copy my code</button>
+   <div class="warnbox"><b>⚠️ Save it now!</b> Take a screenshot, or write it in the front of your Bible. It's the only way to get your progress back on another phone or computer, or if your browser data gets cleared.</div>
+   <label class="row" style="margin:14px 2px;gap:10px;align-items:center"><input type="checkbox" id="codeSaved" style="width:22px;height:22px"> <b>I saved my code</b></label>
+   <button class="btn pri wide" id="codeGo" data-act="codeStart" data-c="${esc(code)}" disabled>Continue →</button>`);
+  $('#codeSaved').addEventListener('change',e=>{$('#codeGo').disabled=!e.target.checked})}
+function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">Enter your Bible code</h3>
+   <input id="codeIn2" class="f codein2" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="GRACE-7K4M-2QXT">
+   <button class="btn pri wide" data-act="codeOpen">📖 Open my Bible</button>
+   <div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div>
+   <button class="linkbtn" data-act="codeBack">← Back</button>`);
+  const i=$('#codeIn2');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
+function codeLost(){Code.clear();Store.disconnect();Store.items.clear();clearLocal();showWelcome('That Bible code wasn’t found. Start fresh or try your code again.')}
+function startCode(){hideAuth();Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView()}
+Object.assign(A,{
+  codeNew:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Making your code…';
+    try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
+    catch(e){authMsg(e.message||'No connection — check your internet and try again.');el.disabled=false;el.textContent='✨ Start — give me my Bible code'}},
+  codeCopy:async el=>{try{await navigator.clipboard.writeText(el.dataset.c);toast('Code copied ✓')}catch(e){const r=document.createRange();r.selectNodeContents($('#bigCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast('Select and copy the code')}},
+  codeStart:el=>{Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome! Your progress now saves with your Bible code 🔑')},
+  codeHave:()=>showHaveCode(''),
+  codeBack:()=>showWelcome(''),
+  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!/^[A-Z]{3,8}-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(c)){authMsg('That doesn’t look like a Bible code. It looks like GRACE-7K4M-2QXT.');return}
+    const b=$('[data-act=codeOpen]');b.disabled=true;b.innerHTML='<span class="spin"></span>';
+    try{const r=await fetch('/api/code/check',{method:'POST',headers:{'X-Code':c}});
+      if(r.ok){const n=localCount();if(n){welcomeBox(`<h3 style="text-align:center;margin:18px 0 6px">One question</h3><p style="text-align:center">This device already has some progress (${n} items) that isn’t saved with a code yet. Add it to <b>${esc(c)}</b> too?</p>
+          <button class="btn pri wide" data-act="codeMerge" data-c="${esc(c)}" data-m="1">Yes, add it</button><button class="btn wide" data-act="codeMerge" data-c="${esc(c)}" data-m="0">No, just open my code</button>`);return}
+        Code.set(c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖');return}
+      authMsg(r.status===429?'Too many wrong tries. Wait 15 minutes and try again.':'That code wasn’t found. Check the letters and numbers and try again.')}
+    catch(e){authMsg('No connection — check your internet and try again.')}
+    b.disabled=false;b.textContent='📖 Open my Bible'},
+  codeMerge:el=>{if(el.dataset.m!=='1')clearLocal();Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖')},
+  codeShow:()=>{S.codeShown=!S.codeShown;renderView()},
+  codeCopyMine:async()=>{try{await navigator.clipboard.writeText(Code.value);toast('Code copied ✓')}catch(e){S.codeShown=true;renderView();toast('Select and copy your code')}},
+  codeSwitch:()=>confirmSheet('Use a different Bible code? This device will forget your current code — make sure you saved it. Your progress stays safe online under that code.','Use a different code',()=>{Code.clear();Store.disconnect();Store.items.clear();clearLocal();setTab('load');showWelcome('')}),
+});
 /* ---------- boot ---------- */
-if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#load').slice(1));updateAvatar()}
+if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#load').slice(1));updateAvatar();if(Code.value)startCode();else showWelcome('')}
 else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
 Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});
 </script>
