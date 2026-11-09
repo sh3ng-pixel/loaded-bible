@@ -18,14 +18,14 @@
 :root{
   --paper:#f6efe2; --card:#fffaf0; --ink:#2a2018; --muted:#857561; --line:#e4d8c3;
   --accent:#8b2e24; --accent-ink:#fff; --gold:#b07d2a; --soft:#efe5d2;
-  --hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff;
+  --hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff; --hl-r:#ffaba1; --hl-t:#93e0d8; --hl-l:#d6f28a; --hl-n:#e3c7a2; --hl-k:#d6d6d6;
   --serif:"Crimson Pro",Georgia,serif; --sans:Inter,system-ui,-apple-system,sans-serif;
   --navh:64px;
 }
 @media (prefers-color-scheme:dark){
   :root{--paper:#17130f; --card:#221c16; --ink:#ede3d2; --muted:#a6957e; --line:#3a3028; --soft:#2c241c;
     --accent:#d0705f; --accent-ink:#1a120d; --gold:#d6a24e;
-    --hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78;}
+    --hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78; --hl-r:#6e2a24; --hl-t:#1f5a55; --hl-l:#4b5a1a; --hl-n:#5a4330; --hl-k:#4a4a4a;}
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
@@ -168,13 +168,13 @@ details.guide .body{padding-bottom:12px;line-height:1.5;font-size:15px}
 :root[data-theme=light]{
   --paper:#f6efe2; --card:#fffaf0; --ink:#2a2018; --muted:#857561; --line:#e4d8c3;
   --accent:#8b2e24; --accent-ink:#fff; --gold:#b07d2a; --soft:#efe5d2;
-  --hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff;
+  --hl-y:#ffe27a; --hl-g:#a8e6a3; --hl-b:#a9d0ff; --hl-p:#ffbfd0; --hl-o:#ffc98a; --hl-v:#d6c2ff; --hl-r:#ffaba1; --hl-t:#93e0d8; --hl-l:#d6f28a; --hl-n:#e3c7a2; --hl-k:#d6d6d6;
   --serif:"Crimson Pro",Georgia,serif; --sans:Inter,system-ui,-apple-system,sans-serif;
   --navh:64px;
 }
 :root[data-theme=dark]{--paper:#17130f; --card:#221c16; --ink:#ede3d2; --muted:#a6957e; --line:#3a3028; --soft:#2c241c;
     --accent:#d0705f; --accent-ink:#1a120d; --gold:#d6a24e;
-    --hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78;}
+    --hl-y:#6b5a12; --hl-g:#2d5a2a; --hl-b:#244a73; --hl-p:#6e2f44; --hl-o:#704516; --hl-v:#4b3a78; --hl-r:#6e2a24; --hl-t:#1f5a55; --hl-l:#4b5a1a; --hl-n:#5a4330; --hl-k:#4a4a4a;}
 :root[data-theme=sepia]{--paper:#efe2c4;--card:#f8eed6;--ink:#3a2a19;--muted:#7a6346;--line:#dbc7a0;--soft:#e8d7b2;--accent:#8b2e24;--accent-ink:#fff;--gold:#a8741f;--hl-y:#ffe27a;--hl-g:#a8e6a3;--hl-b:#a9d0ff;--hl-p:#ffbfd0;--hl-o:#ffc98a;--hl-v:#d6c2ff}
 .hbtn{background:none;border:0;font-size:20px;padding:4px;line-height:1}
 .avatar{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-size:20px;display:grid;place-items:center;padding:0}
@@ -253,6 +253,17 @@ details.grp[open]>summary::after{content:"▴"}
 .bannerpick span{position:absolute;left:8px;bottom:6px;color:#fff;font-weight:700;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .bannerpick[data-b=photo]{height:90px;margin-top:6px}
 .previewbar{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:12px;padding:8px 10px;margin-bottom:14px;font-size:13px;font-weight:600}
+.v.hl-r{background:var(--hl-r)}.dot.r{background:var(--hl-r)}.sw-r{background:var(--hl-r)}.v.hl-t{background:var(--hl-t)}.dot.t{background:var(--hl-t)}.sw-t{background:var(--hl-t)}.v.hl-l{background:var(--hl-l)}.dot.l{background:var(--hl-l)}.sw-l{background:var(--hl-l)}.v.hl-n{background:var(--hl-n)}.dot.n{background:var(--hl-n)}.sw-n{background:var(--hl-n)}.v.hl-k{background:var(--hl-k)}.dot.k{background:var(--hl-k)}.sw-k{background:var(--hl-k)}
+.kdot{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:20px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px}.lg{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.keyhead.ismain{border:2px solid var(--gold)}
+.settabs .chip{max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.addchip{border-style:dashed!important;color:var(--accent)}
+.palette{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pal{height:52px;border-radius:12px;border:3px solid transparent;position:relative}
+.pal small{position:absolute;left:0;right:0;bottom:3px;font-size:10.5px;font-weight:700;color:#222;opacity:.75}
+.pal.on{border-color:var(--ink)}
+.stepper{gap:14px}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),#5a1c16);color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -383,6 +394,7 @@ const refCode=(b,c,vs)=>`${b} ${c}${vs&&vs.length?':'+rangeStr(vs):''}`;
 const codeToLabel=code=>{const p=parseRef(code);if(!p)return code;return `${BM[p.b].name} ${p.c}${p.v1?':'+p.v1+(p.v2?'-'+p.v2:''):''}`};
 
 const TRANS={KJV:'King James Version (KJV, 1769)',WEB:'World English Bible (WEB)',ASV:'American Standard Version (ASV, 1901)',YLT:"Young's Literal Translation (YLT, 1898)"};
+const PALETTE=[['y','yellow'],['g','green'],['b','blue'],['p','pink'],['o','orange'],['v','purple'],['r','red'],['t','teal'],['l','lime'],['n','brown'],['k','gray']];
 const COLORS=[['y','Promises of God'],['g','Commands & growth'],['b','Prayer & worship'],['p','God’s love & grace'],['o','Sin & warnings'],['v','Jesus & the Holy Spirit']];
 const TOPICS=[
  ['salvation','✝️','Salvation',['JHN 3:16','ROM 3:23','ROM 6:23','ROM 10:9','EPH 2:8-9']],
@@ -475,7 +487,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner'].includes(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner'].includes(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -507,7 +519,7 @@ function aiErr(e){if(!e)return 'Something went wrong.';if(e.code==='unavailable_
 /* ---------- state ---------- */
 const settings=()=>Object.assign({trans:'KJV',font:20,book:'JHN',ch:1,labels:{}},Store.get('settings')||{});
 function saveSettings(p){Store.set('settings',Object.assign(settings(),p))}
-const S={tab:'load',onlineSub:'read',verses:null,loadingCh:false,chErr:'',sel:new Set(),ctrl:null,studyRef:'',study:null,studyCtrl:null,notesFilter:'all',notesColor:'',q:'',loadedSub:'colors',flashV:null,bookIntro:{}};
+const S={tab:'load',onlineSub:'read',verses:null,loadingCh:false,chErr:'',sel:new Set(),ctrl:null,studyRef:'',study:null,studyCtrl:null,notesFilter:'all',notesColor:'',q:'',loadedSub:'key',flashV:null,bookIntro:{}};
 const progress=()=>(Store.get('progress')||{read:{}}).read||{};
 function isRead(b,c){return (progress()[b]||[]).includes(c)}
 function toggleRead(b,c){const r=JSON.parse(JSON.stringify(progress()));const a=new Set(r[b]||[]);a.has(c)?a.delete(c):a.add(c);r[b]=[...a].sort((x,y)=>x-y);Store.set('progress',{read:r})}
@@ -627,9 +639,10 @@ function selText(){return selVerses().map(n=>`${n} ${S.verses?.[n-1]||''}`).join
 function renderSelbar(){const bar=$('#selbar');if(!isReading()||!S.sel.size){bar.classList.remove('show');bar.innerHTML='';return}
   const s=settings();bar.classList.add('show');
   bar.innerHTML=`<div class="sb"><div class="top"><span class="grow">${esc(refLabel(s.book,s.ch,selVerses()))}</span><button class="iconbtn" style="width:32px;height:32px" data-act="clearSel" aria-label="Clear selection">✕</button></div>
-   <div class="dots">${COLORS.map(([c])=>`<button class="dot ${c}" data-act="hl" data-c="${c}" title="${esc(colorLabel(c))}"></button>`).join('')}<button class="dot x" data-act="hl" data-c="" title="Remove highlight">⌫</button></div>
+   <div class="dots" style="flex-wrap:wrap">${usedColors().map(c=>`<button class="dot ${c}" data-act="hl" data-c="${c}" title="${esc(colorLabel(c))}"></button>`).join('')}<button class="dot x" data-act="hl" data-c="" title="Remove highlight">⌫</button></div>
    <div class="sbacts"><button data-act="addNote"><b>✎</b>Note</button><button data-act="bookmark"><b>🔖</b>Bookmark</button><button data-act="addToTab"><b>🏷️</b>Topic tab</button><button data-act="studySel"><b>🔍</b>Study</button><button data-act="copySel"><b>⧉</b>Copy</button></div></div>`}
-const colorLabel=c=>(settings().labels||{})[c]||(COLORS.find(x=>x[0]===c)||[])[1]||'';
+const colorLabel=c=>{const ts=mainSet().topics.filter(t=>t.color===c).map(t=>t.name);return ts.length?ts.join(' / '):((PALETTE.find(p=>p[0]===c)||[])[1]||'')};
+const usedColors=()=>{const u=[...new Set(mainSet().topics.map(t=>t.color))].filter(c=>PALETTE.some(p=>p[0]===c));return u.length?u:PALETTE.map(p=>p[0])};
 
 /* ---------- STUDY ---------- */
 function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.book,s.ch,[]);
@@ -679,11 +692,11 @@ async function runStudy(tool,refText,question,force){
 
 /* ---------- LOADED BIBLE ---------- */
 function viewLoaded(v){const sub=S.loadedSub;
-  v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: your highlighter color key, book tabs, topic tabs and insert cards to tuck inside.</p></div>
-  <div class="chips">${[['colors','🎨 Color key'],['books','📑 Book tabs'],['topics','🏷️ Topic tabs'],['inserts','🗂️ Inserts'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
+  v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: your topics & highlighter colors, book tabs and insert cards to tuck inside.</p></div>
+  <div class="chips">${[['key','🎨 Topics & colors'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
-  ({books:loadedBooks,topics:loadedTopics,colors:loadedColors,inserts:loadedInserts,progress:loadedProgress})[sub](body)}
+  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,progress:loadedProgress})[sub](body)}
 function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
   for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
     let g=null;
@@ -769,7 +782,7 @@ function viewNotes(v){
   v.innerHTML=`<p class="small muted" style="margin:4px 2px">Every note, highlight, bookmark and journal entry in your Online Bible.</p>
   <div class="row" style="margin:12px 0 4px"><input class="f grow" id="noteQ" placeholder="Search your notes…" value="${esc(S.q)}"></div>
   <div class="chips">${[['all','All'],['notes','✎ Notes'],['hl','🖍 Highlights'],['bm','🔖 Bookmarks'],['journal','📓 Journal']].map(([k,l])=>`<button class="chip ${S.notesFilter===k?'on':''}" data-act="notesFilter" data-f="${k}">${l}</button>`).join('')}</div>
-  ${S.notesFilter==='hl'?`<div class="chips"><button class="chip ${!S.notesColor?'on':''}" data-act="notesColor" data-c="">All colors</button>${COLORS.map(([c])=>`<button class="chip ${S.notesColor===c?'on':''}" data-act="notesColor" data-c="${c}"><span class="swatch sw-${c}"></span> ${esc(colorLabel(c))}</button>`).join('')}</div>`:''}
+  ${S.notesFilter==='hl'?`<div class="chips"><button class="chip ${!S.notesColor?'on':''}" data-act="notesColor" data-c="">All colors</button>${[...new Set([...usedColors(),...Store.list('h_').map(h=>h.color)])].map(c=>`<button class="chip ${S.notesColor===c?'on':''}" data-act="notesColor" data-c="${c}"><span class="swatch sw-${c}"></span> ${esc(colorLabel(c))}</button>`).join('')}</div>`:''}
   <div id="noteList"></div>
   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn sm" data-act="copyAll">⧉ Copy everything as text (backup)</button></div>`;
   $('#noteQ').oninput=e=>{S.q=e.target.value;renderNoteList()};renderNoteList()}
@@ -875,10 +888,10 @@ const A={
   markRead:()=>{const s=settings();toggleRead(s.book,s.ch);toast(isRead(s.book,s.ch)?'Marked as read ✓':'Unmarked')},
   addToTab:()=>{const s=settings();const vs=selVerses();const code=refCode(s.book,s.ch,[vs[0]].concat(vs.length>1&&vs[vs.length-1]-vs[0]===vs.length-1?[vs[vs.length-1]]:[]));
     const code2=vs.length>1&&vs[vs.length-1]-vs[0]===vs.length-1?`${s.book} ${s.ch}:${vs[0]}-${vs[vs.length-1]}`:`${s.book} ${s.ch}:${vs[0]}`;
-    S._tabRef=code2;openSheet(`<h3>Add ${esc(codeToLabel(code2))} to a topic tab</h3>${topicData().map(t=>`<button class="item row" style="width:100%;text-align:left" data-act="addToTopic" data-t="${t.id}"><span>${esc(t.ic)}</span><b class="grow">${esc(t.name)}</b><span class="tag">${t.refs.length}</span></button>`).join('')}
+    S._tabRef=code2;openSheet(`<h3>Add ${esc(codeToLabel(code2))} to a topic</h3><p class="small muted" style="margin-top:0">Saved to ⭐ your main key.</p>${mainSet().topics.map(t=>`<button class="item row" style="width:100%;text-align:left" data-act="addToTopic" data-t="${t.id}">${swBig(t.color,t.emoji)}<b class="grow">${esc(t.name)}</b><span class="tag">${(t.verses||[]).length}</span></button>`).join('')}
      <label class="l">Or create a new tab</label><div class="row"><input class="f grow" id="newTabName" placeholder="e.g. Marriage, Courage, Faith"><button class="btn pri" data-act="addToNewTopic">Create</button></div>`)},
-  addToTopic:el=>{topicAddRef(el.dataset.t,S._tabRef);closeSheet();S.sel.clear();changed();toast('Added to topic tab')},
-  addToNewTopic:()=>{const n=$('#newTabName').value.trim();if(!n)return;const id='u'+newId();Store.set('t_'+id,{name:n,ic:'🏷️',refs:[S._tabRef]});closeSheet();S.sel.clear();changed();toast('New tab created')},
+  addToTopic:el=>{const r=S._tabRef;updateSet('main',m=>{const t=findTopic(m,el.dataset.t);if(!t.verses.some(v=>v.ref===r))t.verses.push({ref:r,why:''})});closeSheet();S.sel.clear();changed();toast('Added to your main key ⭐')},
+  addToNewTopic:()=>{const n=$('#newTabName').value.trim();if(!n)return;const r=S._tabRef;updateSet('main',m=>{const free=PALETTE.find(p=>!m.topics.some(t=>t.color===p[0]));m.topics.push({id:'t'+newId(),emoji:'🏷️',name:n,color:free?free[0]:'y',meaning:'',verses:[{ref:r,why:''}]})});closeSheet();S.sel.clear();changed();toast('New topic created ⭐')},
   /* study */
   useCurrent:()=>{const s=settings();S.studyRef=S.sel.size?refLabel(s.book,s.ch,selVerses()):refLabel(s.book,s.ch,[]);$('#studyRef').value=S.studyRef},
   study:el=>runStudy(el.dataset.tool,$('#studyRef').value),
@@ -903,7 +916,7 @@ const A={
   topicDelete:el=>confirmSheet('Delete this topic tab?','Delete',()=>Store.del('t_'+el.dataset.t)),
   topicStudy:el=>{const t=topicData().find(x=>x.id===el.dataset.t);S.studyRef=t.refs.map(codeToLabel).join('; ');runStudy(null,S.studyRef,`Give a short topical Bible study on "${t.name}" using these passages: ${S.studyRef}. Show what they teach together, then give practical application.`)},
   colorView:el=>{S.notesFilter='hl';S.notesColor=el.dataset.c;S.onlineSub='notes';setTab('online')},
-  copyKey:()=>copyText('My highlight key\n'+COLORS.map(([c])=>`${COLOR_NAMES[c][0].toUpperCase()+COLOR_NAMES[c].slice(1)} = ${colorLabel(c)}`).join('\n')),
+  copyKey:()=>copyText('My Bible key\n'+mainSet().topics.map(t=>`${t.emoji||''} ${COLOR_NAMES[okColor(t.color)][0].toUpperCase()+COLOR_NAMES[okColor(t.color)].slice(1)} = ${t.name}${t.verses&&t.verses.length?' ('+t.verses.map(v=>shortRef(v.ref)).join(', ')+')':''}`.trim()).join('\n')),
   loadBookPaper:el=>{Object.assign(S.build,{mode:'book',bookOnly:el.dataset.b,planKey:null,err:''});closeSheet();setTab('load');runBuild()},
   loadTopicPaper:el=>{Object.assign(S.build,{mode:'topic',topic:el.dataset.n,planKey:null,err:''});setTab('load');runBuild()},
   resetColors:()=>{saveSettings({labels:{}});renderView()},
@@ -949,9 +962,9 @@ const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depress
 const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['soap','📖 S.O.A.P.']];
 S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
 function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
-function colorKeyText(){return COLORS.map(([c])=>`${c} = ${colorLabel(c)}`).join('; ')}
-const okColor=c=>COLORS.some(x=>x[0]===c)?c:'y';
-const COLOR_NAMES={y:'yellow',g:'green',b:'blue',p:'pink',o:'orange',v:'purple'};
+function colorKeyText(){const m=mainSet().topics;return m.map(t=>`${okColor(t.color)} (${COLOR_NAMES[okColor(t.color)]}) = ${t.name}${t.meaning?' — '+t.meaning:''}`).join('; ')+'. Only use these letters.'}
+const okColor=c=>PALETTE.some(x=>x[0]===c)?c:'y';
+const COLOR_NAMES=Object.fromEntries(PALETTE);
 const colorWord=c=>COLOR_NAMES[okColor(c)];
 function parseJSON(t){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw {message:'The answer came back incomplete — tap Generate again.'};
   try{return JSON.parse(t.slice(a,b+1))}catch(e){throw {message:'The answer came back incomplete — tap Generate again.'}}}
@@ -1093,7 +1106,7 @@ function planOnline(pl){const d=pl.data;
     (d.xrefs||[]).forEach(x=>addNote(b,c,V(x.v),'Cross-references',(x.refs||[]).map(y=>`${y.ref} — ${y.why||''}`).join('\n')));
     (d.words||[]).forEach(x=>addNote(b,c,V(x.v),`Word: ${x.word} (${x.original||''})`,x.meaning||''));}
   else if(pl.kind==='topic'){const refs=(d.verses||[]).map(x=>parseRef(x.ref)).filter(Boolean);
-    Store.set('t_u'+newId(),{name:d.title||pl.topic,ic:d.emoji||'🏷️',refs:refs.map(rc)});(d.verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),d.color,x.quote)})}
+    const tp={name:d.title||pl.topic,emoji:d.emoji||'🏷️',color:okColor(d.color),meaning:''};refs.forEach(p=>saveVerseToMainQuiet(tp,{ref:rc(p),why:''}));(d.verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),d.color,x.quote)})}
   else{const b=BM[pl.b];Store.set('i_'+newId(),{title:`${b.name} — chapter by chapter`,ref:`${b.abbr} 1`,body:(d.tagline?d.tagline+'\n\n':'')+(d.chapters||[]).map(x=>`${x.c}. ${x.title}${x.summary?' — '+x.summary:''}`).join('\n'),updated:Date.now()});
     (d.key_verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),'y','')})}
   toast('Added to your Online Bible')}
@@ -1170,7 +1183,7 @@ function computeStats(){const plans=Store.list('k_');let steps=0,loaded=0,topics
   const pr=progress();const read=Object.values(pr).reduce((a,x)=>a+x.length,0);
   const gospels=['MAT','MRK','LUK','JHN'].every(b=>(pr[b]||[]).length>=BM[b].chapters);
   const ntRead=BOOKS.filter(b=>b.nt).reduce((a,b)=>a+(pr[b.abbr]||[]).length,0);
-  const hl=Store.list('h_').length,notes=Store.list('n_').length,journal=Store.list('j_').length,tabs=Store.list('t_').length,ins=Store.list('i_').length;
+  const hl=Store.list('h_').length,notes=Store.list('n_').length,journal=Store.list('j_').length,tabs=mainSet().topics.length,ins=Store.list('i_').length;
   const days=(Store.get('stats')||{}).days||{};let streak=0;const d=new Date();if(!days[todayStr(d)])d.setDate(d.getDate()-1);while(days[todayStr(d)]){streak++;d.setDate(d.getDate()-1)}
   const today=days[todayStr()]||0;let best=0,run=0,prev=null;Object.keys(days).sort().forEach(k=>{const dt=new Date(k+'T12:00');run=prev&&(dt-prev)<36*3600e3?run+1:1;prev=dt;best=Math.max(best,run)});
   const xp=steps*5+hl*2+notes*3+journal*10+read*5+loaded*25+topics*25+books*60+Math.min(streak,60)*5;
@@ -1360,7 +1373,132 @@ Object.assign(A,{
     try{const keys=[...Store.items.keys()];if(Store.col)for(const k of keys){try{await Store.col.doc(k).delete()}catch(e){}}
       await Auth.fb.A.deleteUser(Auth.user);Store.items.clear();toast('Your account was deleted')}catch(x){toast(AUTH_ERR[x.code]||'Couldn’t delete the account')}}),
 });
+/* ---------- TOPICS & COLORS (one key: every topic has a highlighter color and verses) ---------- */
+const MAIN_DEFAULT_TOPICS=[
+ ['promises','🌟','Promises of God','y','What God promises to do for us',['JER 29:11','ISA 41:10','ROM 8:28','PHP 4:19','JOS 1:9']],
+ ['commands','🌱','Commands & growth','g','What God asks of us and how we grow',['MIC 6:8','MAT 22:37-39','ROM 12:2','GAL 5:22-23','2PE 3:18']],
+ ['prayer','🙏','Prayer & worship','b','Talking to God and praising him',['PHP 4:6-7','PSA 100:4','1TH 5:16-18','JHN 4:24','MAT 6:9-13']],
+ ['love','❤️','God’s love & grace','p','God’s love, mercy and forgiveness',['JHN 3:16','ROM 5:8','EPH 2:8-9','1JN 4:9-10','LAM 3:22-23']],
+ ['warnings','⚠️','Sin & warnings','o','Sin, temptation and God’s warnings',['ROM 3:23','ROM 6:23','JAS 1:14-15','GAL 6:7','1JN 1:8-9']],
+ ['jesus','🕊️','Jesus & the Holy Spirit','v','Who Jesus is and the Spirit’s work',['JHN 1:14','JHN 14:6','JHN 14:26','ACT 1:8','COL 1:15']],
+];
+const STARTER_COLORS={salvation:'p',romansroad:'o',prayer:'b',peace:'t',forgive:'l',strength:'r',identity:'v',hope:'y',wisdom:'g',love:'p',temptation:'k',comfort:'n'};
+const FOCUS_IDEAS=['General','New believers','Hard times','Teens','Families','Prayer life','Leaders','Doubts & questions'];
+const vv=refs=>refs.map(r=>({ref:r,why:''}));
+function defaultMain(){const labels=(Store.get('settings')||{}).labels||{};
+  const topics=MAIN_DEFAULT_TOPICS.map(([id,emoji,name,color,meaning,refs])=>({id,emoji,name:labels[color]||name,color,meaning,verses:vv(refs)}));
+  const used=new Set(topics.map(t=>t.color));const free=PALETTE.map(p=>p[0]).filter(c=>!used.has(c));
+  Store.list('t_').filter(t=>t.key.startsWith('t_u')).forEach((t,i)=>topics.push({id:t.key.slice(2),emoji:t.ic||'🏷️',name:t.name||'Topic',color:free[i%free.length]||'y',meaning:'',verses:vv(t.refs||[])}));
+  return {id:'main',name:'My main key',main:true,topics}}
+function defaultStarter(){return {id:'starter',name:'Starter topics',builtin:true,topics:TOPICS.map(([id,ic,name,refs])=>({id,emoji:ic,name,color:STARTER_COLORS[id]||'y',meaning:'',verses:vv(refs)}))}}
+function getSet(id){const s=Store.get('s_'+id);if(s)return Object.assign({id},s);if(id==='main')return defaultMain();if(id==='starter')return defaultStarter();return null}
+const mainSet=()=>getSet('main');
+function allSets(){const out=[mainSet(),getSet('starter')];Store.list('s_').filter(s=>s.key!=='s_main'&&s.key!=='s_starter').sort((a,b)=>(a.at||0)-(b.at||0)).forEach(s=>out.push(Object.assign({},s,{id:s.key.slice(2)})));return out}
+function updateSet(id,fn){const s=JSON.parse(JSON.stringify(getSet(id)));fn(s);delete s.key;Store.set('s_'+id,s);return s}
+const findTopic=(s,tid)=>(s.topics||[]).find(t=>t.id===tid);
+const sameName=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
+function normRef(r){const p=parseRef(r);return p?rc(p):null}
+function saveVerseToMain(topic,verse){let where='';updateSet('main',m=>{let t=m.topics.find(x=>sameName(x.name,topic.name));
+    if(!t){t={id:'t'+newId(),emoji:topic.emoji,name:topic.name,color:topic.color,meaning:topic.meaning||'',verses:[]};m.topics.push(t)}
+    if(!t.verses.some(x=>x.ref===verse.ref))t.verses.push({ref:verse.ref,why:verse.why||''});where=t.name});
+  toast(`⭐ Saved to your main key → ${where}`)}
+const swBig=(c,emoji)=>`<span class="kdot sw-${okColor(c)}">${esc(emoji||'')}</span>`;
+function keyLegend(s){return `<div class="legend">${(s.topics||[]).map(t=>`<span class="lg"><span class="swatch sw-${okColor(t.color)}"></span>${esc(t.name)}</span>`).join('')}</div>`}
 
+function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.keySet='main';const s=getSet(S.keySet);const isMain=s.id==='main';
+  el.innerHTML=`<div class="chips settabs">${sets.map(x=>`<button class="chip ${x.id===s.id?'on':''}" data-act="keySet" data-s="${esc(x.id)}">${x.id==='main'?'⭐ ':x.id==='starter'?'🌱 ':'✨ '}${esc(x.name)}</button>`).join('')}<button class="chip addchip" data-act="keyGenerate">＋ Generate a new set</button></div>
+   <div class="card keyhead ${isMain?'ismain':''}">
+     <div class="row"><h3 class="grow" style="margin:0;font-size:22px">${isMain?'⭐ ':''}${esc(s.name)}</h3><span class="tag">${s.topics.length} topics</span></div>
+     <p class="small muted" style="margin:6px 0 8px">${isMain?'This is the key you use in your paper Bible: each topic has a highlighter color and its verses. Save verses or whole topics here from the other sets.':s.id==='starter'?'Ready-made topics to get you started. Tap ⭐ to save verses or topics into your main key.':`Generated${s.focus?' for “'+esc(s.focus)+'”':''}${s.at?' · '+new Date(s.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}. Compare the colors, then save what fits you with ⭐.`}</p>
+     ${keyLegend(s)}
+     <div class="row" style="margin-top:10px">
+       <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button>
+       ${isMain?'<button class="btn sm" data-act="copyKey">📋 Copy key for my inside cover</button>':'<button class="btn sm pri" data-act="keyUseMain">⭐ Use as my main key</button>'}
+       ${!isMain?'<button class="btn sm" data-act="keyRename">✏️ Rename</button>':''}${!isMain&&s.id!=='starter'?'<button class="btn sm danger" data-act="keyDelSet">🗑 Delete set</button>':''}
+     </div></div>
+   ${s.topics.length?s.topics.map(t=>topicCard(s,t)).join(''):'<div class="empty">No topics yet — tap ＋ Add topic.</div>'}
+   ${isMain?'<p class="small muted">Tip: in Online Bible you can tap verses → 🏷️ to add them here.</p>':''}`;
+  $$('details.topic',el).forEach(d=>d.querySelector('summary').addEventListener('click',()=>{S.openTopic=d.open?null:d.dataset.topic}))}
+function topicCard(s,t){const isMain=s.id==='main';const open=S.openTopic===s.id+'|'+t.id;const busy=S.keyBusy===s.id+'|'+t.id;
+  const vrow=(v,i,sugg)=>{const p=parseRef(v.ref);return `<div class="refrow" style="align-items:flex-start"><div class="grow">${p?refA(rc(p),codeToLabel(v.ref)):esc(v.ref)}${v.why?`<div class="small muted">${esc(v.why)}</div>`:''}</div>
+    ${sugg?`<button class="btn sm pri" data-act="keyAddSugg" data-t="${t.id}" data-i="${i}">＋ Add</button>`:isMain?`<button class="btn sm ghost" data-act="keyDelVerse" data-t="${t.id}" data-i="${i}" aria-label="Remove">✕</button>`:`<button class="btn sm" data-act="keySaveVerse" data-t="${t.id}" data-i="${i}">⭐ Save</button>`}</div>`};
+  return `<details class="topic" data-topic="${esc(s.id+'|'+t.id)}" ${open?'open':''}><summary>${swBig(t.color,t.emoji)}<div class="grow" style="min-width:0"><b>${esc(t.name)}</b><div class="small muted">${esc(colorWord(t.color))}${t.meaning?' · '+esc(t.meaning):''}</div></div><span class="tag">${(t.verses||[]).length}</span></summary>
+   <div class="refs">${(t.verses||[]).map((v,i)=>vrow(v,i,false)).join('')||'<p class="small muted">No verses yet.</p>'}
+   ${isMain&&(t.suggest||[]).length?`<div class="glabel" style="margin-top:12px">✨ Suggestions</div>${t.suggest.map((v,i)=>vrow(v,i,true)).join('')}`:''}
+   ${isMain?`<div class="row" style="margin-top:8px"><input class="f grow" id="kadd_${t.id}" placeholder="Add a verse, e.g. Psalm 27:1"><button class="btn sm" data-act="keyAddVerse" data-t="${t.id}">Add</button></div>`:''}
+   <div class="row" style="margin-top:10px"><button class="btn sm ${isMain?'':'pri'}" data-act="keyRefresh" data-t="${t.id}" ${busy?'disabled':''}>${busy?'<span class="spin"></span> Finding…':isMain?'✨ Suggest new verses':'🔄 New verses'}</button>
+     ${!isMain?`<button class="btn sm" data-act="keySaveTopic" data-t="${t.id}">⭐ Save whole topic</button>`:''}
+     <button class="btn sm" data-act="loadTopicPaper" data-n="${esc(t.name)}">✨ Load in my Bible</button>
+     <button class="btn sm" data-act="keyEditTopic" data-t="${t.id}">✏️ Edit</button><button class="btn sm danger" data-act="keyDelTopic" data-t="${t.id}">🗑</button></div></div></details>`}
+function topicSheet(tid){const s=getSet(S.keySet);const t=tid?findTopic(s,tid):{name:'',emoji:'🏷️',color:(PALETTE.find(p=>!s.topics.some(x=>x.color===p[0]))||PALETTE[0])[0],meaning:''};S._tColor=t.color;
+  openSheet(`<h3>${tid?'Edit topic':'New topic'}</h3>
+   <label class="l">Name</label><input class="f" id="tkName" value="${esc(t.name)}" placeholder="e.g. Faith, Courage, Family" maxlength="40">
+   <label class="l">What this color marks (optional)</label><input class="f" id="tkMeaning" value="${esc(t.meaning||'')}" placeholder="e.g. Verses about trusting God" maxlength="80">
+   <label class="l">Emoji</label><input class="f" id="tkEmoji" value="${esc(t.emoji||'')}" maxlength="4" style="width:90px">
+   <label class="l">Highlighter color</label><div class="palette">${PALETTE.map(([c,n])=>`<button class="pal sw-${c} ${t.color===c?'on':''}" data-act="keyPickColor" data-c="${c}" title="${n}"><small>${n}</small></button>`).join('')}</div>
+   <div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="keySaveTopicForm" data-t="${tid||''}">${tid?'Save':'Add topic'}</button></div>`)}
+function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
+  openSheet(`<h3>✨ Generate a new set</h3><p class="small muted">Get a fresh set of topics, each with a highlighter color and 5 verses. It opens as its own tab, so your main key stays safe.</p>
+   <label class="l">How many topics / colors?</label>
+   <div class="row stepper"><button class="iconbtn" data-act="genStep" data-d="-1">−</button><b id="genN" style="font-size:28px;min-width:44px;text-align:center">${S.genN}</b><button class="iconbtn" data-act="genStep" data-d="1">＋</button><span class="small muted">(2–12)</span></div>
+   <label class="l">Focus (optional)</label><input class="f" id="genFocus" value="${esc(S.genFocus)}" placeholder="e.g. hard times, new believers, my marriage">
+   <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FOCUS_IDEAS.map(f=>`<button class="chip" data-act="genFocusPick" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
+   <button class="btn pri wide" id="genGo" data-act="genGo">✨ Generate ${S.genN} topics</button><div id="genMsg" class="small muted" style="text-align:center;margin-top:8px"></div>`);
+  $('#genFocus').addEventListener('input',e=>S.genFocus=e.target.value)}
+async function runGenerate(){const n=S.genN,focus=(S.genFocus||'').trim();const btn=$('#genGo');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generating your set…'}
+  const pal=PALETTE.map(([c,nm])=>`${c}=${nm}`).join(', ');
+  try{const r=await ai(JSYS+`Create a set of ${n} topic tabs for marking up a paper Bible with highlighters${focus&&focus!=='General'?`, focused on: ${focus}`:''}. Give each topic one highlighter color from this palette: ${pal}. Use a different color for each topic where possible${n>PALETTE.length?' (reuse colors for related topics if needed)':''}.\nReturn JSON: {"name": "short set name (2-4 words)", "topics": [{"name": "1-3 words", "emoji": "one emoji", "color": "palette letter", "meaning": "what this color marks, max 10 words", "verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]}]} with exactly ${n} topics and exactly 5 well-known verses per topic, each true to its context.`,null,null,'default');
+    const d=parseJSON(r.text);const id='g'+newId();
+    const topics=(d.topics||[]).slice(0,12).map(t=>({id:'t'+newId(),emoji:t.emoji||'🏷️',name:String(t.name||'Topic').slice(0,40),color:okColor(t.color),meaning:t.meaning||'',verses:(t.verses||[]).map(v=>({ref:normRef(v.ref),why:v.why||''})).filter(v=>v.ref).slice(0,5)}));
+    if(!topics.length)throw {message:'No topics came back — try again.'};
+    Store.set('s_'+id,{name:String(d.name||'New set').slice(0,40),focus,at:Date.now(),topics});S.keySet=id;closeSheet();renderView();toast('New set ready ✨')}
+  catch(e){const m=$('#genMsg');if(m)m.textContent=aiErr(e);if(btn){btn.disabled=false;btn.textContent='✨ Try again'}}}
+async function refreshTopic(tid){const sid=S.keySet;const s=getSet(sid);const t=findTopic(s,tid);if(!t)return;const isMain=sid==='main';
+  const main=mainSet();const mt=main.topics.find(x=>sameName(x.name,t.name));
+  const exclude=[...new Set([...(t.seen||[]),...(t.verses||[]).map(v=>v.ref),...((t.suggest||[]).map(v=>v.ref)),...(mt?mt.verses.map(v=>v.ref):[])])].map(codeToLabel);
+  S.keyBusy=sid+'|'+tid;S.openTopic=sid+'|'+tid;renderView();
+  try{const r=await ai(JSYS+`Give 5 different Bible verses for the topic "${t.name}"${t.meaning?` (${t.meaning})`:''}. Do NOT use any of these: ${exclude.join('; ')||'none'}. Pick verses that truly fit the topic in their context, from across the Bible.\nReturn JSON: {"verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]}`,null,null,'default');
+    const d=parseJSON(r.text);const ex=new Set(exclude.map(x=>normRef(x)));
+    const fresh=(d.verses||[]).map(v=>({ref:normRef(v.ref),why:v.why||''})).filter(v=>v.ref&&!ex.has(v.ref)).slice(0,5);
+    if(!fresh.length)throw {message:'No new verses came back — try again.'};
+    updateSet(sid,x=>{const tt=findTopic(x,tid);tt.seen=[...new Set([...(tt.seen||[]),...(tt.verses||[]).map(v=>v.ref),...((tt.suggest||[]).map(v=>v.ref))])].slice(-150);
+      if(isMain)tt.suggest=fresh;else tt.verses=fresh});
+    toast(isMain?'New suggestions ✨':'Fresh verses 🔄')}
+  catch(e){toast(aiErr(e))}
+  S.keyBusy=null;renderView()}
+
+Object.assign(A,{
+  keySet:el=>{S.keySet=el.dataset.s;S.openTopic=null;renderView()},
+  keyGenerate:()=>genSheet(),
+  genStep:el=>{S.genN=Math.max(2,Math.min(12,(S.genN||6)+(+el.dataset.d)));$('#genN').textContent=S.genN;$('#genGo').textContent=`✨ Generate ${S.genN} topics`},
+  genFocusPick:el=>{S.genFocus=el.dataset.f;$('#genFocus').value=el.dataset.f},
+  genGo:()=>runGenerate(),
+  keyAddTopic:()=>topicSheet(null),
+  keyEditTopic:el=>topicSheet(el.dataset.t),
+  keyPickColor:el=>{S._tColor=el.dataset.c;$$('.pal').forEach(b=>b.classList.toggle('on',b.dataset.c===el.dataset.c))},
+  keySaveTopicForm:el=>{const name=$('#tkName').value.trim();if(!name){toast('Give the topic a name');return}const tid=el.dataset.t;
+    const data={name,meaning:$('#tkMeaning').value.trim(),emoji:$('#tkEmoji').value.trim()||'🏷️',color:okColor(S._tColor)};
+    updateSet(S.keySet,s=>{if(tid)Object.assign(findTopic(s,tid),data);else{const t=Object.assign({id:'t'+newId(),verses:[]},data);s.topics.push(t);S.openTopic=S.keySet+'|'+t.id}});closeSheet();renderView()},
+  keyDelTopic:el=>{const t=findTopic(getSet(S.keySet),el.dataset.t);confirmSheet(`Delete “${t.name}” and its ${(t.verses||[]).length} verses?`,'Delete',()=>{updateSet(S.keySet,s=>{s.topics=s.topics.filter(x=>x.id!==el.dataset.t)});toast('Topic deleted')})},
+  keyAddVerse:el=>{const tid=el.dataset.t;const inp=$('#kadd_'+tid);const r=normRef(inp.value);if(!r){toast('Try a reference like "Psalm 27:1"');return}
+    S.openTopic=S.keySet+'|'+tid;updateSet(S.keySet,s=>{const t=findTopic(s,tid);if(!t.verses.some(v=>v.ref===r))t.verses.push({ref:r,why:''})});toast('Verse added')},
+  keyDelVerse:el=>{S.openTopic=S.keySet+'|'+el.dataset.t;updateSet(S.keySet,s=>{const t=findTopic(s,el.dataset.t);t.verses.splice(+el.dataset.i,1)})},
+  keyAddSugg:el=>{S.openTopic=S.keySet+'|'+el.dataset.t;updateSet(S.keySet,s=>{const t=findTopic(s,el.dataset.t);const v=t.suggest.splice(+el.dataset.i,1)[0];if(v&&!t.verses.some(x=>x.ref===v.ref))t.verses.push(v)});toast('Added to your main key ⭐')},
+  keySaveVerse:el=>{const t=findTopic(getSet(S.keySet),el.dataset.t);saveVerseToMain(t,t.verses[+el.dataset.i])},
+  keySaveTopic:el=>{const t=findTopic(getSet(S.keySet),el.dataset.t);let added=0;updateSet('main',m=>{let mt=m.topics.find(x=>sameName(x.name,t.name));
+      if(!mt){mt={id:'t'+newId(),emoji:t.emoji,name:t.name,color:t.color,meaning:t.meaning||'',verses:[]};m.topics.push(mt)}
+      t.verses.forEach(v=>{if(!mt.verses.some(x=>x.ref===v.ref)){mt.verses.push({ref:v.ref,why:v.why||''});added++}})});
+    toast(`⭐ “${t.name}” saved to your main key (${added} new verse${added===1?'':'s'})`)},
+  keyRefresh:el=>refreshTopic(el.dataset.t),
+  keyUseMain:()=>{const s=getSet(S.keySet);confirmSheet(`Use “${s.name}” as your main key? Your current main key is kept as its own tab, so nothing is lost.`,'Use as main key',()=>{
+    const old=mainSet();const oid='g'+newId();Store.set('s_'+oid,{name:'Previous main key',at:Date.now(),topics:old.topics});
+    Store.set('s_main',{name:'My main key',main:true,topics:JSON.parse(JSON.stringify(s.topics))});S.keySet='main';renderView();toast('This is now your main key ⭐')})},
+  keyRename:()=>{const s=getSet(S.keySet);openSheet(`<h3>Rename set</h3><input class="f" id="setName" value="${esc(s.name)}" maxlength="40"><div class="row" style="margin-top:12px"><button class="btn pri grow" data-act="keyRenameGo">Save</button></div>`)},
+  keyRenameGo:()=>{const n=$('#setName').value.trim();if(!n)return;updateSet(S.keySet,s=>{s.name=n});closeSheet();renderView()},
+  keyDelSet:()=>{const s=getSet(S.keySet);confirmSheet(`Delete the set “${s.name}”? Anything you saved to your main key stays.`,'Delete set',()=>{Store.del('s_'+S.keySet);S.keySet='main';renderView();toast('Set deleted')})},
+});
+
+function saveVerseToMainQuiet(topic,verse){updateSet('main',m=>{let t=m.topics.find(x=>sameName(x.name,topic.name));if(!t){t={id:'t'+newId(),emoji:topic.emoji,name:topic.name,color:topic.color,meaning:topic.meaning||'',verses:[]};m.topics.push(t)}if(!t.verses.some(x=>x.ref===verse.ref))t.verses.push(verse)})}
 /* ---------- boot ---------- */
 if(STANDALONE){Store.LS='lb1:none:d:';setTab((location.hash||'#load').slice(1));initAuth()}
 else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
