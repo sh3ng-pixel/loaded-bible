@@ -303,6 +303,8 @@ details.grp[open]>summary::after{content:"▴"}
 .codein2{font-family:ui-monospace,Menlo,monospace;font-size:22px;text-align:center;text-transform:uppercase;letter-spacing:.05em}
 .authbox .btn.wide+.btn.wide{margin-top:10px}
 .codecard{border:2px solid var(--gold)}
+.codechip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:800;font-family:ui-monospace,Menlo,monospace;color:var(--accent);white-space:nowrap}
+.vpreview{margin:10px 0 2px;background:var(--soft);border-radius:12px;padding:9px 12px;font-size:14.5px}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),var(--accent2,#5a1c16));color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -317,6 +319,7 @@ details.grp[open]>summary::after{content:"▴"}
 <header class="top">
   <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
   <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
+  <button class="codechip" id="codeChip" data-act="tab" data-tab="account" style="display:none" aria-label="My Bible code"></button>
   <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
 </header>
 <main id="view"></main>
@@ -533,7 +536,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner'].includes(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -706,17 +709,32 @@ function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.bo
    <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>
   </div>
   <div id="studyOut">${studyOutHtml()}</div>
+  <div id="studyList">${studyListHtml()}</div>
   <h2 class="sec">How the methods work</h2>
   ${GUIDES.map(g=>`<details class="guide"><summary>${g[0]}</summary><div class="body">${g[1]}</div></details>`).join('')}`;
-  $('#studyRef').oninput=e=>S.studyRef=e.target.value;
+  $('#studyRef').oninput=e=>S.studyRef=e.target.value;wireStudyList();
   if(st&&st.loading)$('#studyOut').scrollIntoView({block:'start'});
 }
+function wireStudyList(){const q=$('#studyQ');if(q)q.oninput=()=>{S.studyQ=q.value;const l=$('#studyList');const pos=q.selectionStart;l.innerHTML=studyListHtml();wireStudyList();const q2=$('#studyQ');q2.focus();q2.setSelectionRange(pos,pos)}}
 function studyOutHtml(){const st=S.study;if(!st)return '';
   return `<div class="card out"><div class="row" style="margin-bottom:6px"><span class="tag">${esc(st.title)}</span><b class="grow" style="font-family:var(--serif);font-size:19px">${esc(st.refLabel)}</b>${st.loading?'<span class="spin"></span>':''}</div>
    <div id="studyBody">${st.err?`<p class="muted">${esc(st.err)}</p>`:(st.text?md(st.text):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>')}</div>
    ${st.loading?'<div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="stopStudy">Stop</button></div>':
    (st.text?`<div class="row" style="margin-top:10px">${METHODS[st.tool]?'<button class="btn sm pri" data-act="saveMethod">📓 Save to Journal</button>':''}<button class="btn sm ${METHODS[st.tool]?'':'pri'}" data-act="saveStudy">＋ Save to my notes</button><button class="btn sm" data-act="insertStudy">🗂️ Make insert</button><button class="btn sm" data-act="copyStudy">⧉ Copy</button><button class="btn sm ghost" data-act="redoStudy">↻ Redo</button></div>`:'')}</div>
    <p class="small muted">Study helps are written by Claude — test them against Scripture (Acts 17:11) and a trusted pastor or commentary.</p>`}
+const STUDY_ICON=t=>t==='q'?'💬':(TL(t)||['📘'])[0];
+function keepStudy(st){if(!st||!st.text)return;const ex=!st.question&&Store.list('y_').find(y=>y.tool===st.tool&&y.refCode===st.refCode&&!y.question);
+  const k=ex?ex.key:'y_'+newId();Store.set(k,{tool:st.question?'q':st.tool,question:st.question||'',refLabel:st.refLabel,refCode:st.refCode,title:st.title,text:st.text,at:Date.now()});st.key=k;S.openStudy=null;if(S.tab==='study'){const l=$('#studyList');if(l)l.innerHTML=studyListHtml()}}
+function studyListHtml(){const all=Store.list('y_').sort((a,b)=>(b.at||0)-(a.at||0));if(!all.length)return '';
+  const types=[...new Set(all.map(y=>y.tool))];const F=S.studyFilter||'all';const q=(S.studyQ||'').toLowerCase();
+  const list=all.filter(y=>(F==='all'||y.tool===F)&&(!q||(y.refLabel+' '+y.title+' '+y.question).toLowerCase().includes(q)));
+  return `<div class="row" style="margin:20px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">📚 My studies</h2><span class="small muted">${all.length} saved</span></div>
+   <p class="small muted" style="margin:0 2px 8px">Everything you study is saved here automatically. Tap one to open or close it.</p>
+   <input class="f" id="studyQ" placeholder="Search your studies…" value="${esc(S.studyQ||'')}" style="margin-bottom:6px">
+   <div class="chips"><button class="chip ${F==='all'?'on':''}" data-act="studyFilter" data-f="all">All</button>${types.map(t=>`<button class="chip ${F===t?'on':''}" data-act="studyFilter" data-f="${t}">${STUDY_ICON(t)} ${t==='q'?'Questions':esc((TL(t)||[,'Study'])[1])}</button>`).join('')}</div>
+   ${list.map(y=>{const open=S.openStudy===y.key;return `<div class="plan ${open?'open':''}" id="st-${y.key}"><div class="planhead" data-act="toggleStudy" data-k="${y.key}" role="button"><span class="pico">${STUDY_ICON(y.tool)}</span>
+     <div class="grow" style="min-width:0"><div class="ptitle">${esc(y.refLabel)}</div><div class="small muted">${esc(y.question?'Q: '+y.question:y.title)} · ${new Date(y.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div></div><span class="chev">${open?'▴':'▾'}</span></div>
+     ${open?`<div class="planbody"><div class="out">${md(y.text)}</div><div class="row planfoot">${METHODS[y.tool]?`<button class="btn sm pri" data-act="saveMethod" data-k="${y.key}">📓 Save to Journal</button>`:''}<button class="btn sm" data-act="saveStudy" data-k="${y.key}">＋ My notes</button><button class="btn sm" data-act="insertStudy" data-k="${y.key}">🗂️ Make insert</button><button class="btn sm" data-act="copyStudy" data-k="${y.key}">⧉ Copy</button><button class="btn sm" data-act="redoStudyK" data-k="${y.key}">🔄 Redo</button><button class="btn sm danger" data-act="delStudy" data-k="${y.key}">🗑 Delete</button><button class="btn sm ghost" data-act="toggleStudy" data-k="${y.key}">▴ Close</button></div></div>`:''}</div>`}).join('')||'<div class="empty">No studies match.</div>'}`}
 function updateStudyOut(){const o=$('#studyOut');if(o&&S.tab==='study')o.innerHTML=studyOutHtml()}
 async function runStudy(tool,refText,question,force){
   refText=(refText||'').trim();if(!refText){toast('Type a passage first');return}
@@ -728,13 +746,13 @@ async function runStudy(tool,refText,question,force){
   S.study={tool,question,refLabel:label,refCode:code,title,text:'',loading:true};
   if(S.tab!=='study')setTab('study');else updateStudyOut();
   $('#studyOut')?.scrollIntoView({block:'start',behavior:'smooth'});
-  if(ck&&!force){const c=await Cache.get('studies',ck);if(c&&c.text){S.study.text=c.text;S.study.loading=false;updateStudyOut();return}}
+  if(ck&&!force){const c=await Cache.get('studies',ck);if(c&&c.text){S.study.text=c.text;S.study.loading=false;keepStudy(S.study);updateStudyOut();return}}
   let passage='';const s=settings();
   if(p&&p.b===s.book&&p.c===s.ch&&S.verses?.length){const vs=p.v1?S.verses.slice(p.v1-1,(p.v2||p.v1)):S.verses;if(vs.join(' ').length<9000)passage=`\n\nPassage text (${s.trans}):\n${vs.map((t,i)=>((p.v1||1)+i)+' '+t).join('\n')}`}
   const prompt=SYS+(question?`Answer this question about ${label}: ${question}`:TL(tool)[3].replace(/\{R\}/g,label).replace(/\{T\}/g,TRANS[s.trans]))+passage;
   const ctrl=new AbortController();S.studyCtrl=ctrl;const my=S.study;
   try{const res=await ai(prompt,t=>{if(S.study!==my)return;my.text=t;const b=$('#studyBody');if(b)b.innerHTML=md(t)},ctrl.signal,'default');
-    my.text=res.text;my.loading=false;if(ck)Cache.put('studies',ck,{text:res.text,at:Date.now()})}
+    my.text=res.text;my.loading=false;if(ck)Cache.put('studies',ck,{text:res.text,at:Date.now()});keepStudy(my)}
   catch(e){my.loading=false;if(!my.text)my.err=aiErr(e)}
   if(S.study===my)updateStudyOut();
 }
@@ -953,10 +971,14 @@ const A={
   ask:()=>{const q=$('#askQ').value.trim();if(!q){toast('Type a question');return}runStudy(null,$('#studyRef').value||'the Bible',q)},
   stopStudy:()=>{S.studyCtrl&&S.studyCtrl.abort()},
   redoStudy:()=>{const st=S.study;if(!st)return;if(st.question)runStudy(null,st.refLabel,st.question);else{Cache.drop('studies',st.tool+'__'+st.refCode.replace(/[^A-Za-z0-9:\-]/g,'_'));runStudy(st.tool,st.refLabel,null,true)}},
-  saveStudy:()=>{const st=S.study;const p=parseRef(st.refCode);const vs=p&&p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[];
+  saveStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const p=parseRef(st.refCode);const vs=p&&p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[];
     Store.set('n_'+newId(),{ref:p?st.refCode:'',b:p?p.b:null,c:p?p.c:null,vs,title:st.question?('Q: '+st.question):st.title,text:st.text,md:true,created:Date.now(),updated:Date.now()});toast('Saved to My Notes')},
-  insertStudy:()=>{const st=S.study;Store.set('i_'+newId(),{title:`${st.title} — ${st.refLabel}`,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,updated:Date.now()});toast('Insert card created (Loaded Bible → Inserts)')},
-  copyStudy:()=>copyText(`${S.study.title} — ${S.study.refLabel}\n\n${plain(S.study.text)}`),
+  insertStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;Store.set('i_'+newId(),{title:`${st.title} — ${st.refLabel}`,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,updated:Date.now()});toast('Insert card created (Loaded Bible → Inserts)')},
+  copyStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;copyText(`${st.title} — ${st.refLabel}\n\n${plain(st.text)}`)},
+  toggleStudy:el=>{const k=el.dataset.k;S.openStudy=S.openStudy===k?null:k;const l=$('#studyList');if(l)l.innerHTML=studyListHtml();wireStudyList();const c=document.getElementById('st-'+k);if(c&&S.openStudy)c.scrollIntoView({behavior:'smooth',block:'start'})},
+  studyFilter:el=>{S.studyFilter=el.dataset.f;const l=$('#studyList');if(l)l.innerHTML=studyListHtml();wireStudyList()},
+  delStudy:el=>confirmSheet('Delete this study?','Delete',()=>{Store.del(el.dataset.k);toast('Study deleted')}),
+  redoStudyK:el=>{const y=Store.get(el.dataset.k);if(y.question)runStudy(null,y.refLabel,y.question);else runStudy(y.tool,y.refLabel,null,true)},
   /* loaded */
   loadedSub:el=>{S.loadedSub=el.dataset.s;renderView()},
   bookCard:el=>bookCard(el.dataset.b),
@@ -1069,14 +1091,14 @@ function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.
 function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.book;B.ch=s.ch}if(!B.bookOnly)B.bookOnly=s.book;
   const bookOpts=sel=>BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===sel?'selected':''}>${esc(b.name)}</option>`).join('');
   let form='';
-  if(B.mode==='chapter')form=`<label class="l">Which chapter are you loading?</label>
-    <div class="row"><select class="f grow" id="bBook">${bookOpts(B.book)}</select><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div>
+  if(B.mode==='chapter')form=`<div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${bookOpts(B.book)}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
     <label class="l">What do you want to add?</label>
     <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}</button>`;
-  else if(B.mode==='verses'){const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);form=`<label class="l">Which verse(s)?</label>
-    <div class="row"><select class="f grow" id="bBook">${bookOpts(B.book)}</select><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div>
-    <div class="row" style="margin-top:8px"><span class="small muted">Verse</span><input class="f" id="bV1" type="number" inputmode="numeric" min="1" max="176" value="${v1}" style="width:84px"><span class="small muted">to</span><input class="f" id="bV2" type="number" inputmode="numeric" min="1" max="176" value="${v2}" style="width:84px"></div>
+  else if(B.mode==='verses'){const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);form=`<div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${bookOpts(B.book)}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
+    <div class="row" style="align-items:flex-end"><div><label class="l">From verse</label><input class="f" id="bV1" type="number" inputmode="numeric" min="1" max="176" value="${v1}" style="width:110px"></div><div><label class="l">To verse</label><input class="f" id="bV2" type="number" inputmode="numeric" min="1" max="176" value="${v2}" style="width:110px"></div></div>
+    <p class="small muted" style="margin:6px 2px 0">For one verse, use the same number twice.</p>
+    <div class="vpreview" id="vPrev">You're loading <b>${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'–'+v2:''}</b></div>
     <label class="l">What do you want to add?</label>
     <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
@@ -1106,7 +1128,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const bo=$('#bBookOnly',v);if(bo)bo.onchange=()=>{B.bookOnly=bo.value;renderView()};
   const bt=$('#bTopic',v);if(bt)bt.oninput=()=>{B.topic=bt.value};
   const isub=$('#insSubj',v);if(isub)isub.oninput=()=>{S.ins.subject=isub.value};
-  const v1i=$('#bV1',v),v2i=$('#bV2',v);if(v1i){const upd=()=>{B.v1=Math.max(1,parseInt(v1i.value)||1);B.v2=Math.max(B.v1,parseInt(v2i.value)||B.v1);const b=$('[data-act=bGo]',v);if(b)b.textContent=`✨ Show me how to load ${BM[B.book].name} ${B.ch}:${B.v1}${B.v2>B.v1?'-'+B.v2:''}`};v1i.oninput=upd;v2i.oninput=upd}
+  const v1i=$('#bV1',v),v2i=$('#bV2',v);if(v1i){const upd=()=>{B.v1=Math.max(1,parseInt(v1i.value)||1);B.v2=Math.max(B.v1,parseInt(v2i.value)||B.v1);const pv=$('#vPrev',v);if(pv)pv.innerHTML=`You're loading <b>${esc(BM[B.book].name)} ${B.ch}:${B.v1}${B.v2>B.v1?'–'+B.v2:''}</b>`;const b=$('[data-act=bGo]',v);if(b)b.textContent=`✨ Show me how to load ${BM[B.book].name} ${B.ch}:${B.v1}${B.v2>B.v1?'-'+B.v2:''}`};v1i.oninput=upd;v2i.oninput=upd}
   $$('details.grp>summary',v).forEach(sm=>sm.addEventListener('click',()=>{const d=sm.parentElement;S.grpState[d.dataset.g]=!d.open}));
   renderBuildOut()}
 
@@ -1213,11 +1235,15 @@ function insertForm(){const I=S.ins;const T=INS_TYPES.find(t=>t[0]===I.type)||IN
    <label class="l">Size</label><div class="chips">${INS_SIZES.map(z=>`<button class="chip ${I.size===z[0]?'on':''}" data-act="insSize" data-z="${z[0]}">${z[1]}</button>`).join('')}</div>
    <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Make my insert</button>
    <p class="small muted">Inserts are cards and pages you tuck into your Bible. Save the ones you like — they go to <b>Tabs & Key → Inserts</b>.</p>`}
-function insertOutHtml(){const I=S.ins;const n=Store.list('i_').length;
-  return (I.drafts.length?`<div class="row" style="margin:16px 2px 4px"><h2 class="sec grow" style="margin:0">Your new inserts</h2><button class="btn sm ghost" data-act="insGoSaved">🗂️ My inserts (${n})</button></div>`:'')+
-   I.drafts.map((d,i)=>`<div class="insert" style="--gc:var(--gold)">${d.loading&&!d.text?'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>':`<div class="b">${md(d.text||'')}</div>`}
-     ${d.err?`<p class="muted">${esc(d.err)}</p>`:''}
-     ${!d.loading&&d.text?`<div class="row" style="margin-top:8px">${d.saved?'<button class="btn sm" disabled>✓ Saved to my inserts</button>':`<button class="btn sm pri" data-act="insSave" data-i="${i}">💾 Save to my inserts</button>`}<button class="btn sm" data-act="insAgain" data-i="${i}">🔄 Another version</button><button class="btn sm" data-act="insCopy" data-i="${i}">⧉ Copy</button><button class="btn sm ghost" data-act="insDrop" data-i="${i}" aria-label="Remove">✕</button></div>`:''}</div>`).join('')}
+function insertOutHtml(){const I=S.ins;const n=Store.list('i_').length;const kept=Store.list('g_').sort((a,b)=>(b.at||0)-(a.at||0));const live=I.drafts.filter(d=>d.loading||d.err);
+  if(!kept.length&&!live.length)return '';
+  const kn=t=>(INS_TYPES.find(x=>x[0]===t)||INS_TYPES[INS_TYPES.length-1]);
+  return `<div class="row" style="margin:18px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">🗂️ My generated inserts</h2><button class="btn sm ghost" data-act="insGoSaved">Tabs & Key (${n})</button></div>
+   <p class="small muted" style="margin:0 2px 8px">Everything you generate is kept here. Tap <b>💾 Save to my inserts</b> on the ones you want in Tabs & Key → Inserts.</p>
+   ${live.map(d=>`<div class="insert" style="--gc:var(--gold)">${d.err?`<p class="muted">${esc(d.err)}</p><button class="btn sm ghost" data-act="insDropLive">✕</button>`:d.text?`<div class="b">${md(d.text)}</div>`:'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>'}</div>`).join('')}
+   ${kept.map(g=>{const open=S.openIns===g.key;const T=kn(g.type);return `<div class="plan ${open?'open':''}" id="gi-${g.key}"><div class="planhead" data-act="insToggle" data-k="${g.key}" role="button"><span class="pico">${T[1]}</span>
+      <div class="grow" style="min-width:0"><div class="ptitle">${esc(insTitle(g.text))}</div><div class="small muted">${esc(T[2])}${g.subject?' · '+esc(g.subject):''} · ${new Date(g.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div></div>${g.saved?'<span class="pstat done">✓ Saved</span>':''}<span class="chev">${open?'▴':'▾'}</span></div>
+      ${open?`<div class="planbody"><div class="insert" style="--gc:var(--gold);margin-top:6px"><div class="b">${md(g.text)}</div></div><div class="row planfoot">${g.saved?'<button class="btn sm" disabled>✓ In my inserts</button>':`<button class="btn sm pri" data-act="insSave" data-k="${g.key}">💾 Save to my inserts</button>`}<button class="btn sm" data-act="insAgain" data-k="${g.key}">🔄 Another version</button><button class="btn sm" data-act="insCopy" data-k="${g.key}">⧉ Copy</button><button class="btn sm danger" data-act="insDel" data-k="${g.key}">🗑 Delete</button><button class="btn sm ghost" data-act="insToggle" data-k="${g.key}">▴ Close</button></div></div>`:''}</div>`}).join('')}`}
 function insTitle(text){const m=String(text||'').match(/^\s*#{1,3}\s+(.+)$/m);return m?m[1].replace(/\*\*/g,'').trim().slice(0,60):'Insert'}
 async function runInsert(again){const I=S.ins;const src=again||{type:I.type,size:I.size,subject:(I.subject||'').trim()};
   const T=INS_TYPES.find(t=>t[0]===src.type);if(!src.subject&&src.type!=='gospel'){toast('Type what the insert is about');$('#insSubj')?.focus();return}
@@ -1226,7 +1252,7 @@ async function runInsert(again){const I=S.ins;const src=again||{type:I.type,size
   const prompt=SYS+`Make ${Z[2]} to tuck into a paper Bible. It is ${T[3]}${src.subject?` — about: ${src.subject}`:''}. Quote Scripture from the ${TRANS[s.trans]}.
 Start with one "# " title line (max 6 words). Then use short lines, bullet points and Bible references with full book names, so it can be printed or copied by hand. ${again?'Make this version clearly different from earlier ones.':''} No introduction or closing remarks about yourself.`;
   try{const r=await ai(prompt,t=>{d.text=t;if(S.build.mode==='inserts')renderBuildOut()},null,'default');d.text=r.text}catch(e){d.err=aiErr(e)}
-  d.loading=false;if(!d.text&&d.err){}renderBuildOut()}
+  d.loading=false;if(d.text&&!d.err){const k='g_'+newId();Store.set(k,{type:src.type,size:src.size,subject:src.subject,text:d.text,at:Date.now(),saved:false});I.drafts.splice(I.drafts.indexOf(d),1);S.openIns=k}renderBuildOut();if(S.openIns)setTimeout(()=>document.getElementById('gi-'+S.openIns)?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
 function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
   const rows=plans.map(pl=>({pl,pp:planProg(pl)}));const act=rows.filter(r=>!r.pp.done),fin=rows.filter(r=>r.pp.done);
   const card=r=>{const open=B.planKey===r.pl.key;return `<div class="plan ${open?'open':''} ${r.pp.done?'isdone':''}" id="plan-${esc(r.pl.key)}">${planHead(r.pl,r.pp,open)}${open?`<div class="planbody">${planBody(r.pl,r.pp)}</div>`:''}</div>`};
@@ -1291,14 +1317,16 @@ Object.assign(A,{
   insType:el=>{S.ins.type=el.dataset.t;S.ins.subject='';renderView()},
   insSubj:el=>{S.ins.subject=el.dataset.v;renderView()},
   insSize:el=>{S.ins.size=el.dataset.z;renderView()},
-  insSave:el=>{const d=S.ins.drafts[+el.dataset.i];const p=parseRef(d.subject||'');Store.set('i_'+newId(),{title:insTitle(d.text),ref:p?rc(p):'',body:d.text,md:true,kind:d.type,updated:Date.now()});d.saved=true;renderBuildOut();const kn=(INS_KINDS().find(x=>x[0]===(d.type==='custom'?'own':d.type))||[])[2];toast(`Saved to Tabs & Key → Inserts → ${kn||'Inserts'} 🗂️`)},
-  insAgain:el=>{const d=S.ins.drafts[+el.dataset.i];runInsert({type:d.type,size:d.size,subject:d.subject})},
-  insCopy:el=>{const d=S.ins.drafts[+el.dataset.i];copyText(plain(d.text))},
-  insDrop:el=>{S.ins.drafts.splice(+el.dataset.i,1);renderBuildOut()},
+  insSave:el=>{const g=Store.get(el.dataset.k);const p=parseRef(g.subject||'');Store.set('i_'+newId(),{title:insTitle(g.text),ref:p?rc(p):'',body:g.text,md:true,kind:g.type,updated:Date.now()});Store.set(el.dataset.k,Object.assign({},g,{saved:true}));const kn=(INS_KINDS().find(x=>x[0]===(g.type==='custom'?'own':g.type))||[])[2];toast(`Saved to Tabs & Key → Inserts → ${kn||'Inserts'} 🗂️`)},
+  insAgain:el=>{const g=Store.get(el.dataset.k);runInsert({type:g.type,size:g.size,subject:g.subject})},
+  insCopy:el=>{copyText(plain(Store.get(el.dataset.k).text))},
+  insDel:el=>confirmSheet('Delete this generated insert? (Copies you saved in Tabs & Key stay.)','Delete',()=>{Store.del(el.dataset.k);toast('Deleted')}),
+  insToggle:el=>{const k=el.dataset.k;S.openIns=S.openIns===k?null:k;renderBuildOut();if(S.openIns)setTimeout(()=>document.getElementById('gi-'+k)?.scrollIntoView({behavior:'smooth',block:'start'}),40)},
+  insDropLive:()=>{S.ins.drafts=S.ins.drafts.filter(d=>!d.err);renderBuildOut()},
   insGoSaved:()=>{S.loadedSub='inserts';S.insKind='all';setTab('tabs')},
   goMakeInsert:el=>{const k=el&&el.dataset&&el.dataset.k;if(k&&k!=='all'&&k!=='own'&&k!==S.ins.type){S.ins.type=k;S.ins.subject=''}S.build.mode='inserts';setTab('load')},
   insKind:el=>{S.insKind=el.dataset.k;renderView()},
-  saveMethod:()=>{const st=S.study;const t=st.text||'';const p=parseRef(st.refCode);const ref=p?rc(p):st.refCode;
+  saveMethod:el=>{const st=el&&el.dataset&&el.dataset.k?Object.assign({},Store.get(el.dataset.k)):S.study;const t=st.text||'';const p=parseRef(st.refCode);const ref=p?rc(p):st.refCode;
     if(st.tool==='soap'){const sec={};let cur=null;t.split('\n').forEach(l=>{const m=l.match(/^#{1,4}\s*([SOAP])\b/i);if(m){cur=m[1].toUpperCase();sec[cur]='';return}if(cur)sec[cur]+=l+'\n'});
       const c=x=>plain((sec[x]||'').trim());Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref,scripture:c('S'),obs:c('O'),app:c('A'),prayer:c('P')}})}
     else Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:`${METHODS[st.tool][1]}: ${st.refLabel}`,ref,body:plain(t)}});
@@ -1352,7 +1380,7 @@ function displayName(){const p=profile();return p.name||(Auth.user&&Auth.user.di
 function applyTheme(){const t=profile().theme;if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
 function avatarHtml(){const ph=Store.get('pic_avatar');return ph&&ph.data?`<img src="${ph.data}" alt="">`:esc(profile().avatar)}
 function bannerStyle(){const ph=Store.get('pic_banner');const pf=profile();if(pf.banner==='photo'&&ph&&ph.data)return `background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),url(${ph.data}) center/cover`;const b=BANNERS.find(x=>x[0]===pf.banner)||BANNERS[0];return 'background:'+b[1]}
-function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}}
+function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}const c=$('#codeChip');if(c){const v=STANDALONE&&typeof Code!=='undefined'?Code.value:null;c.style.display=v?'':'none';if(v)c.textContent='🔑 '+v.split('-')[0]}}
 async function fileToJpeg(file,w,h,maxLen){const url=URL.createObjectURL(file);try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('That file isn\u2019t a picture I can open.'));i.src=url});
   const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');const sr=Math.max(w/img.naturalWidth,h/img.naturalHeight);const sw=w/sr,sh=h/sr;
   x.drawImage(img,(img.naturalWidth-sw)/2,(img.naturalHeight-sh)/2,sw,sh,0,0,w,h);let q=.86,d;do{d=c.toDataURL('image/jpeg',q);q-=.08}while(d.length>maxLen&&q>.3);return d}finally{URL.revokeObjectURL(url)}}
@@ -1426,11 +1454,9 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
    ${STANDALONE&&Code.value?`<div class="card codecard"><div class="row"><b class="grow">🔑 My Bible code</b><button class="btn sm ghost" data-act="codeShow">${S.codeShown?'🙈 Hide':'👁 Show'}</button></div>
      <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
-     <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">↪ Use a different code</button></div></div>`:''}
-   <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved online with your <b>Bible code</b>, and on this device.':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
-     <p class="small muted" style="margin:6px 0 0">Want it in the other version too (Claude app ↔ your website)? Tap <b>Copy my progress</b> here, then <b>Import progress</b> in the other one.</p>
-     <div class="row" style="margin-top:10px"><button class="btn sm pri" data-act="exportCopy">📋 Copy my progress</button><button class="btn sm" data-act="importSheet">📥 Import progress</button><button class="btn sm" data-act="copyAll">⧉ Back up notes as text</button></div>
-     <textarea id="exportBox" class="f" style="display:none;margin-top:10px;min-height:110px;font-size:12px" readonly></textarea></div>
+     <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">🚪 Log out</button></div></div>`:''}
+   <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved online with your <b>Bible code</b>, so it\u2019s the same on every phone or computer where you log in.':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
+     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="copyAll">⧉ Back up my notes as text</button></div></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
   const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
   const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
@@ -1752,18 +1778,23 @@ Object.assign(A,{
 const localCount=()=>{let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('lb1:me:d:')&&!/settings$/.test(k))n++}}catch(e){}return n};
 function clearLocal(){try{Object.keys(localStorage).filter(k=>k.startsWith('lb1:me:')).forEach(k=>localStorage.removeItem(k))}catch(e){}}
 function welcomeBox(inner){const el=$('#auth');el.classList.add('show');el.innerHTML=`<div class="authbox"><div class="brand" style="justify-content:center;font-size:30px">${BOOK_SVG}Loaded Bible</div>${inner}</div>`}
-function showWelcome(msg){welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">Welcome 👋</h3>
-   <p style="text-align:center;margin:0 0 16px">No accounts, no passwords. Your progress is saved with your own <b>Bible code</b>, a code like <span class="codepill">GRACE-7K4M-2QXT</span>.</p>
-   <div class="card small" style="margin:0 0 14px">🔑 Use your code on any phone or computer to get all your progress back.<br>📝 Keep it safe, like a key. Without it, nobody can get your progress back, not even us.</div>
-   <button class="btn pri wide" data-act="codeNew">✨ Start — give me my Bible code</button>
-   <button class="btn wide" data-act="codeHave">🔑 I already have a code</button>
-   <div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div>`)}
+function showWelcome(msg){welcomeBox(`<h3 style="text-align:center;font-size:25px;margin:18px 0 4px">🔑 Log in with your Bible code</h3>
+   <p class="small muted" style="text-align:center;margin:0 0 12px">No email, no password. Just your code.</p>
+   <input id="codeIn2" class="f codein2" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="GRACE-7K4M-2QXT">
+   <button class="btn pri wide" data-act="codeOpen">📖 Log in</button>
+   <div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div>
+   <div class="or"><span>New here?</span></div>
+   <button class="btn wide" data-act="codeNew">✨ Get my own Bible code</button>
+   <div class="card small" style="margin:14px 0 0">🔑 Your code is unique — it’s yours only, and it holds all your progress.<br>📱 Log in with it on any phone or computer.<br>📝 Keep it safe, like a key. Nobody can look it up for you.</div>`);
+  const i=$('#codeIn2');i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
+function showHaveCode(msg){showWelcome(msg)}
 function showNewCode(code){welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 4px">This is your Bible code</h3>
    <div class="bigcode" id="bigCode">${esc(code)}</div>
    <button class="btn wide" data-act="codeCopy" data-c="${esc(code)}">⧉ Copy my code</button>
    <div class="warnbox"><b>⚠️ Save it now!</b> Take a screenshot, or write it in the front of your Bible. It's the only way to get your progress back on another phone or computer, or if your browser data gets cleared.</div>
    <label class="row" style="margin:14px 2px;gap:10px;align-items:center"><input type="checkbox" id="codeSaved" style="width:22px;height:22px"> <b>I saved my code</b></label>
-   <button class="btn pri wide" id="codeGo" data-act="codeStart" data-c="${esc(code)}" disabled>Continue →</button>`);
+   <button class="btn pri wide" id="codeGo" data-act="codeStart" data-c="${esc(code)}" disabled>Continue →</button>
+   <button class="linkbtn" data-act="codeBack">← Back to log in</button>`);
   $('#codeSaved').addEventListener('change',e=>{$('#codeGo').disabled=!e.target.checked})}
 function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">Enter your Bible code</h3>
    <input id="codeIn2" class="f codein2" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="GRACE-7K4M-2QXT">
@@ -1772,16 +1803,16 @@ function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24
    <button class="linkbtn" data-act="codeBack">← Back</button>`);
   const i=$('#codeIn2');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
 function codeLost(){Code.clear();Store.disconnect();Store.items.clear();clearLocal();showWelcome('That Bible code wasn’t found. Start fresh or try your code again.')}
-function startCode(){hideAuth();Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView()}
+function startCode(){hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView()}
 Object.assign(A,{
   codeNew:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Making your code…';
     try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
-    catch(e){authMsg(e.message||'No connection — check your internet and try again.');el.disabled=false;el.textContent='✨ Start — give me my Bible code'}},
+    catch(e){authMsg(e.message||'No connection — check your internet and try again.');el.disabled=false;el.textContent='✨ Get my own Bible code'}},
   codeCopy:async el=>{try{await navigator.clipboard.writeText(el.dataset.c);toast('Code copied ✓')}catch(e){const r=document.createRange();r.selectNodeContents($('#bigCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast('Select and copy the code')}},
   codeStart:el=>{Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome! Your progress now saves with your Bible code 🔑')},
   codeHave:()=>showHaveCode(''),
   codeBack:()=>showWelcome(''),
-  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!/^[A-Z]{3,8}-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(c)){authMsg('That doesn’t look like a Bible code. It looks like GRACE-7K4M-2QXT.');return}
+  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!/^[A-Z]{3,8}-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(c)){authMsg('Type your Bible code — it looks like GRACE-7K4M-2QXT.');return}
     const b=$('[data-act=codeOpen]');b.disabled=true;b.innerHTML='<span class="spin"></span>';
     try{const r=await fetch('/api/code/check',{method:'POST',headers:{'X-Code':c}});
       if(r.ok){const n=localCount();if(n){welcomeBox(`<h3 style="text-align:center;margin:18px 0 6px">One question</h3><p style="text-align:center">This device already has some progress (${n} items) that isn’t saved with a code yet. Add it to <b>${esc(c)}</b> too?</p>
@@ -1789,11 +1820,11 @@ Object.assign(A,{
         Code.set(c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖');return}
       authMsg(r.status===429?'Too many wrong tries. Wait 15 minutes and try again.':'That code wasn’t found. Check the letters and numbers and try again.')}
     catch(e){authMsg('No connection — check your internet and try again.')}
-    b.disabled=false;b.textContent='📖 Open my Bible'},
+    b.disabled=false;b.textContent='📖 Log in'},
   codeMerge:el=>{if(el.dataset.m!=='1')clearLocal();Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖')},
   codeShow:()=>{S.codeShown=!S.codeShown;renderView()},
   codeCopyMine:async()=>{try{await navigator.clipboard.writeText(Code.value);toast('Code copied ✓')}catch(e){S.codeShown=true;renderView();toast('Select and copy your code')}},
-  codeSwitch:()=>confirmSheet('Use a different Bible code? This device will forget your current code — make sure you saved it. Your progress stays safe online under that code.','Use a different code',()=>{Code.clear();Store.disconnect();Store.items.clear();clearLocal();setTab('load');showWelcome('')}),
+  codeSwitch:()=>confirmSheet('Log out? Make sure you saved your Bible code — you\u2019ll need it to log in again. Your progress stays safe online under your code.','Log out',()=>{Code.clear();Store.disconnect();Store.items.clear();clearLocal();setTab('load');showWelcome('')}),
 });
 /* ---------- boot ---------- */
 if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#load').slice(1));updateAvatar();if(Code.value)startCode();else showWelcome('')}
