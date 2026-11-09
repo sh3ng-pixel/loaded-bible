@@ -160,8 +160,16 @@ details.guide .body{padding-bottom:12px;line-height:1.5;font-size:15px}
 .prog i{display:block;height:100%;background:var(--accent)}
 .step{display:flex;gap:12px;align-items:flex-start;margin:6px 0}
 .step.done{opacity:.6}
-.step.done>.grow{text-decoration:line-through;text-decoration-color:var(--muted)}
-.step.done>.grow .hand{text-decoration:line-through}
+.step.done .stxt{text-decoration:line-through;text-decoration-color:var(--muted)}
+.step.done .stxt .hand{text-decoration:line-through}
+.stepacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mini{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600}
+.mini.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mini:disabled{opacity:.6}
+.subpanel{margin-top:8px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.subpanel .out{font-size:14.5px}
+.subpanel .out h2{font-size:18px}.subpanel .out h3,.subpanel .out h4{font-size:16px}
+.grpacts{gap:6px;margin:4px 0 10px}
 .tick{flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);background:var(--card);color:var(--accent-ink);font-weight:800;font-size:16px;margin-top:1px}
 .step.done .tick{background:var(--accent)}
 .hand{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--accent);background:var(--soft);border-radius:8px;padding:4px 9px;margin-top:4px}
@@ -960,7 +968,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();
 /* ---------- LOAD: guide for marking up a physical Bible ---------- */
 const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depression','Doubt','Shame & guilt','Temptation','Joy','Gratitude','Hope','Patience','Rejection','Stress','Forgiving others','Waiting on God','Courage','Purpose','Marriage','Parenting','Friendship','Money','Sickness','Peace','Salvation','Prayer'];
 const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['soap','📖 S.O.A.P.']];
-S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
+S.panel={};S.streams={};S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
 function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
 function colorKeyText(){const m=mainSet().topics;return m.map(t=>`${okColor(t.color)} (${COLOR_NAMES[okColor(t.color)]}) = ${t.name}${t.meaning?' — '+t.meaning:''}`).join('; ')+'. Only use these letters.'}
 const okColor=c=>PALETTE.some(x=>x[0]===c)?c:'y';
@@ -982,8 +990,8 @@ const shortRef=r=>{const p=parseRef(r);if(!p)return r;const m=BM[p.b].name.match
 function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,text)=>items.push({group,id,html,text});
   if(pl.kind==='chapter'){const b=pl.b,c=pl.c,nm=`${BM[b].name} ${c}`;const vr=v=>refA(`${b} ${c}:${v}`,'v. '+v);
     if(d.context){const x=d.context;
-      add('✍️ Top of the chapter','top',`Write above chapter ${c}: <b>“${esc(x.heading||'')}”</b>${x.summary?`<div class="small muted">Optional one-liner: ${esc(x.summary)}</div>`:''}`,`Top of ${nm}: "${x.heading}"`);
-      add('✍️ Top of the chapter','ctx',`Write a small context box by verse 1: <b>${[x.author&&'By '+x.author,x.audience&&'to '+x.audience].filter(Boolean).map(esc).join(' ')}</b>${x.setting?` · ${esc(x.setting)}`:''}${(x.background||[]).length?`<ul class="small" style="margin:6px 0 0">${x.background.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}`,`Context box by v.1: ${[x.author&&'By '+x.author,x.audience&&'to '+x.audience,x.setting].filter(Boolean).join(' · ')}`)}
+      add(pl.v1?'✍️ Above the verses':'✍️ Top of the chapter','top',`Write above ${pl.v1?'verse '+pl.v1:'chapter '+c}: <b>“${esc(x.heading||'')}”</b>${x.summary?`<div class="small muted">Optional one-liner: ${esc(x.summary)}</div>`:''}`,`Top of ${nm}: "${x.heading}"`);
+      add(pl.v1?'✍️ Above the verses':'✍️ Top of the chapter','ctx',`Write a small context box by verse ${pl.v1||1}: <b>${[x.author&&'By '+x.author,x.audience&&'to '+x.audience].filter(Boolean).map(esc).join(' ')}</b>${x.setting?` · ${esc(x.setting)}`:''}${(x.background||[]).length?`<ul class="small" style="margin:6px 0 0">${x.background.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}`,`Context box by v.1: ${[x.author&&'By '+x.author,x.audience&&'to '+x.audience,x.setting].filter(Boolean).join(' · ')}`)}
     (d.highlights||[]).forEach((x,i)=>add('🖍 Highlight','hl'+i,`${sw(x.color)} Highlight ${vr(x.v)} in <b>${colorWord(x.color)}</b> <span class="small muted">(${esc(colorLabel(okColor(x.color)))})</span>${x.quote?`<div style="font-family:var(--serif);font-size:16.5px">“${esc(x.quote)}”</div>`:''}<div class="small">${esc(x.why||'')}</div>`,`Highlight v.${x.v} ${colorWord(x.color)} — ${x.why||''}`));
     (d.margin||[]).forEach((x,i)=>add('✎ Write in the margin','mg'+i,`Next to ${vr(x.v)} write:<div class="hand">${esc(x.note||'')}</div>`,`Margin v.${x.v}: ${x.note}`));
     (d.xrefs||[]).forEach((x,i)=>add('🔗 Cross-references','xr'+i,`Next to ${vr(x.v)} write: <span class="hand" style="display:inline">${(x.refs||[]).map(y=>esc(y.ref)).join('; ')}</span><div class="small muted">${(x.refs||[]).map(y=>{const p=parseRef(y.ref);return (p?refA(rc(p),y.ref):esc(y.ref))+' — '+esc(y.why||'')}).join('<br>')}</div>`,`v.${x.v} → ${(x.refs||[]).map(y=>y.ref).join('; ')}`));
@@ -1003,7 +1011,7 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
   return items}
 
 function loadPlans(){return Store.list('k_').sort((a,b)=>(b.at||0)-(a.at||0))}
-function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
+function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
 function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.book;B.ch=s.ch}if(!B.bookOnly)B.bookOnly=s.book;
   const bookOpts=sel=>BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===sel?'selected':''}>${esc(b.name)}</option>`).join('');
@@ -1013,6 +1021,12 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     <label class="l">What do you want to add?</label>
     <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}</button>`;
+  else if(B.mode==='verses'){const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);form=`<label class="l">Which verse(s)?</label>
+    <div class="row"><select class="f grow" id="bBook">${bookOpts(B.book)}</select><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div>
+    <div class="row" style="margin-top:8px"><span class="small muted">Verse</span><input class="f" id="bV1" type="number" inputmode="numeric" min="1" max="176" value="${v1}" style="width:84px"><span class="small muted">to</span><input class="f" id="bV2" type="number" inputmode="numeric" min="1" max="176" value="${v2}" style="width:84px"></div>
+    <label class="l">What do you want to add?</label>
+    <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
+    <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
     <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
     <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
@@ -1024,7 +1038,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const plans=loadPlans();
   v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
   <div class="card">
-    <div class="chips">${[['chapter','📖 A chapter'],['topic','💭 A feeling / topic'],['book','📚 A whole book']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verse(s)'],['topic','💭 A feeling / topic'],['book','📚 A whole book']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
     ${form}</div>
   <div id="buildOut"></div>
   ${loadingListHtml(plans)}
@@ -1037,12 +1051,13 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const bc=$('#bCh',v);if(bc)bc.onchange=()=>{B.ch=+bc.value;renderView()};
   const bo=$('#bBookOnly',v);if(bo)bo.onchange=()=>{B.bookOnly=bo.value;renderView()};
   const bt=$('#bTopic',v);if(bt)bt.oninput=()=>{B.topic=bt.value};
+  const v1i=$('#bV1',v),v2i=$('#bV2',v);if(v1i){const upd=()=>{B.v1=Math.max(1,parseInt(v1i.value)||1);B.v2=Math.max(B.v1,parseInt(v2i.value)||B.v1);const b=$('[data-act=bGo]',v);if(b)b.textContent=`✨ Show me how to load ${BM[B.book].name} ${B.ch}:${B.v1}${B.v2>B.v1?'-'+B.v2:''}`};v1i.oninput=upd;v2i.oninput=upd}
   $$('details.grp>summary',v).forEach(sm=>sm.addEventListener('click',()=>{const d=sm.parentElement;S.grpState[d.dataset.g]=!d.open}));
   renderBuildOut()}
 
 function planProg(pl){const it=planItems(pl),ch=pl.checks||{};const dn=it.filter(x=>ch[x.id]).length;return {it,dn,total:it.length,pct:it.length?Math.round(dn/it.length*100):0,done:it.length>0&&dn===it.length}}
 const KIND={chapter:['📖','Chapter'],topic:['💭','Feeling / topic'],book:['📚','Whole book']};
-function planHead(pl,pp,open){const k=KIND[pl.kind]||KIND.chapter;const title=pl.kind==='topic'?planTitle(pl).replace(/^\S+\s/,''):pl.kind==='book'?BM[pl.b].name:planTitle(pl);
+function planHead(pl,pp,open){const k=pl.v1?['📌','Verses']:(KIND[pl.kind]||KIND.chapter);const title=pl.kind==='topic'?planTitle(pl).replace(/^\S+\s/,''):pl.kind==='book'?BM[pl.b].name:planTitle(pl);
   const status=pp.done?'<span class="pstat done">✓ Done</span>':pp.dn?`<span class="pstat">${pp.pct}%</span>`:'<span class="pstat new">New</span>';
   return `<div class="planhead" data-act="togglePlan" data-k="${pl.key}" role="button" aria-expanded="${open}">
     <span class="pico">${pl.kind==='topic'&&pl.data&&pl.data.emoji?esc(pl.data.emoji):k[0]}</span>
@@ -1056,11 +1071,71 @@ function planBody(pl,pp){const ch=pl.checks||{};const groups=[];pp.it.forEach(x=
   if(pl.kind==='topic'&&pl.data.intro)h+=`<p style="margin:4px 2px 10px">${esc(pl.data.intro)}</p>`;
   groups.forEach(g=>{const gd=g.items.filter(x=>ch[x.id]).length;const sk=pl.key+'|'+g.name;const open=S.grpState[sk]!=null?S.grpState[sk]:gd<g.items.length;
     h+=`<details class="grp" data-g="${esc(sk)}" ${open?'open':''}><summary><span class="grow">${esc(g.name)}</span><span class="tag ${gd===g.items.length?'ok':''}">${gd}/${g.items.length}</span></summary>
-     ${g.items.map(it=>`<div class="item step ${ch[it.id]?'done':''}"><button class="tick" data-act="tick" data-k="${pl.key}" data-i="${esc(it.id)}" aria-label="Mark done">${ch[it.id]?'✓':''}</button><div class="grow">${it.html}</div></div>`).join('')}</details>`});
+     ${g.items.map(it=>stepHtml(pl,it,ch)).join('')}${grpActs(pl,g)}</details>`});
   if(pl.kind==='topic'&&pl.data.prayer)h+=`<div class="card" style="margin:10px 0"><b>A prayer</b><p style="font-family:var(--serif);font-size:17px;margin:6px 0 0"><i>${esc(pl.data.prayer)}</i></p></div>`;
   h+=`<div class="row planfoot">${pl.kind!=='topic'?`<button class="btn sm" data-act="openCh" data-b="${pl.b}" data-c="${pl.c||1}">📖 Read it</button>`:''}<button class="btn sm" data-act="copyPlan" data-k="${pl.key}">📋 Copy checklist</button><button class="btn sm" data-act="planOnline" data-k="${pl.key}">💻 Add to Online Bible</button><button class="btn sm" data-act="redoPlan" data-k="${pl.key}">↻ New ideas</button><button class="btn sm danger" data-act="delPlan" data-k="${pl.key}">🗑 Delete</button><button class="btn sm ghost" data-act="togglePlan" data-k="${pl.key}">▴ Close</button></div>
    <p class="small muted" style="margin:6px 2px 0">Written by Claude — read the verses yourself and only mark what you agree with.</p>`;
   return h}
+const SEC_OF={hl:'highlights',mg:'margin',xr:'xrefs',wd:'words',tv:'verses',kv:'key_verses',ch:'chapters',top:'context',ctx:'context',soap:'soap'};
+const SEC_NAME={highlights:'highlight',margin:'margin note',xrefs:'cross-reference',words:'word meaning',verses:'verse',key_verses:'key verse',chapters:'chapter heading',context:'context',soap:'S.O.A.P.'};
+function idSec(id){const m=String(id).match(/^([a-z]+)(\d*)$/);return m?SEC_OF[m[1]]:null}
+function idIndex(pl,id){const m=String(id).match(/^([a-z]+)(\d+)$/);if(!m)return -1;if(m[1]==='ch')return (pl.data.chapters||[]).findIndex(x=>String(x.c)===m[2]);return +m[2]}
+function secIds(pl,sec){const d=pl.data;if(sec==='context')return ['top','ctx'];if(sec==='soap')return ['soap'];const pre={highlights:'hl',margin:'mg',xrefs:'xr',words:'wd',verses:'tv',key_verses:'kv'}[sec];
+  if(sec==='chapters')return (d.chapters||[]).map(x=>'ch'+x.c);return (d[sec]||[]).map((_,i)=>pre+i)}
+const cssId=s=>String(s).replace(/[^A-Za-z0-9_-]/g,'_');
+function stepHtml(pl,it,ch){const sk=pl.key+'|'+it.id;const pm=S.panel[sk];const ex=((pl.extra||{})[it.id])||{};const sec=idSec(it.id);
+  const busy=m=>S.itemBusy===sk+'|'+m;
+  const tabs=['explain','deep'].filter(m=>ex[m]||S.streams[sk+'|'+m]!=null);
+  const content=pm?(S.streams[sk+'|'+pm]!=null?S.streams[sk+'|'+pm]:ex[pm]):'';
+  return `<div class="item step ${ch[it.id]?'done':''}"><button class="tick" data-act="tick" data-k="${pl.key}" data-i="${esc(it.id)}" aria-label="Mark done">${ch[it.id]?'✓':''}</button><div class="grow"><div class="stxt">${it.html}</div>
+   <div class="stepacts"><button class="mini ${pm==='explain'?'on':''}" data-act="itemAI" data-k="${pl.key}" data-i="${esc(it.id)}" data-m="explain" ${busy('explain')?'disabled':''}>${busy('explain')?'<span class="spin"></span>':'💡'} Explain</button>
+     <button class="mini ${pm==='deep'?'on':''}" data-act="itemAI" data-k="${pl.key}" data-i="${esc(it.id)}" data-m="deep" ${busy('deep')?'disabled':''}>${busy('deep')?'<span class="spin"></span>':'📖'} In depth</button>
+     ${sec?`<button class="mini" data-act="itemRegen" data-k="${pl.key}" data-i="${esc(it.id)}" ${S.itemBusy===sk+'|regen'?'disabled':''}>${S.itemBusy===sk+'|regen'?'<span class="spin"></span> New…':'🔄 New '+SEC_NAME[sec]}</button>`:''}</div>
+   ${pm?`<div class="subpanel"><div class="row" style="gap:6px">${tabs.map(m=>`<button class="mini ${pm===m?'on':''}" data-act="panelTab" data-k="${pl.key}" data-i="${esc(it.id)}" data-m="${m}">${m==='explain'?'💡 Explain':'📖 In depth'}</button>`).join('')}<span class="grow"></span>
+     ${content&&!busy(pm)?`<button class="mini" data-act="itemAI" data-k="${pl.key}" data-i="${esc(it.id)}" data-m="${pm}" data-f="1">↻</button>`:''}<button class="mini" data-act="panelClose" data-k="${pl.key}" data-i="${esc(it.id)}">✕</button></div>
+     <div class="out" id="px-${cssId(sk)}">${content?md(content):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>'}</div></div>`:''}</div></div>`}
+function grpActs(pl,g){const sec=idSec(g.items[0].id);if(!sec)return '';const arr=Array.isArray(pl.data[sec]);const bk=S.secBusy===pl.key+'|'+sec;
+  return `<div class="row grpacts">${arr&&sec!=='chapters'?`<button class="btn sm" data-act="secPart" data-k="${pl.key}" data-s="${sec}" data-m="more" ${bk?'disabled':''}>${bk&&S.secMode==='more'?'<span class="spin"></span> Loading…':'＋ Load more'}</button>`:''}
+    <button class="btn sm ghost" data-act="secPart" data-k="${pl.key}" data-s="${sec}" data-m="section" ${bk?'disabled':''}>${bk&&S.secMode==='section'?'<span class="spin"></span> Regenerating…':'🔄 Regenerate this section'}</button></div>`}
+function planPassage(pl){return pl.kind==='topic'?`a topic tab for "${pl.topic}"`:pl.kind==='book'?`the book of ${BM[pl.b].name}`:planTitle(pl)}
+function secSchema(pl,sec){const s=settings();const t=pl.topic||'';return ({
+  highlights:'[{"v": "verse number or range", "color": "one letter from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}]',
+  margin:'[{"v": "verse number or range", "note": "margin note, max 15 words, handwritable"}]',
+  xrefs:'[{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}]',
+  words:'[{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}]',
+  verses:`[{"ref": "Book chapter:verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}]`,
+  key_verses:'[{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]',
+  chapters:'[{"c": chapter number, "title": "heading to write above the chapter, max 5 words", "summary": "max 10 words"}]',
+  context:'{"heading": "short title to write above the passage (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "few words", "setting": "max 15 words", "background": ["2-4 short historical or cultural facts (max 15 words each)"]}',
+  soap:`{"v": "key verse number or range", "scripture": "text of that verse in the ${s.trans}", "observation": "2-3 sentences", "application": "2-3 practical, personal sentences", "prayer": "1-2 sentence prayer"}`})[sec]}
+function updatePlan(key,fn){const pl=JSON.parse(JSON.stringify(Store.get(key)));delete pl.key;fn(pl);Store.set(key,pl)}
+async function regenPart(key,sec,mode,id){const pl=Object.assign({key},Store.get(key));if(!pl.data)return;const s=settings();const cur=pl.data[sec];const isObj=!Array.isArray(cur);
+  let ask;if(isObj)ask=`Return JSON: {"${sec}": ${secSchema(pl,sec)}} — a fresh version that is different from this one: ${JSON.stringify(cur||{}).slice(0,1500)}`;
+  else{const n=mode==='item'?1:mode==='more'?5:Math.max(cur.length,3);const one=mode==='item'?JSON.stringify(cur[idIndex(pl,id)]||{}):'';
+    ask=`Return JSON: {"items": ${secSchema(pl,sec)}} with exactly ${n} item${n>1?'s':''}. ${mode==='item'?`It replaces this one: ${one}. Pick something different from everything already in the list`:mode==='more'?'Add new ones — do NOT repeat any verse or idea already in the list':'Make a fresh set, different from the current list'}: ${JSON.stringify(cur).slice(0,3500)}`}
+  const bk=mode==='item'?key+'|'+id+'|regen':null;if(bk)S.itemBusy=bk;else{S.secBusy=key+'|'+sec;S.secMode=mode}renderView();
+  try{const r=await ai(JSYS+`I'm loading ${planPassage(pl)} in my paper Bible (${TRANS[s.trans]}).${pl.v1?` Only use verses ${pl.v1}${pl.v2>pl.v1?'-'+pl.v2:''} of ${BM[pl.b].name} ${pl.c}.`:''}\nMy highlighter color key: ${colorKeyText()}.\n${ask}`,null,null,'default');
+    const d=parseJSON(r.text);
+    updatePlan(key,p=>{p.checks=Object.assign({},p.checks);p.extra=Object.assign({},p.extra);
+      const clear=ids=>ids.forEach(i=>{delete p.checks[i];delete p.extra[i]});
+      if(isObj){if(!d[sec])throw {message:'Nothing came back — try again.'};p.data[sec]=d[sec];clear(secIds(p,sec))}
+      else{const items=(d.items||[]).filter(Boolean);if(!items.length)throw {message:'Nothing came back — try again.'};
+        if(mode==='item'){const i=idIndex(p,id);p.data[sec][i]=items[0];clear([id])}
+        else if(mode==='more')p.data[sec]=p.data[sec].concat(items);
+        else{clear(secIds(p,sec));p.data[sec]=items}}});
+    toast(mode==='more'?'More added ＋':'Regenerated 🔄')}
+  catch(e){toast(aiErr(e))}
+  if(bk)S.itemBusy=null;else S.secBusy=null;renderView()}
+async function itemAI(key,id,mode,force){const pl=Object.assign({key},Store.get(key));const it=planItems(pl).find(x=>x.id===id);if(!it)return;const sk=key+'|'+id;
+  S.panel[sk]=mode;const have=((pl.extra||{})[id]||{})[mode];if(have&&!force){renderView();return}
+  S.streams[sk+'|'+mode]='';S.itemBusy=sk+'|'+mode;renderView();const s=settings();
+  const what=`"${it.text}" (from loading ${planPassage(pl)}, ${TRANS[s.trans]})`;
+  const prompt=mode==='explain'?SYS.replace('450','140')+`In 60–120 words, briefly explain what this means and its context — no headings, 1–2 short paragraphs: ${what}`
+    :SYS+`Give an in-depth study of this: ${what}. Use ## headings: Context, What it means, Key words, Connections in Scripture, Living it out. About 350–450 words.`;
+  try{const r=await ai(prompt,t=>{S.streams[sk+'|'+mode]=t;const el=document.getElementById('px-'+cssId(sk));if(el&&S.panel[sk]===mode)el.innerHTML=md(t)},null,mode==='explain'?'quick':'default');
+    updatePlan(key,p=>{p.extra=Object.assign({},p.extra);p.extra[id]=Object.assign({},p.extra[id],{[mode]:r.text})})}
+  catch(e){toast(aiErr(e));if(!S.streams[sk+'|'+mode])delete S.panel[sk]}
+  delete S.streams[sk+'|'+mode];S.itemBusy=null;renderView()}
 function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
   const rows=plans.map(pl=>({pl,pp:planProg(pl)}));const act=rows.filter(r=>!r.pp.done),fin=rows.filter(r=>r.pp.done);
   const card=r=>{const open=B.planKey===r.pl.key;return `<div class="plan ${open?'open':''} ${r.pp.done?'isdone':''}" id="plan-${esc(r.pl.key)}">${planHead(r.pl,r.pp,open)}${open?`<div class="planbody">${planBody(r.pl,r.pp)}</div>`:''}</div>`};
@@ -1076,16 +1151,16 @@ function archivePlan(pl){const pp=planProg(pl);const st=Object.assign({},Store.g
   ar.steps+=pp.dn;if(pp.done){if(pl.kind==='chapter'){ar.loaded++;if(pl.b==='PSA')ar.psalms++}else if(pl.kind==='topic')ar.topics++;else ar.books++}st.arch=ar;Store.set('stats',st)}
 function removePlan(k){const pl=Store.get(k);if(!pl)return;archivePlan(pl);Store.del(k);if(S.build.planKey===k)S.build.planKey=null}
 async function runBuild(){const B=S.build;const s=settings();let prompt,meta,key;
-  if(B.mode==='chapter'){const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
-    const name=`${BM[B.book].name} ${B.ch}`;const keys=[];
+  if(B.mode==='chapter'||B.mode==='verses'){const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
+    const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;const keys=[];
     if(B.parts.context)keys.push('"context": {"heading": "short title to write above the chapter (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "who it was first written to (few words)", "setting": "when/where and what is happening (max 15 words)", "background": ["2-4 short historical or cultural facts a modern reader would miss (max 15 words each)"]}');
     if(B.parts.hl)keys.push(`"highlights": [{"v": "verse number or range like 3-5", "color": "one letter from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}] — the 5-10 most important verses`);
     if(B.parts.margin)keys.push('"margin": [{"v": "verse number or range", "note": "margin note, max 15 words, handwritable"}] — 5-10 notes across the chapter');
     if(B.parts.xrefs)keys.push('"xrefs": [{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}] — 4-8 verses with 1-3 well-known cross-references each');
     if(B.parts.words)keys.push('"words": [{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}] — 2-4 key words');
     if(B.parts.soap)keys.push(`"soap": {"v": "key verse number or range", "scripture": "text of that verse in the ${s.trans}", "observation": "2-3 sentences", "application": "2-3 practical, personal sentences", "prayer": "1-2 sentence prayer"}`);
-    prompt=JSYS+`Show me how to load ${name} in my paper Bible (${TRANS[s.trans]}).\nMy highlighter color key: ${colorKeyText()}.\nReturn a JSON object with exactly these keys:\n${keys.join(',\n')}`;
-    key=`k_${B.book}.${B.ch}`;meta={kind:'chapter',b:B.book,c:B.ch};}
+    prompt=JSYS+`Show me how to load ${name} in my paper Bible (${TRANS[s.trans]}).${isV?` Only cover verses ${v1}${v2>v1?'-'+v2:''} (use fewer items if the passage is short); the context may describe the surrounding chapter.`:''}\nMy highlighter color key: ${colorKeyText()}.\nReturn a JSON object with exactly these keys:\n${keys.join(',\n')}`;
+    key=isV?`k_${B.book}.${B.ch}.${v1}-${v2}`:`k_${B.book}.${B.ch}`;meta=isV?{kind:'chapter',b:B.book,c:B.ch,v1,v2}:{kind:'chapter',b:B.book,c:B.ch};}
   else if(B.mode==='topic'){const t=(B.topic||'').trim();if(!t){toast('Type or pick a feeling or topic');return}
     prompt=JSYS+`I want to make a topic tab in my paper Bible for "${t}" — verses to highlight in one color and chain together in the margins.\nMy highlighter color key: ${colorKeyText()}.\nReturn JSON: {"title": "tab label (1-2 words)", "emoji": "one emoji", "color": "best color letter from my key", "intro": "2 sentences on what the Bible says about ${t}, gently and honestly", "verses": [{"ref": "Book chapter:verse or chapter:verse-verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}] (7-10 verses in Bible order, Old and New Testament, never ripped out of context), "prayer": "a short prayer"}`;
     key='k_t-'+t.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40);meta={kind:'topic',topic:t};}
@@ -1117,12 +1192,17 @@ Object.assign(A,{
   bFeel:el=>{S.build.topic=el.dataset.f;renderView()},
   bGo:()=>runBuild(),
   openPlan:el=>{S.build.planKey=el.dataset.k;renderView();scrollToPlan(el.dataset.k)},
+  itemAI:el=>itemAI(el.dataset.k,el.dataset.i,el.dataset.m,!!el.dataset.f),
+  itemRegen:el=>regenPart(el.dataset.k,idSec(el.dataset.i),'item',el.dataset.i),
+  panelTab:el=>{S.panel[el.dataset.k+'|'+el.dataset.i]=el.dataset.m;renderView()},
+  panelClose:el=>{delete S.panel[el.dataset.k+'|'+el.dataset.i];renderView()},
+  secPart:el=>{const m=el.dataset.m;if(m==='section')confirmSheet('Regenerate this whole section? Its ticks will be cleared.','Regenerate',()=>regenPart(el.dataset.k,el.dataset.s,'section'));else regenPart(el.dataset.k,el.dataset.s,'more')},
   togglePlan:el=>{const k=el.dataset.k;const was=S.build.planKey===k;S.build.planKey=was?null:k;S.build.err='';renderView();scrollToPlan(k)},
   redoPlan:el=>{const pl=Store.get(el.dataset.k);if(!pl)return;S.build.mode=pl.kind;if(pl.kind==='chapter'){S.build.book=pl.b;S.build.ch=pl.c}else if(pl.kind==='topic')S.build.topic=pl.topic;else S.build.bookOnly=pl.b;
     confirmSheet('Replace this checklist with new ideas? Your ticks will be cleared.','Get new ideas',()=>runBuild())},
   clearDone:()=>{const fin=loadPlans().filter(pl=>planProg(pl).done);confirmSheet(`Remove ${fin.length} finished loading${fin.length===1?'':'s'} from your list? Your badges and stats are kept.`,'Remove',()=>{fin.forEach(pl=>removePlan(pl.key));toast('Finished loadings removed');renderView()})},
   tick:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const ch=Object.assign({},pl.checks);ch[el.dataset.i]=!ch[el.dataset.i];if(ch[el.dataset.i])touch();
-    if(pl.kind==='chapter'){const it=planItems(pl);if(it.every(x=>ch[x.id])&&!isRead(pl.b,pl.c))toggleRead(pl.b,pl.c)}
+    if(pl.kind==='chapter'&&!pl.v1){const it=planItems(pl);if(it.every(x=>ch[x.id])&&!isRead(pl.b,pl.c))toggleRead(pl.b,pl.c)}
     Store.set(k,Object.assign({},pl,{checks:ch}))},
   copyPlan:el=>{const pl=Store.get(el.dataset.k||S.build.planKey);const it=planItems(pl);let g=null;
     copyText(`Load my Bible — ${planTitle(pl).replace(/^\S+\s/,m=>/\p{Emoji}/u.test(m)?'':m)}\n`+it.map(x=>{let s='';if(x.group!==g){g=x.group;s+=`\n${g.replace(/^\S+\s/,'')}\n`}return s+`${(pl.checks||{})[x.id]?'[x]':'[ ]'} ${x.text}`}).join('\n'))},
