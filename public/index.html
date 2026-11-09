@@ -306,6 +306,9 @@ details.grp[open]>summary::after{content:"▴"}
 .codechip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:800;font-family:ui-monospace,Menlo,monospace;color:var(--accent);white-space:nowrap}
 .vpreview{margin:10px 0 2px;background:var(--soft);border-radius:12px;padding:9px 12px;font-size:14.5px}
 @media (max-width:420px){.brand{font-size:19px!important}header.top{gap:6px;padding:10px 12px}.codechip{padding:5px 8px;font-size:11.5px}}
+.item.today{border:2px solid var(--accent)}
+.flipcard{background:var(--card);border:2px solid var(--gold);border-radius:20px;padding:26px 18px;text-align:center;min-height:220px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.fliptext{font-family:var(--serif);font-size:21px;line-height:1.5;margin:10px 0 0}
 #toast{position:fixed;left:50%;bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hero{background:linear-gradient(135deg,var(--accent),var(--accent2,#5a1c16));color:#fff;border-radius:18px;padding:18px;margin:8px 0 6px}
@@ -538,7 +541,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -762,10 +765,10 @@ async function runStudy(tool,refText,question,force){
 /* ---------- LOADED BIBLE ---------- */
 function viewLoaded(v){const sub=S.loadedSub;
   v.innerHTML=`<div class="hero"><h2>Tabs & Key</h2><p>Set up your paper Bible: topic tabs with their highlighter colors, book tabs and insert cards to tuck inside.</p></div>
-  <div class="chips">${[['key','🏷️ Topic tabs'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
+  <div class="chips">${[['key','🏷️ Topic tabs'],['books','📑 Book tabs'],['inserts','🗂️ Inserts'],['plans','📅 Reading plans'],['memory','🧠 Memory verses'],['progress','📈 Progress']].map(([k,l])=>`<button class="chip ${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
-  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,progress:loadedProgress})[sub](body)}
+  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
 function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
   for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
     let g=null;
@@ -826,6 +829,55 @@ function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)
     <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
    :`<div class="empty">${K==='all'?'No insert cards yet — generate one or start with a template above.':'Nothing here yet — tap ✨ Generate above.'}</div>`}`}
+/* ----- 📅 Reading plans ----- */
+const RPLANS=[
+ ['year','🌍','Bible in a year','The whole Bible, start to finish',365,()=>BOOKS],
+ ['nt90','✝️','New Testament in 90 days','Matthew to Revelation',90,()=>BOOKS.filter(b=>b.nt)],
+ ['gospels30','🕊️','The Gospels in 30 days','Matthew, Mark, Luke and John',30,()=>BOOKS.filter(b=>b.genre==='gospel')],
+ ['psprov60','🎵','Psalms & Proverbs in 60 days','Praise, prayer and wisdom',60,()=>[BM.PSA,BM.PRO]],
+ ['paul30','✉️','Paul’s letters in 30 days','Romans to Philemon',30,()=>BOOKS.filter(b=>b.genre==='pauline')],
+ ['ot','📜','Old Testament in 9 months','Genesis to Malachi',270,()=>BOOKS.filter(b=>!b.nt)],
+];
+function planDays(id){const P=RPLANS.find(p=>p[0]===id);const chs=[];P[5]().forEach(b=>{for(let c=1;c<=b.chapters;c++)chs.push([b.abbr,c])});const n=chs.length,d=P[4];
+  return Array.from({length:d},(_,i)=>chs.slice(Math.floor(i*n/d),Math.floor((i+1)*n/d)))}
+function dayLabel(list){const parts=[];list.forEach(([b,c])=>{const last=parts[parts.length-1];if(last&&last.b===b&&last.e===c-1)last.e=c;else parts.push({b,s:c,e:c})});
+  return parts.map(p=>`${BM[p.b].name} ${p.s}${p.e>p.s?'–'+p.e:''}`).join(', ')}
+const dayNum=start=>Math.floor((new Date(todayStr()+'T12:00')-new Date(start+'T12:00'))/864e5);
+function loadedPlans(el){const rp=Store.get('readplan');
+  if(!rp||!rp.id){el.innerHTML=`<p class="small muted">Pick a plan and read a little every day. Each day tells you exactly which chapters to read, and ticking a day marks those chapters as read in your Progress.</p>
+    ${RPLANS.map(p=>{const days=planDays(p[0]);const per=Math.round(days.reduce((a,d)=>a+d.length,0)/days.length*10)/10;return `<div class="item"><div class="row"><span style="font-size:28px">${p[1]}</span><div class="grow"><b style="font-family:var(--serif);font-size:19px">${esc(p[2])}</b><div class="small muted">${esc(p[3])} · ${p[4]} days · about ${per} chapters a day</div></div><button class="btn sm pri" data-act="rpStart" data-p="${p[0]}">Start</button></div></div>`}).join('')}`;return}
+  const P=RPLANS.find(p=>p[0]===rp.id);const days=planDays(rp.id);const done=rp.done||{};const nDone=Object.keys(done).length;const today=Math.max(0,Math.min(days.length-1,dayNum(rp.start)));
+  const behind=Array.from({length:today},(_,i)=>i).filter(i=>!done[i]).length;const show=S.rpAll?days.map((_,i)=>i):Array.from({length:Math.min(days.length,today+7)},(_,i)=>i).slice(Math.max(0,today-3));
+  const dayRow=i=>{const isT=i===today;return `<div class="item step ${done[i]?'done':''} ${isT?'today':''}"><button class="tick" data-act="rpTick" data-d="${i}" aria-label="Mark day done">${done[i]?'✓':''}</button><div class="grow"><div class="stxt"><b>Day ${i+1}${isT?' · Today':''}</b><div>${days[i].length?days[i].map(([b,c])=>`<a class="ref" data-act="openCh" data-b="${b}" data-c="${c}">${esc(BM[b].name)} ${c}</a>`).join(', '):'<span class="muted">Rest day</span>'}</div></div></div></div>`};
+  el.innerHTML=`<div class="card keyhead ismain"><div class="row"><span style="font-size:30px">${P[1]}</span><div class="grow"><h3 style="margin:0;font-size:21px">${esc(P[2])}</h3><div class="small muted">Started ${new Date(rp.start+'T12:00').toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})} · ${nDone} of ${days.length} days done</div></div></div>
+     <div class="prog" style="margin:10px 0 6px"><i style="width:${nDone/days.length*100}%"></i></div>
+     <p class="small" style="margin:0">${nDone===days.length?'🎉 You finished the whole plan!':behind?`You’re ${behind} day${behind===1?'':'s'} behind — no problem, just keep going.`:'✅ You’re on track!'}</p></div>
+   <h3 style="font-size:20px;margin:14px 2px 4px">📖 Today</h3>${dayRow(today)}
+   <div class="row" style="margin:14px 2px 4px"><h3 class="grow" style="margin:0;font-size:20px">All days</h3><button class="btn sm ghost" data-act="rpAll">${S.rpAll?'Show fewer':'Show all '+days.length}</button></div>
+   ${show.filter(i=>i!==today).map(dayRow).join('')}
+   <div class="row" style="margin-top:12px"><button class="btn sm danger" data-act="rpStop">Stop this plan</button></div>`}
+/* ----- 🧠 Memory verses ----- */
+const MEM_SUGGEST=['JHN 3:16','PSA 23:1','PRO 3:5-6','PHP 4:13','ROM 8:28','ISA 41:10','JOS 1:9','MAT 6:33','2TI 1:7','PSA 119:105','ROM 12:2','GAL 5:22-23','1PE 5:7','LAM 3:22-23'];
+const memList=()=>((Store.get('memory')||{}).verses||[]);
+function saveMem(list){Store.set('memory',{verses:list})}
+function kjvText(ref){const p=parseRef(ref);if(!p||!KJV||!KJV[p.b]||!KJV[p.b][p.c])return '';return (p.v1?vrange(p):KJV[p.b][p.c].map((_,i)=>i+1)).map(n=>plainV(KJV[p.b][p.c][n-1]||'')).join(' ')}
+function loadedMemory(el){const L=memList();const learned=L.filter(v=>v.learned).length;
+  if(S.memPractice!=null&&L.length){const order=S.memOrder||[];const idx=order[S.memPractice];const v=L[idx];
+    if(!v){S.memPractice=null;return loadedMemory(el)}
+    const t=v.text||kjvText(v.ref);
+    el.innerHTML=`<div class="row" style="margin:6px 2px"><b class="grow">🧠 Practice · ${S.memPractice+1} of ${order.length}</b><button class="btn sm ghost" data-act="memStop">✕ Stop</button></div>
+     <div class="flipcard" data-act="memFlip"><div class="small muted">${S.memShow?'':'Say the verse out loud, then tap to check'}</div><h3 style="font-size:28px;margin:8px 0">${esc(codeToLabel(v.ref))}</h3>
+       ${S.memShow?`<p class="fliptext">${t?esc(t):S.memKjvTried?'<span class="muted">Couldn\u2019t load the verse text — check your internet, then open it in the Online Bible.</span><br>'+refA(v.ref,'Open '+codeToLabel(v.ref)):'<span class="muted">Loading the verse…</span>'}</p>`:'<p class="muted" style="font-size:40px;margin:10px 0">👆</p>'}</div>
+     ${S.memShow?`<div class="row" style="margin-top:12px"><button class="btn grow" data-act="memNext" data-l="0">↻ Keep practicing</button><button class="btn pri grow" data-act="memNext" data-l="1">✓ I know it</button></div>`:''}`;
+    if(S.memShow&&!t&&!S.memKjvTried){S.memKjvTried=true;loadKJV().catch(()=>{}).then(()=>{if(S.memPractice!=null)renderView()})}return}
+  el.innerHTML=`<p class="small muted">Save verses you want to know by heart, then practice with flip cards.</p>
+   <div class="card"><div class="row"><input class="f grow" id="memAdd" placeholder="Add a verse, e.g. Psalm 46:10"><button class="btn sm pri" data-act="memAdd">Add</button></div>
+     <div class="chips" style="flex-wrap:wrap;margin-top:8px">${MEM_SUGGEST.filter(r=>!L.some(v=>v.ref===r)).slice(0,8).map(r=>`<button class="chip" data-act="memAddRef" data-r="${r}">＋ ${esc(codeToLabel(r))}</button>`).join('')}</div></div>
+   ${L.length?`<div class="row" style="margin:8px 2px"><b class="grow">${L.length} verse${L.length===1?'':'s'} · ${learned} learned</b><button class="btn sm pri" data-act="memPractice">🧠 Practice</button></div>
+     <div class="prog" style="margin:0 2px 8px"><i style="width:${learned/L.length*100}%"></i></div>
+     ${L.map((v,i)=>`<div class="item"><div class="h">${refA(v.ref,codeToLabel(v.ref))}<span class="grow"></span>${v.learned?'<span class="pstat done">✓ Learned</span>':'<span class="tag">learning</span>'}<button class="btn sm ghost" data-act="memToggle" data-i="${i}" title="${v.learned?'Mark as learning':'Mark as learned'}">${v.learned?'↺':'✓'}</button><button class="btn sm ghost" data-act="memDel" data-i="${i}" aria-label="Remove">🗑</button></div></div>`).join('')}`
+   :'<div class="empty">No memory verses yet — add one above.</div>'}`;
+  const i=$('#memAdd',el);if(i)i.addEventListener('keydown',e=>{if(e.key==='Enter')A.memAdd()})}
 function loadedProgress(el){const pr=progress();const read=Object.values(pr).reduce((a,x)=>a+x.length,0);
   const ot=BOOKS.filter(b=>!b.nt).reduce((a,b)=>a+(pr[b.abbr]||[]).length,0),otT=BOOKS.filter(b=>!b.nt).reduce((a,b)=>a+b.chapters,0);
   el.innerHTML=`<div class="card"><h3 style="font-size:22px">${read} of ${TOTAL_CH} chapters read</h3><div class="prog"><i style="width:${read/TOTAL_CH*100}%"></i></div>
@@ -1333,6 +1385,20 @@ Object.assign(A,{
       const c=x=>plain((sec[x]||'').trim());Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref,scripture:c('S'),obs:c('O'),app:c('A'),prayer:c('P')}})}
     else Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:`${METHODS[st.tool][1]}: ${st.refLabel}`,ref,body:plain(t)}});
     toast('Saved to your Journal 📓')},
+  rpStart:el=>{Store.set('readplan',{id:el.dataset.p,start:todayStr(),done:{}});toast('Plan started — Day 1 is today 📅');renderView()},
+  rpTick:el=>{const rp=JSON.parse(JSON.stringify(Store.get('readplan')));const d=+el.dataset.d;const days=planDays(rp.id);rp.done=rp.done||{};
+    if(rp.done[d])delete rp.done[d];else{rp.done[d]=true;days[d].forEach(([b,c])=>{if(!isRead(b,c))toggleRead(b,c)});touch()}Store.set('readplan',rp)},
+  rpAll:()=>{S.rpAll=!S.rpAll;renderView()},
+  rpStop:()=>confirmSheet('Stop this reading plan? Chapters you marked as read stay read.','Stop plan',()=>{Store.del('readplan');renderView()}),
+  memAdd:()=>{const i=$('#memAdd');const p=parseRef(i.value);if(!p||!p.v1){toast('Type a verse like "Psalm 46:10"');return}A.memAddRef({dataset:{r:rc(p)}})},
+  memAddRef:el=>{const r=el.dataset.r;const L=memList().slice();if(L.some(v=>v.ref===r)){toast('Already in your list');return}L.push({ref:r,learned:false,added:Date.now()});saveMem(L);toast('Added to memory verses 🧠')},
+  memToggle:el=>{const L=JSON.parse(JSON.stringify(memList()));L[+el.dataset.i].learned=!L[+el.dataset.i].learned;saveMem(L)},
+  memDel:el=>{const L=memList().slice();L.splice(+el.dataset.i,1);saveMem(L)},
+  memPractice:()=>{const L=memList();const idx=L.map((v,i)=>i);const first=idx.filter(i=>!L[i].learned).sort(()=>Math.random()-.5).concat(idx.filter(i=>L[i].learned).sort(()=>Math.random()-.5));S.memOrder=first;S.memPractice=0;S.memShow=false;renderView()},
+  memFlip:()=>{if(!S.memShow){S.memShow=true;renderView()}},
+  memNext:el=>{const L=JSON.parse(JSON.stringify(memList()));const idx=S.memOrder[S.memPractice];if(el.dataset.l==='1'&&L[idx]&&!L[idx].learned){L[idx].learned=true;saveMem(L);touch()}
+    S.memPractice++;S.memShow=false;if(S.memPractice>=S.memOrder.length){S.memPractice=null;toast('Practice done! 🎉')}renderView()},
+  memStop:()=>{S.memPractice=null;renderView()},
   togglePlan:el=>{const k=el.dataset.k;const was=S.build.planKey===k;S.build.planKey=was?null:k;S.build.err='';renderView();scrollToPlan(k)},
   redoPlan:el=>{const pl=Store.get(el.dataset.k);if(!pl)return;S.build.mode=pl.kind;if(pl.kind==='chapter'){S.build.book=pl.b;S.build.ch=pl.c}else if(pl.kind==='topic')S.build.topic=pl.topic;else S.build.bookOnly=pl.b;
     confirmSheet('Replace this checklist with new ideas? Your ticks will be cleared.','Get new ideas',()=>runBuild())},
@@ -1448,7 +1514,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
    <div class="badges">${BADGES.map(b=>{const ok=b[4](st);return `<div class="badge ${ok?'got':''}" title="${esc(b[3])}"><span>${ok?b[1]:'🔒'}</span><b>${esc(b[2])}</b><small>${esc(b[3])}</small></div>`}).join('')}</div>
    <div class="card donatecard"><div class="row"><span style="font-size:30px">❤️</span><div class="grow"><b>Support Loaded Bible</b><div class="small muted">Help keep it free and growing.</div></div><button class="btn pri" data-act="donate">Donate</button></div></div>
    <h2 class="sec">My profile</h2>
-   <div class="card"><label class="l" style="margin-top:0">Name</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
+   <div class="card"><label class="l" style="margin-top:0">Username</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
      <label class="l">Favorite verse</label><input class="f" id="pfFav" value="${esc(pf.fav?codeToLabel(pf.fav):'')}" placeholder="e.g. Psalm 46:10">
      ${pf.fav&&parseRef(pf.fav)?`<p class="small" style="margin:6px 2px 0">${refA(pf.fav,'Open '+codeToLabel(pf.fav))}</p>`:''}
      <label class="l">Look</label><div class="chips">${[['','Auto'],['light','☀️ Light'],['sepia','📜 Sepia'],['dark','🌙 Dark'],['blush','🌸 Blush'],['lavender','💜 Lavender'],['forest','🌲 Forest'],['navy','⚓ Navy']].map(([k,l])=>`<button class="chip ${pf.theme===k?'on':''}" data-act="setTheme" data-t="${k}">${l}</button>`).join('')}</div>
@@ -1458,11 +1524,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
      <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">🚪 Log out</button></div></div>`:''}
-   ${!STANDALONE?`<div class="card codecard"><b>🌐 My website</b>
-     <p class="small muted" style="margin:4px 0 8px">Your website: <b>${esc(SITE_URL.replace('https://',''))}</b>. Save the code you use there, then send your Claude progress to it with one tap.</p>
-     <label class="l" style="margin-top:4px">🔑 My website code</label><div class="row"><input class="f grow codein2" id="webCodeIn" style="font-size:18px" autocapitalize="characters" value="${esc(settings().webCode||'')}" placeholder="e.g. SHENG446644"><button class="btn sm" data-act="webCodeSave">Save</button></div>
-     <div id="syncBox" style="margin-top:10px"><button class="btn pri wide" data-act="syncPrepare">📲 Send my progress to my website</button></div>
-     <p class="small muted" style="margin:6px 0 0">One-way: it copies what\u2019s in the Claude app to your website. Tap it again whenever you want to update the website.</p></div>`:''}
+
    <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved online with your <b>Bible code</b>, so it\u2019s the same on every phone or computer where you log in.':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
      <div class="row" style="margin-top:10px"><button class="btn sm" data-act="copyAll">⧉ Back up my notes as text</button></div></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
@@ -1794,7 +1856,6 @@ function showWelcome(msg){welcomeBox(`<h3 style="text-align:center;font-size:25p
    <div id="authMsg" class="authmsg ${msg?'bad':''}">${esc(msg||'')}</div>
    <div class="or"><span>New here?</span></div>
    <button class="btn wide" data-act="codeNew">✨ Get a Bible code</button>
-   <button class="btn wide" data-act="codeChoose">✏️ Choose my own code</button>
    ${S.pendingSync?'<div class="warnbox">📲 You\u2019re bringing progress from the Claude app. Log in with your code and it will be loaded in.</div>':''}
    <div class="card small" style="margin:14px 0 0">🔑 Your code is unique — it’s yours only, and it holds all your progress.<br>📱 Log in with it on any phone or computer.<br>📝 Keep it safe, like a key. Nobody can look it up for you.</div>`);
   const i=$('#codeIn2');i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
@@ -1820,21 +1881,25 @@ Object.assign(A,{
     try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
     catch(e){authMsg(e.message||'No connection — check your internet and try again.');el.disabled=false;el.textContent='✨ Get a Bible code'}},
   codeCopy:async el=>{try{await navigator.clipboard.writeText(el.dataset.c);toast('Code copied ✓')}catch(e){const r=document.createRange();r.selectNodeContents($('#bigCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast('Select and copy the code')}},
-  codeStart:el=>{Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome! Your progress now saves with your Bible code 🔑')},
+  codeStart:el=>{Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}
+    welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">What should we call you?</h3><p class="small muted" style="text-align:center;margin:0 0 12px">Your name is saved with your Bible code. You can change it any time in My Account.</p>
+      <input id="nameIn" class="f" style="text-align:center;font-size:20px" maxlength="30" autocomplete="nickname" placeholder="Your name">
+      <button class="btn pri wide" data-act="nameGo">Continue →</button><button class="linkbtn muted" data-act="nameSkip">Skip for now</button>`);
+    const i=$('#nameIn');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.nameGo()})},
+  nameGo:()=>{const n=($('#nameIn').value||'').trim().slice(0,30);startCode();if(n)saveProfile({name:n});toast(`Welcome${n?', '+n:''}! 🎉 Your progress now saves with your Bible code`)},
+  nameSkip:()=>{startCode();toast('Welcome! 🎉 Your progress now saves with your Bible code')},
   codeHave:()=>showHaveCode(''),
   codeBack:()=>showWelcome(''),
-  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!GEN_RE.test(c)&&!CUSTOM_RE.test(c)){authMsg('Type your Bible code — it looks like GRACE-7K4M-2QXT, or your own code (10+ letters and numbers).');return}
+  codeOpen:async()=>{const i=$('#codeIn2');const c=normCode(i.value);i.value=c;if(!GEN_RE.test(c)&&!CUSTOM_RE.test(c)){authMsg('Type your Bible code — it looks like GRACE-7K4M-2QXT.');return}
     const b=$('[data-act=codeOpen]');b.disabled=true;b.innerHTML='<span class="spin"></span>';
     try{const r=await fetch('/api/code/check',{method:'POST',headers:{'X-Code':c}});
       if(r.ok){const n=localCount();if(n){welcomeBox(`<h3 style="text-align:center;margin:18px 0 6px">One question</h3><p style="text-align:center">This device already has some progress (${n} items) that isn’t saved with a code yet. Add it to <b>${esc(c)}</b> too?</p>
           <button class="btn pri wide" data-act="codeMerge" data-c="${esc(c)}" data-m="1">Yes, add it</button><button class="btn wide" data-act="codeMerge" data-c="${esc(c)}" data-m="0">No, just open my code</button>`);return}
-        Code.set(c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖');return}
-      if(r.status===401&&CUSTOM_RE.test(c)){welcomeBox(`<h3 style="text-align:center;margin:18px 0 6px">New code?</h3><p style="text-align:center"><b>${esc(c)}</b> isn\u2019t a Bible code yet. Do you want to make it <b>your</b> code?</p>
-          <button class="btn pri wide" data-act="codeClaim" data-c="${esc(c)}">✅ Yes, make it my code</button><button class="btn wide" data-act="codeBack">← No, go back</button><div id="authMsg" class="authmsg"></div>`);return}
+        Code.set(c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();setTimeout(()=>{const n=profile().name;toast(`Welcome back${n?', '+n:''}! 📖`)},1500);return}
       authMsg(r.status===429?'Too many wrong tries. Wait 15 minutes and try again.':'That code wasn\u2019t found. Check the letters and numbers and try again.')}
     catch(e){authMsg('No connection — check your internet and try again.')}
     b.disabled=false;b.textContent='📖 Log in'},
-  codeMerge:el=>{if(el.dataset.m!=='1')clearLocal();Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();toast('Welcome back! 📖')},
+  codeMerge:el=>{if(el.dataset.m!=='1')clearLocal();Code.set(el.dataset.c);try{localStorage.setItem(Code.SAVED,'1')}catch(e){}startCode();setTimeout(()=>{const n=profile().name;toast(`Welcome back${n?', '+n:''}! 📖`)},1500)},
   codeShow:()=>{S.codeShown=!S.codeShown;renderView()},
   codeChoose:()=>{welcomeBox(`<h3 style="text-align:center;font-size:24px;margin:18px 0 6px">✏️ Choose your own code</h3>
      <p class="small muted" style="text-align:center;margin:0 0 10px">At least 10 letters and numbers, with both letters and numbers. Make it something only you would think of.</p>
