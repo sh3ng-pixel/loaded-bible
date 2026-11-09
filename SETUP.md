@@ -9,8 +9,9 @@ Follow the steps in order. It takes about an hour the first time, and **every se
 
 | File | What it is |
 |---|---|
-| `index.html` | The app |
-| `config.js` | **Your settings: you fill this in (step 1)** |
+| `public/index.html` | The app (everything inside `public/` is the website) |
+| `worker.js`, `wrangler.jsonc` | Tell Cloudflare how to run the site |
+| `public/config.js` | **Your settings: you fill this in (step 1)** |
 | `functions/api/ai.js` | Server code that talks to Claude (keeps your secret key safe) |
 | `functions/api/tiktok/…` | Server code for "Continue with TikTok" |
 | `firestore.rules` | Security rules: each person can only see their own notes |
@@ -22,7 +23,7 @@ Follow the steps in order. It takes about an hour the first time, and **every se
 ## 1. Firebase: accounts and saving progress (free)
 
 1. Go to **console.firebase.google.com**, click **Create a project** and name it `loaded-bible`. You can turn Analytics off.
-2. Click the **</> (Web)** icon to add a web app and name it `Loaded Bible`. Firebase shows a block of code with `apiKey`, `authDomain`, and so on. **Copy those values into `config.js`.**
+2. Click the **</> (Web)** icon to add a web app and name it `Loaded Bible`. Firebase shows a block of code with `apiKey`, `authDomain`, and so on. **Copy those values into `public/config.js`.**
 3. In the left menu, open **Build → Authentication → Get started → Sign-in method**:
    - Turn on **Email/Password**.
    - Turn on **Google**, then pick a support email.

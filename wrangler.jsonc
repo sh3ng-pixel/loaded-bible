@@ -1,0 +1,8 @@
+{
+  "name": "loaded-bible",
+  "main": "worker.js",
+  "compatibility_date": "2025-06-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  // keep the variables and secrets you add in the Cloudflare dashboard when the site updates
+  "keep_vars": true
+}
