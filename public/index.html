@@ -357,18 +357,20 @@ details.grp[open]>summary::after{content:"▴"}
 .partcard .pe{font-size:20px}.partcard b{font-size:13.5px;display:block}.partcard small{font-size:11.5px;color:var(--muted);line-height:1.3;display:block}
 .partcard .pc{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}
 .partcard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--card))}.partcard.on .pc{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.paperwrap{padding:6px;border-radius:18px;background:linear-gradient(135deg,#d8c7a3,#b99a63);box-shadow:0 10px 26px rgba(0,0,0,.18)}
-.paperpage{background:#fbf6ea;color:#2a2018;border-radius:12px;padding:22px 20px;text-align:center;font-family:var(--serif);outline:1.5px solid #c9a96a;outline-offset:-9px}
-.pp-small{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a7558}
-.pp-name{font-size:30px;font-style:italic;margin:4px 0 6px;color:#2a2018}.pp-blank{color:#b8a888;font-style:italic}
-.pp-orn{color:#b0894a;letter-spacing:.4em;margin:12px 0 4px}
-.pp-h{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8b2e24;margin:16px 0 6px;font-weight:700;font-family:inherit}
-.pp-verse{font-size:17px;line-height:1.5;font-style:italic}.pp-ref{font-style:normal;font-size:13px;color:#8a7558;margin-top:4px}
-.pp-key{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 10px;text-align:left;font-size:14.5px}.pp-key div{display:flex;align-items:center;gap:7px}
+.paperwrap{border-radius:18px;border:1.5px solid var(--line);background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.06);overflow:hidden}
+.paperwrap::before{content:'📄 Preview of your page';display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:9px 14px;border-bottom:1px solid var(--line);background:var(--soft)}
+.paperpage{color:var(--ink);padding:20px 18px 22px;text-align:center;font-family:var(--serif)}
+.pp-small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:inherit}
+.pp-name{font-size:30px;font-style:italic;margin:4px 0 6px;color:var(--ink)}.pp-blank{color:var(--muted);font-style:italic}
+.pp-orn{color:var(--gold);letter-spacing:.4em;margin:12px 0 4px}
+.pp-h{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:18px 0 8px;font-weight:700;display:flex;align-items:center;gap:10px}
+.pp-h::before,.pp-h::after{content:'';flex:1;height:1px;background:var(--line)}
+.pp-verse{font-size:17px;line-height:1.5;font-style:italic;background:var(--soft);border-radius:12px;padding:12px}.pp-ref{font-style:normal;font-size:13px;color:var(--muted);margin-top:4px}
+.pp-key{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 10px;text-align:left;font-size:14.5px}.pp-key div{display:flex;align-items:center;gap:7px}
 .pp-stroke{display:inline-block;width:26px;height:11px;border-radius:3px 7px 4px 8px;transform:skewX(-12deg);flex:none}
-.pp-line{display:flex;justify-content:space-between;gap:8px;font-size:14.5px;border-bottom:1px dotted #d6c6a4;padding:3px 0;text-align:left}
-.pp-mem{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-size:14px}
-.pp-ded{font-style:italic;font-size:15.5px;line-height:1.55}
+.pp-line{display:flex;justify-content:space-between;gap:8px;font-size:14.5px;border-bottom:1px dashed var(--line);padding:5px 0;text-align:left}
+.pp-mem{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.pp-mem span{font-size:13.5px;padding:3px 9px;border-radius:999px;background:var(--soft)}
+.pp-ded{font-style:italic;font-size:15.5px;line-height:1.55;color:var(--ink)}
 .lifesugg{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.lifesugg b{display:block;font-size:14px}.lifesugg span{font-size:12.5px;color:var(--muted)}
 .savecard{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-top:8px;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.savecard span{font-size:26px}.savecard b{display:block;font-size:15.5px}.savecard small{color:var(--muted);font-size:12.5px}
 .howsteps{padding-left:20px;margin:8px 0}.howsteps li{margin:0 0 10px;line-height:1.45}
