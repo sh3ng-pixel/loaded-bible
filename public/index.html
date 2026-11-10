@@ -347,6 +347,8 @@ details.grp[open]>summary::after{content:"▴"}
 .praytext{font-family:var(--serif);font-size:17px;line-height:1.55;margin-top:6px;max-height:4.8em;overflow:hidden;position:relative;cursor:pointer;-webkit-mask-image:linear-gradient(#000 55%,transparent)}
 .praytext.open{max-height:none;-webkit-mask-image:none}.praytext p{margin:0 0 .5em}
 .prayitem.fav{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.howto{font-size:13.5px;line-height:1.45;color:var(--muted);background:var(--soft);border-radius:12px;padding:8px 10px;margin:8px 0}
+.coverpage{font-family:var(--serif);font-size:16px;line-height:1.6;background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-top:10px}
 .jhead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:0 0 10px;border-radius:16px;background:var(--soft)}
 .jhead b{font-family:var(--serif);font-size:19px}.jhi{font-size:26px;line-height:1}
 .jitem{cursor:pointer}.jitem .h .iconbtn{min-width:32px;height:30px;padding:0 6px;font-size:13px}
@@ -663,7 +665,7 @@ function renderView(){const v=$('#view');
   renderSelbar()}
 
 /* ---------- ONLINE BIBLE ---------- */
-function viewOnline(v){v.innerHTML=`<div class="chips" style="padding-top:2px">${[['read','📖 Read'],['notes','🔖 My notes & highlights']].map(([k,l])=>`<button class="chip ${S.onlineSub===k?'on':''}" data-act="onlineSub" data-s="${k}">${l}</button>`).join('')}</div><div id="onlineBody"></div>`;
+function viewOnline(v){v.innerHTML=`<div class="chips" style="padding-top:2px">${[['read','📖 Read'],['notes','🔖 My notes & highlights']].map(([k,l])=>`<button class="chip ${S.onlineSub===k?'on':''}" data-act="onlineSub" data-s="${k}">${l}</button>`).join('')}</div><div class="howto" style="margin:0 2px 8px">ℹ️ ${S.onlineSub==='notes'?'All your notes, highlights and saved studies in one place. Tap a reference to jump to the verse.':'Read the Bible here. Tap a verse to highlight it, write a note or add it to a topic tab.'}</div><div id="onlineBody"></div>`;
   const body=$('#onlineBody');if(S.onlineSub==='read'){viewRead(body);if(!S.verses&&!S.loadingCh&&!S.chErr)loadChapter(settings().trans==='KJV')}else viewNotes(body)}
 /* ---------- READ ---------- */
 function viewRead(v){const s=settings();const b=BM[s.book];
@@ -775,7 +777,7 @@ function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.bo
    <div class="toolgrid">${Object.entries(TOOLS).map(([k,t])=>`<button class="tool" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>
    <label class="l">📝 Study methods — I'll do one for you</label>
    <div class="toolgrid">${Object.entries(METHODS).map(([k,t])=>`<button class="tool method" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>
-   <p class="small muted" style="margin:6px 2px 0">Works for a chapter (Psalm 23), one verse (John 3:16) or several verses (Romans 8:28-30). Save it to your Journal when it's done.</p>
+   <p class="small muted" style="margin:6px 2px 0">Works for a chapter (Psalm 23), one verse (John 3:16) or several verses (Romans 8:28-30).<br><b>When it’s done:</b> 📓 Save to Journal → Journal › Timeline · ＋ Save to my notes → Online Bible › My notes · 🗂️ Make insert → Bible Kit › Inserts › From Study.</p>
    <label class="l">Or ask your own question</label>
    <textarea class="f" id="askQ" placeholder="e.g. Why did Jesus speak in parables here? What does 'born again' mean?" style="min-height:70px"></textarea>
    <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>
@@ -830,14 +832,26 @@ async function runStudy(tool,refText,question,force){
 }
 
 /* ---------- LOADED BIBLE ---------- */
-const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✒️','Marking',[['symbols','✒️ Symbols'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
+const KHELP={key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📖','First page','Copy this onto the first blank page or inside cover of your Bible, so you always know what your colors and symbols mean.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
+function loadedCover(el){const m=mainSet?mainSet():null;const pf=profile();const sy=symList();const ch=chainList();const mem=memList();
+  const lines=[];lines.push('MY LOADED BIBLE'+(pf.name?' — '+pf.name:''),'Started: '+new Date().toLocaleDateString());
+  if(pf.fav)lines.push('','My verse: '+codeToLabel(pf.fav));
+  if(m&&m.topics&&m.topics.length){lines.push('','COLOR KEY');m.topics.forEach(t=>{const pc=PALETTE.find(x=>x[0]===t.color);lines.push(`${pc?pc[1][0].toUpperCase()+pc[1].slice(1):t.color} = ${t.name}`)})}
+  if(sy.length){lines.push('','SYMBOLS');sy.forEach(x=>lines.push(`${x.s}  ${x.m}`))}
+  if(ch.length){lines.push('','VERSE CHAINS (start here)');ch.forEach(c=>lines.push(`${c.title}: start at ${codeToLabel(c.refs[0])}`))}
+  if(mem.length){lines.push('','MEMORY VERSES');mem.forEach(v=>lines.push(codeToLabel(v.ref)))}
+  el.innerHTML=`<div class="coverpage">${lines.map(l=>l===''?'<br>':/^[A-Z ()]+$/.test(l)&&l.length>3||l.startsWith('MY LOADED')?`<b>${esc(l)}</b><br>`:esc(l)+'<br>').join('')}</div>
+   <div class="row" style="margin-top:10px"><button class="btn pri grow" data-act="coverCopy">⧉ Copy it</button></div>
+   <p class="small muted">Want more on it? Add topics in 🏷️ Topics, symbols in ✒️ Symbols, chains in 🔗 Chains and verses in 🧠 Memory. Set your favorite verse in My Account.</p>`;S._cover=lines.join('\n')}
+const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✍️','Write-ins',[['symbols','✒️ Symbols'],['chains','🔗 Chains'],['cover','📖 First page']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
 function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
   v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Set up and keep track of your paper Bible.</p></div>
   <div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
   <div class="subtabs">${KG[3].map(([k,l])=>`<button class="${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
+  ${KHELP[sub]?jHead(...KHELP[sub]):''}
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
-  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,symbols:loadedSymbols,chains:loadedChains,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
+  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,symbols:loadedSymbols,chains:loadedChains,cover:loadedCover,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
 function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
   for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
     let g=null;
@@ -886,6 +900,10 @@ function loadedColors(el){const hs=Store.list('h_');
   <p class="small muted">Tip: draw a small color key on the inside cover of your Bible so you remember what each color means.</p>`;
   $$('input[data-label]',el).forEach(i=>i.addEventListener('change',()=>{const l=Object.assign({},settings().labels);l[i.dataset.label]=i.value.trim();saveSettings({labels:l});toast('Color key saved')}))}
 function insKindOf(x){return x.kind==='study'?'study':x.kind&&INS_TYPES.some(t=>t[0]===x.kind)&&x.kind!=='custom'?x.kind:'own'}
+function whereSheet(title,intro,crumbs,openAttrs){openSheet(`<div style="text-align:center"><div style="font-size:44px">✅</div><h3 style="margin:4px 0">Saved!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
+   <div class="card"><div class="small muted" style="margin-bottom:6px">${intro}</div><div class="inspath">${crumbs.map((c,i)=>i===crumbs.length-1?`<b>${c}</b>`:`<span>${c}</span><i>›</i>`).join('')}</div></div>
+   <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" ${openAttrs}>Open it now →</button></div>`)}
+const notesSaved=title=>whereSheet(title,'You can find it here:',['📖 Online Bible','🔖 My notes & highlights'],'data-act="goNotes"');
 function insSavedSheet(kind,title){const kk=INS_KINDS().find(x=>x[0]===kind)||['own','✍️','My own & other'];
   openSheet(`<div style="text-align:center"><div style="font-size:44px">🗂️</div><h3 style="margin:4px 0">Saved as an insert!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
    <div class="card"><div class="small muted" style="margin-bottom:6px">You can find it here:</div><div class="inspath"><span>🧰 Bible Kit</span><i>›</i><span>🏷️ Tabs</span><i>›</i><span>🗂️ Inserts</span><i>›</i><b>${kk[1]} ${esc(kk[2])}</b></div></div>
@@ -893,7 +911,7 @@ function insSavedSheet(kind,title){const kk=INS_KINDS().find(x=>x[0]===kind)||['
 const INS_KINDS=()=>INS_TYPES.filter(t=>t[0]!=='custom').map(t=>[t[0],t[1],({book:'Book overviews',chapter:'Chapter summaries',memory:'Memory verses',topic:'Topic studies',person:'Characters',timeline:'Timelines',gospel:'Gospel',prayer:'Prayer guides',qa:'Tough questions'})[t[0]]||t[2]]).concat([['study','🔎','From Study'],['own','✍️','My own & other']]);
 function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)-(a.updated||0));const K=S.insKind||'all';const kinds=INS_KINDS();
   const cnt=k=>all.filter(x=>insKindOf(x)===k).length;const ins=K==='all'?all:all.filter(x=>insKindOf(x)===K);const kk=kinds.find(x=>x[0]===K);
-  el.innerHTML=`<p class="small muted">Insert cards are the notes you'd tuck inside your Bible — book summaries, memory verses, sermon notes, prayer lists. Copy any card to print or share it.</p>
+  el.innerHTML=`
   <div class="inskinds"><button class="inskind ${K==='all'?'on':''}" data-act="insKind" data-k="all"><span>🗂️</span><b>All</b><small>${all.length}</small></button>${kinds.map(([k,e,n])=>`<button class="inskind ${K===k?'on':''} ${cnt(k)?'':'zero'}" data-act="insKind" data-k="${k}"><span>${e}</span><b>${esc(n)}</b><small>${cnt(k)}</small></button>`).join('')}</div>
   ${K!=='all'?`<h3 style="font-size:22px;margin:14px 2px 4px">${kk[1]} ${esc(kk[2])}</h3>`:''}
   ${K==='study'?`<button class="btn pri wide" style="margin:4px 0 10px" data-act="tab" data-tab="study">🔎 Do a study, then tap “🗂️ Make insert”</button>`:`<button class="btn pri wide" style="margin:4px 0 10px" data-act="goMakeInsert" data-k="${K}">✨ Generate ${K==='all'||K==='own'?'a new insert':'a new '+esc(kk[2].toLowerCase().replace(/s$/,'').replace(/ie$/,'y'))}</button>`}
@@ -906,7 +924,7 @@ function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)
 const DEF_SYMBOLS=[['✝','Jesus / salvation'],['♡','God’s love'],['△','God, Father Son and Spirit'],['🕊','The Holy Spirit'],['☆','A promise to hold onto'],['!','A command to obey'],['?','A question I still have'],['☁','Heaven / eternity'],['⚠','A warning'],['🙏','Prayer'],['→','Cross-reference: see the next verse'],['📅','A date God spoke to me']];
 const symList=()=>{const d=Store.get('symbols');return d&&d.list?d.list:DEF_SYMBOLS.map(([s,m])=>({s,m}))};
 function loadedSymbols(el){const L=symList();
-  el.innerHTML=`<p class="small muted">Small pen symbols you draw in your margins so you can see at a glance what a verse is about. Pick your set, then copy the key onto the inside cover of your Bible.</p>
+  el.innerHTML=`
    <div class="symgrid">${L.map((x,i)=>`<div class="symcell"><div class="sym">${esc(x.s)}</div><div class="grow small">${esc(x.m)}</div><button class="btn sm ghost" data-act="symDel" data-i="${i}" aria-label="Remove">✕</button></div>`).join('')}</div>
    <div class="card"><b>＋ Add your own symbol</b><div class="row" style="margin-top:8px"><input class="f" id="symS" maxlength="4" placeholder="✦" style="width:70px;text-align:center;font-size:22px"><input class="f grow" id="symM" maxlength="60" placeholder="What it means"><button class="btn sm pri" data-act="symAdd">Add</button></div></div>
    <div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="symCopy">⧉ Copy my key</button><button class="btn sm" data-act="symAI">✨ Suggest more symbols</button><button class="btn sm ghost" data-act="symReset">↺ Reset to the starter set</button></div><div id="symOut" class="out small"></div>`}
@@ -971,7 +989,7 @@ function loadedMemory(el){const L=memList();const learned=L.filter(v=>v.learned)
        ${S.memShow?`<p class="fliptext">${t?esc(t):S.memKjvTried?'<span class="muted">Couldn\u2019t load the verse text — check your internet, then open it in the Online Bible.</span><br>'+refA(v.ref,'Open '+codeToLabel(v.ref)):'<span class="muted">Loading the verse…</span>'}</p>`:'<p class="muted" style="font-size:40px;margin:10px 0">👆</p>'}</div>
      ${S.memShow?`<div class="row" style="margin-top:12px"><button class="btn grow" data-act="memNext" data-l="0">↻ Keep practicing</button><button class="btn pri grow" data-act="memNext" data-l="1">✓ I know it</button></div>`:''}`;
     if(S.memShow&&!t&&!S.memKjvTried){S.memKjvTried=true;loadKJV().catch(()=>{}).then(()=>{if(S.memPractice!=null)renderView()})}return}
-  el.innerHTML=`<p class="small muted">Save verses you want to know by heart, then practice with flip cards.</p>
+  el.innerHTML=`
    <div class="card"><div class="row"><input class="f grow" id="memAdd" placeholder="Add a verse, e.g. Psalm 46:10"><button class="btn sm pri" data-act="memAdd">Add</button></div>
      <div class="chips" style="flex-wrap:wrap;margin-top:8px">${MEM_SUGGEST.filter(r=>!L.some(v=>v.ref===r)).slice(0,8).map(r=>`<button class="chip" data-act="memAddRef" data-r="${r}">＋ ${esc(codeToLabel(r))}</button>`).join('')}</div></div>
    ${L.length?`<div class="row" style="margin:8px 2px"><b class="grow">${L.length} verse${L.length===1?'':'s'} · ${learned} learned</b><button class="btn sm pri" data-act="memPractice">🧠 Practice</button></div>
@@ -1215,7 +1233,7 @@ const A={
     const code2=vs.length>1&&vs[vs.length-1]-vs[0]===vs.length-1?`${s.book} ${s.ch}:${vs[0]}-${vs[vs.length-1]}`:`${s.book} ${s.ch}:${vs[0]}`;
     S._tabRef=code2;openSheet(`<h3>Add ${esc(codeToLabel(code2))} to a topic</h3><p class="small muted" style="margin-top:0">Saved to ⭐ your main key.</p>${mainSet().topics.map(t=>`<button class="item row" style="width:100%;text-align:left" data-act="addToTopic" data-t="${t.id}">${swBig(t.color,t.emoji)}<b class="grow">${esc(t.name)}</b><span class="tag">${(t.verses||[]).length}</span></button>`).join('')}
      <label class="l">Or create a new tab</label><div class="row"><input class="f grow" id="newTabName" placeholder="e.g. Marriage, Courage, Faith"><button class="btn pri" data-act="addToNewTopic">Create</button></div>`)},
-  addToTopic:el=>{const r=S._tabRef;updateSet('main',m=>{const t=findTopic(m,el.dataset.t);if(!t.verses.some(v=>v.ref===r))t.verses.push({ref:r,why:''})});closeSheet();S.sel.clear();changed();toast('Added to your main key ⭐')},
+  addToTopic:el=>{const r=S._tabRef;updateSet('main',m=>{const t=findTopic(m,el.dataset.t);if(!t.verses.some(v=>v.ref===r))t.verses.push({ref:r,why:''})});closeSheet();S.sel.clear();changed();toast('Added ⭐ Find it in Bible Kit › Tabs › Topics')},
   addToNewTopic:()=>{const n=$('#newTabName').value.trim();if(!n)return;const r=S._tabRef;updateSet('main',m=>{const free=PALETTE.find(p=>!m.topics.some(t=>t.color===p[0]));m.topics.push({id:'t'+newId(),emoji:'🏷️',name:n,color:free?free[0]:'y',meaning:'',verses:[{ref:r,why:''}]})});closeSheet();S.sel.clear();changed();toast('New topic created ⭐')},
   /* study */
   useCurrent:()=>{const s=settings();S.studyRef=S.sel.size?refLabel(s.book,s.ch,selVerses()):refLabel(s.book,s.ch,[]);$('#studyRef').value=S.studyRef},
@@ -1224,7 +1242,7 @@ const A={
   stopStudy:()=>{S.studyCtrl&&S.studyCtrl.abort()},
   redoStudy:()=>{const st=S.study;if(!st)return;if(st.question)runStudy(null,st.refLabel,st.question);else{Cache.drop('studies',st.tool+'__'+st.refCode.replace(/[^A-Za-z0-9:\-]/g,'_'));runStudy(st.tool,st.refLabel,null,true)}},
   saveStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const p=parseRef(st.refCode);const vs=p&&p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[];
-    Store.set('n_'+newId(),{ref:p?st.refCode:'',b:p?p.b:null,c:p?p.c:null,vs,title:st.question?('Q: '+st.question):st.title,text:st.text,md:true,created:Date.now(),updated:Date.now()});toast('Saved to My Notes')},
+    Store.set('n_'+newId(),{ref:p?st.refCode:'',b:p?p.b:null,c:p?p.c:null,vs,title:st.question?('Q: '+st.question):st.title,text:st.text,md:true,created:Date.now(),updated:Date.now()});notesSaved(st.question?('Q: '+st.question):st.title)},
   insertStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const title=`${st.title} — ${st.refLabel}`;Store.set('i_'+newId(),{title,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,kind:'study',updated:Date.now()});insSavedSheet('study',title)},
   insOpenKind:el=>{closeSheet();S.loadedSub='inserts';S.insKind=el.dataset.k;setTab('tabs');window.scrollTo(0,0)},
   copyStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;copyText(`${st.title} — ${st.refLabel}\n\n${plain(st.text)}`)},
@@ -1236,8 +1254,8 @@ const A={
   loadedSub:el=>{S.loadedSub=el.dataset.s;renderView()},
   bookCard:el=>bookCard(el.dataset.b),
   bookIntro:el=>loadIntro(el.dataset.b,!!S.bookIntro[el.dataset.b]?.text),
-  introInsert:el=>{const b=BM[el.dataset.b];Store.set('i_'+newId(),{title:`${b.name} — book overview`,ref:`${b.abbr} 1`,body:S.bookIntro[b.abbr].text,md:true,updated:Date.now()});toast('Saved as insert card')},
-  introNote:el=>{const b=BM[el.dataset.b];Store.set('n_'+newId(),{ref:`${b.abbr} 1`,b:b.abbr,c:1,vs:[],title:`${b.name} introduction`,text:S.bookIntro[b.abbr].text,md:true,created:Date.now(),updated:Date.now()});toast('Saved to My Notes')},
+  introInsert:el=>{const b=BM[el.dataset.b];Store.set('i_'+newId(),{title:`${b.name} — book overview`,ref:`${b.abbr} 1`,body:S.bookIntro[b.abbr].text,md:true,kind:'book',updated:Date.now()});insSavedSheet('book',`${b.name} — book overview`)},
+  introNote:el=>{const b=BM[el.dataset.b];Store.set('n_'+newId(),{ref:`${b.abbr} 1`,b:b.abbr,c:1,vs:[],title:`${b.name} introduction`,text:S.bookIntro[b.abbr].text,md:true,created:Date.now(),updated:Date.now()});notesSaved(`${b.name} introduction`)},
   newTopic:()=>openSheet(`<h3>New topic tab</h3><label class="l">Name</label><input class="f" id="tName" placeholder="e.g. Marriage, Courage, Leadership"><label class="l">Emoji (optional)</label><input class="f" id="tIc" placeholder="🏷️" maxlength="4"><div class="row" style="margin-top:14px"><button class="btn pri grow" data-act="createTopic">Create tab</button></div>`),
   createTopic:()=>{const n=$('#tName').value.trim();if(!n)return;const id='u'+newId();Store.set('t_'+id,{name:n,ic:$('#tIc').value.trim()||'🏷️',refs:[]});S.openTopic=id;closeSheet();renderView()},
   topicAdd:el=>{const id=el.dataset.t;const inp=$('#tadd_'+id);const p=parseRef(inp.value);if(!p){toast('Try a reference like "Psalm 27:1"');return}
@@ -1260,6 +1278,7 @@ const A={
   /* journal */
   newJournal:el=>journalForm(el.dataset.t),
   editJournal:el=>{const e=Store.get(el.dataset.k);if(!e)return;if(e.type==='goal'){goalSheet(el.dataset.k);return}if(e.type==='reflect'){const f=e.fields||{};S.jDraft={title:f.title||'',ref:f.ref?codeToLabel(f.ref):'',body:f.body||'',mood:f.mood||'',prompt:f.prompt||JPROMPTS[0],key:el.dataset.k};S.jSub='write';if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0);return}journalForm(e.type,el.dataset.k)},
+  coverCopy:()=>copyText(S._cover||''),
   kGroup:el=>{const G=KGROUPS.find(g=>g[0]===el.dataset.g);S.kLast=S.kLast||{};const cur=KGROUPS.find(g=>g[3].some(x=>x[0]===S.loadedSub))||KGROUPS[0];S.kLast[cur[0]]=S.loadedSub;S.loadedSub=S.kLast[G[0]]||G[3][0][0];renderView()},
   jGroup:el=>{const G=JGROUPS.find(g=>g[0]===el.dataset.g);S.jLast=S.jLast||{};const cur=jGroupOf(S.jSub||'all');S.jLast[cur[0]]=S.jSub||'all';S.jSub=S.jLast[G[0]]||G[3][0][0];renderView()},
   jSub:el=>{S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView()},
@@ -1332,6 +1351,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     catch(e){P.out='';toast(aiErr(e))}P.busy=false;renderView()},
   prEditT:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;P.edit=!P.edit;renderView()},
   prCopy:()=>copyText(S.pray.out.replace(/\*\*/g,'')),
+  goNotes:()=>{closeSheet();S.onlineSub='notes';setTab('online');window.scrollTo(0,0)},
   jOpen:el=>{closeSheet();S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0)},
   jwFresh:()=>{S.jDraft=null;S.jSub='write';renderView()},
   prDiscard:()=>confirmSheet('Throw away this prayer? (It isn’t saved.)','🗑 Throw away',()=>{S.pray.out='';S.pray.edit=false;closeSheet();renderView()}),
@@ -1434,6 +1454,19 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
 function loadPlans(){return Store.list('k_').sort((a,b)=>(b.at||0)-(a.at||0))}
 function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
+const LOAD_HELP={chapter:'Pick a chapter and what you want to add. You get step-by-step what to highlight, write and tab in your paper Bible. Tick off each step. It also goes into your Online Bible.',verses:'Same as a chapter, but just for one verse or a few verses.',topic:'Pick a feeling or topic. You get verses to highlight, where to put a tab, and a chain to write in your margins. Saved to Bible Kit › Topics.',book:'Get a heading for each chapter, what to write on the book’s first page, key verses and where to put the book tab.',snote:'A short note in easy words that explains a passage. Write it in your margin, on a sticky note or on an insert. Saved to Online Bible › My notes.',life:'Turn a passage into something for your own life: what it means for you and one thing to do this week. Saved to My notes or your Journal.',inserts:'Make cards and pages to tuck into your Bible. Saved ones go to Bible Kit › Tabs › Inserts.'};
+const LAPP_AREAS=[['family','👨‍👩‍👧 Family'],['friends','🤝 Friends'],['school','🎒 School or work'],['feelings','💭 Feelings'],['faith','🔥 My faith'],['money','💰 Money'],['habits','⏰ Habits'],['love','❤️ Relationships'],['church','⛪ Church']];
+function lappForm(){const N=S.lapp||(S.lapp={v1:'',v2:'',areas:[],situ:'',size:'card',out:'',busy:false});const B=S.build;
+  return `<div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===B.book?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
+   <div class="row" style="align-items:flex-end"><div><label class="l">From verse</label><input class="f" id="laV1" type="number" inputmode="numeric" min="1" placeholder="all" value="${esc(N.v1)}" style="width:110px"></div><div><label class="l">To verse</label><input class="f" id="laV2" type="number" inputmode="numeric" min="1" placeholder="all" value="${esc(N.v2)}" style="width:110px"></div></div>
+   <label class="l">Which part of your life? (optional)</label><div class="chips">${LAPP_AREAS.map(([k,l])=>`<button class="chip ${N.areas.includes(k)?'on':''}" data-act="laArea" data-k="${k}">${l}</button>`).join('')}</div>
+   <label class="l">What’s going on? (optional)</label><textarea class="f" id="laSitu" style="min-height:60px" placeholder="e.g. I find it hard to forgive my brother">${esc(N.situ)}</textarea>
+   <label class="l">How big?</label><div class="chips">${SN_SIZES.map(([k,l,d])=>`<button class="chip ${N.size===k?'on':''}" data-act="laSize" data-k="${k}">${l} <span class="muted small">· ${d}</span></button>`).join('')}</div>
+   <button class="btn pri" style="width:100%;justify-content:center;margin-top:8px" data-act="laGo" ${N.busy?'disabled':''}>${N.busy?'<span class="spin"></span> Writing…':'🌱 Show me how to live it'}</button>
+   ${N.out||N.busy?`<div class="snotecard"><div class="small muted" style="margin-bottom:4px">🌱 ${esc(laRefLabel())}</div><div id="laOut" class="out">${md(N.out)}</div>
+     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm pri grow" data-act="laSave">💾 My notes</button><button class="btn sm grow" data-act="laJournal">📓 Journal</button><button class="iconbtn" data-act="laGo" title="New one">🔁</button><button class="iconbtn" data-act="laCopy" title="Copy">⧉</button><button class="iconbtn" data-act="laDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`}
+function laRefLabel(){const B=S.build,N=S.lapp;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);return `${BM[B.book].name} ${B.ch}${a?':'+a+(b>a?'–'+b:''):''}`}
+function bindLapp(v){const N=S.lapp;[['laV1','v1'],['laV2','v2'],['laSitu','situ']].forEach(([id,k])=>{const i=$('#'+id,v);if(i)i.oninput=()=>{N[k]=i.value}})}
 const SN_KINDS=[['sum','📝 Summary','What happens, in short'],['explain','💡 Explanation','What it means, made simple'],['life','🌱 For my life','What it means for me today'],['all','✨ All three','Summary, meaning and life']];
 const SN_SIZES=[['margin','✎ Margin','2–3 short lines'],['card','🗒️ Sticky note','A small card'],['page','📄 Half page','An insert page']];
 function snoteForm(){const N=S.snote||(S.snote={kind:'all',size:'card',v1:'',v2:'',out:'',busy:false});const B=S.build;
@@ -1464,6 +1497,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
   else if(B.mode==='inserts')form=insertForm();
   else if(B.mode==='snote')form=snoteForm();
+  else if(B.mode==='life')form=lappForm();
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
     <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
     <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
@@ -1474,9 +1508,11 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     <button class="btn pri" style="width:100%;justify-content:center" data-act="bGo">✨ Show me how to load ${esc(BM[B.bookOnly].name)}</button>`;
   const plans=loadPlans();
   if(B.mode==='snote'){setTimeout(()=>bindSnote(v),0)}
+  if(B.mode==='life'){setTimeout(()=>bindLapp(v),0)}
   v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
   <div class="card">
-    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verse(s)'],['topic','💭 A feeling / topic'],['book','📚 A whole book'],['snote','📝 Study note'],['inserts','🗂️ Inserts']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verses'],['topic','💭 A feeling or topic'],['book','📚 A whole book'],['snote','📝 Study note'],['life','🌱 Life application'],['inserts','🗂️ Inserts']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="howto">ℹ️ ${LOAD_HELP[B.mode]||''}</div>
     ${form}</div>
   <div id="buildOut"></div>
   ${loadingListHtml(plans)}
@@ -1663,9 +1699,24 @@ function planOnline(pl){const d=pl.data;
     const tp={name:d.title||pl.topic,emoji:d.emoji||'🏷️',color:okColor(d.color),meaning:''};refs.forEach(p=>saveVerseToMainQuiet(tp,{ref:rc(p),why:''}));(d.verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),d.color,x.quote)})}
   else{const b=BM[pl.b];Store.set('i_'+newId(),{title:`${b.name} — chapter by chapter`,ref:`${b.abbr} 1`,body:(d.tagline?d.tagline+'\n\n':'')+(d.chapters||[]).map(x=>`${x.c}. ${x.title}${x.summary?' — '+x.summary:''}`).join('\n'),updated:Date.now()});
     (d.key_verses||[]).forEach(x=>{const p=parseRef(x.ref);if(p&&p.v1)applyHL(p.b,p.c,vrange(p),'y','')})}
-  toast('Added to your Online Bible')}
+  toast('Done! Open 📖 Online Bible › Read to see the highlights and notes')}
 
 Object.assign(A,{
+  laArea:el=>{const N=S.lapp,k=el.dataset.k;N.areas=N.areas.includes(k)?N.areas.filter(x=>x!==k):[...N.areas,k];renderView()},
+  laSize:el=>{S.lapp.size=el.dataset.k;renderView()},
+  laGo:async()=>{const N=S.lapp;if(N.busy)return;const s=settings();const ref=laRefLabel();
+    const size={margin:'VERY short: max 35 words in total, so it fits in a Bible margin.',card:'short: 60 to 90 words, so it fits on a sticky note.',page:'about 150 to 220 words, for a half-page insert.'}[N.size];
+    const areas=N.areas.map(k=>LAPP_AREAS.find(x=>x[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
+    const prompt=`Write a life application of ${ref} (${TRANS[s.trans]||s.trans}) that someone will hand-write in their paper Bible. Use four short parts with bold labels: **What it says** (one sentence), **What it means for me** (personal, first person), **Try this week** (one small, concrete action), **Ask yourself** (one honest question).${areas?' Focus on this part of life: '+areas+'.':''}${N.situ.trim()?' Their situation: '+N.situ.trim()+'.':''} Length: ${size}
+Use easy, everyday words a 12-year-old understands, short sentences, no hard church words. Be faithful to what the passage really says. Only output the four parts.`;
+    N.busy=true;N.out='';renderView();
+    try{const r=await ai(prompt,t=>{const o=$('#laOut');if(o)o.innerHTML=md(t)},null,'default');N.out=(r.text||'').trim()}catch(e){toast(aiErr(e))}N.busy=false;renderView()},
+  laCopy:()=>copyText(S.lapp.out.replace(/\*\*/g,'')),
+  laDiscard:()=>{S.lapp.out='';renderView()},
+  laSave:()=>{const N=S.lapp,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);const vs=a?Array.from({length:Math.min(b-a+1,60)},(_,i)=>a+i):[];
+    Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'🌱 Life application: '+laRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();notesSaved('🌱 Life application: '+laRefLabel())},
+  laJournal:()=>{const N=S.lapp,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);
+    Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:'🌱 Life application: '+laRefLabel(),ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,body:N.out.replace(/\*\*/g,'')}});touch();jSaved('reflect','🌱 Life application: '+laRefLabel())},
   snKind:el=>{S.snote.kind=el.dataset.k;renderView()},
   snSize:el=>{S.snote.size=el.dataset.k;renderView()},
   snGo:async()=>{const N=S.snote,B=S.build;if(N.busy)return;const ref=snRefLabel();const s=settings();
@@ -1678,7 +1729,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   snDiscard:()=>{S.snote.out='';renderView()},
   snCopy:()=>copyText(S.snote.out.replace(/\*\*/g,'')),
   snSave:()=>{const N=S.snote,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);const vs=a?Array.from({length:Math.min(b-a+1,60)},(_,i)=>a+i):[];
-    Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'📝 Study note: '+snRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();toast('Saved to My Notes in the Online Bible 📝')},
+    Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'📝 Study note: '+snRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();notesSaved('📝 Study note: '+snRefLabel())},
   bMode:el=>{S.build.mode=el.dataset.m;S.build.planKey=null;S.build.err='';renderView()},
   bPart:el=>{const p=el.dataset.p;S.build.parts[p]=!S.build.parts[p];el.classList.toggle('on')},
   bFeel:el=>{S.build.topic=el.dataset.f;renderView()},
@@ -1705,7 +1756,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
     if(st.tool==='soap'){const sec={};let cur=null;t.split('\n').forEach(l=>{const m=l.match(/^#{1,4}\s*([SOAP])\b/i);if(m){cur=m[1].toUpperCase();sec[cur]='';return}if(cur)sec[cur]+=l+'\n'});
       const c=x=>plain((sec[x]||'').trim());Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref,scripture:c('S'),obs:c('O'),app:c('A'),prayer:c('P')}})}
     else Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:`${METHODS[st.tool][1]}: ${st.refLabel}`,ref,body:plain(t)}});
-    toast('Saved to your Journal 📓')},
+    jSaved(st.tool==='soap'?'soap':'reflect',`${METHODS[st.tool][1]}: ${st.refLabel}`)},
   symAdd:()=>{const sy=$('#symS').value.trim(),m=$('#symM').value.trim();if(!sy||!m){toast('Add a symbol and what it means');return}Store.set('symbols',{list:[...symList(),{s:sy,m}]});toast('Symbol added ✒️')},
   symDel:el=>{const L=symList().slice();L.splice(+el.dataset.i,1);Store.set('symbols',{list:L})},
   symReset:()=>confirmSheet('Go back to the starter set of symbols? Your own symbols will be removed.','Reset',()=>{Store.del('symbols');renderView()}),
@@ -1748,7 +1799,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   planOnline:el=>planOnline(Store.get(el.dataset.k||S.build.planKey)),
   delPlan:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const done=planProg(pl).done;
     confirmSheet(done?`Remove “${planTitle(pl)}” from your list? It stays counted in your badges and stats.`:`Delete “${planTitle(pl)}”? You haven\u2019t finished it yet.`,done?'Remove':'Delete',()=>{removePlan(k);toast(done?'Removed — well done! 🎉':'Deleted');renderView()})},
-  bSoap:()=>{const pl=Store.get(S.build.planKey),x=pl.data.soap;Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref:`${pl.b} ${pl.c}:${x.v}`,scripture:x.scripture||'',obs:x.observation||'',app:x.application||'',prayer:x.prayer||''}});toast('S.O.A.P. saved to Journal')},
+  bSoap:()=>{const pl=Store.get(S.build.planKey),x=pl.data.soap;Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref:`${pl.b} ${pl.c}:${x.v}`,scripture:x.scripture||'',obs:x.observation||'',app:x.application||'',prayer:x.prayer||''}});jSaved('soap','S.O.A.P. '+pl.b+' '+pl.c)},
   bTopicIns:()=>{const pl=Store.get(S.build.planKey),d=pl.data;Store.set('i_'+newId(),{title:`${d.emoji||''} ${d.title||pl.topic}`.trim(),ref:'',body:(d.intro?d.intro+'\n\n':'')+(d.verses||[]).map(x=>`${x.ref} — ${x.why||''}`).join('\n')+(d.prayer?'\n\nPrayer: '+d.prayer:''),kind:'topic',updated:Date.now()});insSavedSheet('topic',`${d.emoji||''} ${d.title||pl.topic}`.trim())},
   loadThisChapter:()=>{const s=settings();Object.assign(S.build,{mode:'chapter',book:s.book,ch:s.ch,planKey:null,err:''});setTab('load');runBuild()},
   genSoap:async()=>{const sh=$('#sheet');const ref=$('[data-f="ref"]',sh).value.trim();if(!ref){toast('Add a Scripture reference first');return}
@@ -2104,7 +2155,7 @@ Object.assign(A,{
   keyAddVerse:el=>{const tid=el.dataset.t;const inp=$('#kadd_'+tid);const r=normRef(inp.value);if(!r){toast('Try a reference like "Psalm 27:1"');return}
     S.openTopic=S.keySet+'|'+tid;updateSet(S.keySet,s=>{const t=findTopic(s,tid);if(!t.verses.some(v=>v.ref===r))t.verses.push({ref:r,why:''})});toast('Verse added')},
   keyDelVerse:el=>{S.openTopic=S.keySet+'|'+el.dataset.t;updateSet(S.keySet,s=>{const t=findTopic(s,el.dataset.t);t.verses.splice(+el.dataset.i,1)})},
-  keyAddSugg:el=>{S.openTopic=S.keySet+'|'+el.dataset.t;updateSet(S.keySet,s=>{const t=findTopic(s,el.dataset.t);const v=t.suggest.splice(+el.dataset.i,1)[0];if(v&&!t.verses.some(x=>x.ref===v.ref))t.verses.push(v)});toast('Added to your main key ⭐')},
+  keyAddSugg:el=>{S.openTopic=S.keySet+'|'+el.dataset.t;updateSet(S.keySet,s=>{const t=findTopic(s,el.dataset.t);const v=t.suggest.splice(+el.dataset.i,1)[0];if(v&&!t.verses.some(x=>x.ref===v.ref))t.verses.push(v)});toast('Added ⭐ to your main key (Bible Kit › Tabs › Topics)')},
   keySaveVerse:el=>{const t=findTopic(getSet(S.keySet),el.dataset.t);saveVerseToMain(t,t.verses[+el.dataset.i])},
   keySaveTopic:el=>{const t=findTopic(getSet(S.keySet),el.dataset.t);let added=0;updateSet('main',m=>{let mt=m.topics.find(x=>sameName(x.name,t.name));
       if(!mt){mt={id:'t'+newId(),emoji:t.emoji,name:t.name,color:t.color,meaning:t.meaning||'',verses:[]};m.topics.push(mt)}
