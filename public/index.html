@@ -370,6 +370,9 @@ details.grp[open]>summary::after{content:"▴"}
 .pp-mem{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-size:14px}
 .pp-ded{font-style:italic;font-size:15.5px;line-height:1.55}
 .lifesugg{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.lifesugg b{display:block;font-size:14px}.lifesugg span{font-size:12.5px;color:var(--muted)}
+.savecard{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-top:8px;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.savecard span{font-size:26px}.savecard b{display:block;font-size:15.5px}.savecard small{color:var(--muted);font-size:12.5px}
+.howsteps{padding-left:20px;margin:8px 0}.howsteps li{margin:0 0 10px;line-height:1.45}
+.studyacts{margin-top:10px;flex-wrap:wrap}
 .howto{font-size:13.5px;line-height:1.45;color:var(--ink);background:color-mix(in srgb,var(--accent) 8%,var(--card));border-left:4px solid var(--accent);border-radius:10px;padding:8px 11px;margin:8px 0}
 .coverpage{font-family:var(--serif);font-size:16px;line-height:1.6;background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-top:10px}
 .jhead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:0 0 10px;border-radius:16px;background:var(--soft)}
@@ -792,32 +795,30 @@ const usedColors=()=>{const u=[...new Set(mainSet().topics.map(t=>t.color))].fil
 
 /* ---------- STUDY ---------- */
 function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.book,s.ch,[]);
-  const st=S.study;
-  v.innerHTML=`<div class="hero"><h2>Study a passage</h2><p>Context, meaning, original words, cross-references and life application — for any verse or chapter.</p></div>
-  <div class="card"><label class="l" style="margin-top:0">Passage</label>
+  const st=S.study;const pick=S.studyPick||'tools';
+  const grid=obj=>`<div class="toolgrid">${Object.entries(obj).map(([k,t])=>`<button class="tool ${obj===METHODS?'method':''}" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>`;
+  v.innerHTML=`<div class="hero"><h2>Study a passage</h2><p>Understand what you read, then put it in your paper Bible.</p></div>
+  <div class="card">
+   <div class="stepl" style="margin-top:0"><span>1</span> Which passage?</div>
    <div class="row"><input class="f grow" id="studyRef" value="${esc(S.studyRef)}" placeholder="e.g. Romans 8:28 or Psalm 23"><button class="btn sm" data-act="useCurrent">Current</button></div>
-   <label class="l">Choose a tool</label>
-   <div class="toolgrid">${Object.entries(TOOLS).map(([k,t])=>`<button class="tool" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>
-   <label class="l">📝 Study methods — I'll do one for you</label>
-   <div class="toolgrid">${Object.entries(METHODS).map(([k,t])=>`<button class="tool method" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>
-   <p class="small muted" style="margin:6px 2px 0">Works for a chapter (Psalm 23), one verse (John 3:16) or several verses (Romans 8:28-30).<br><b>When it’s done:</b> 📓 Save to Journal → Journal › Timeline · ＋ Save to my notes → Online Bible › My notes · 🗂️ Make insert → Bible Kit › Inserts › From Study.</p>
-   <label class="l">Or ask your own question</label>
-   <textarea class="f" id="askQ" placeholder="e.g. Why did Jesus speak in parables here? What does 'born again' mean?" style="min-height:70px"></textarea>
-   <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>
+   <div class="small muted" style="margin:4px 2px 0">A chapter (Psalm 23), one verse (John 3:16) or a few (Romans 8:28-30).</div>
+   <div class="stepl"><span>2</span> How do you want to study it?</div>
+   <div class="subtabs">${[['tools','🔎 Quick help'],['methods','📝 Methods'],['ask','❓ Ask']].map(([k,l])=>`<button class="${pick===k?'on':''}" data-act="studyPick" data-p="${k}">${l}</button>`).join('')}</div>
+   <div class="howto">ℹ️ ${pick==='tools'?'One quick explanation, like the background or what a verse means. Tap one to start.':pick==='methods'?'A full Bible study done for you, step by step, using a well-known method. S.O.A.P. is the easiest to start with.':'Ask anything about this passage and get a clear answer.'}</div>
+   ${pick==='tools'?grid(TOOLS):pick==='methods'?grid(METHODS)+'<details class="guide" style="margin-top:8px"><summary>📖 How do these methods work?</summary><div class="body">'+GUIDES.map(g=>`<b>${g[0]}</b><br>${g[1]}`).join('<br><br>')+'</div></details>':`<textarea class="f" id="askQ" placeholder="e.g. Why did Jesus speak in parables here? What does 'born again' mean?" style="min-height:70px"></textarea><div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>`}
   </div>
   <div id="studyOut">${studyOutHtml()}</div>
-  <div id="studyList">${studyListHtml()}</div>
-  <h2 class="sec">How the methods work</h2>
-  ${GUIDES.map(g=>`<details class="guide"><summary>${g[0]}</summary><div class="body">${g[1]}</div></details>`).join('')}`;
+  <div id="studyList">${studyListHtml()}</div>`;
   $('#studyRef').oninput=e=>S.studyRef=e.target.value;wireStudyList();
   if(st&&st.loading)$('#studyOut').scrollIntoView({block:'start'});
 }
+const studyActions=(k,pri)=>`<div class="row studyacts"><button class="btn sm pri grow" data-act="studySaveTo" data-k="${k||''}">💾 Save to…</button><button class="btn sm grow" data-act="paperStudy" data-k="${k||''}">🖊️ Put it in my Bible</button><button class="iconbtn" data-act="copyStudy" data-k="${k||''}" title="Copy">⧉</button>${pri?'<button class="iconbtn" data-act="redoStudy" title="Do it again">↻</button>':''}<button class="iconbtn" data-act="studyDel" data-k="${k||''}" title="Delete">🗑</button></div>`;
 function wireStudyList(){const q=$('#studyQ');if(q)q.oninput=()=>{S.studyQ=q.value;const l=$('#studyList');const pos=q.selectionStart;l.innerHTML=studyListHtml();wireStudyList();const q2=$('#studyQ');q2.focus();q2.setSelectionRange(pos,pos)}}
 function studyOutHtml(){const st=S.study;if(!st)return '';
   return `<div class="card out"><div class="row" style="margin-bottom:6px"><span class="tag">${esc(st.title)}</span><b class="grow" style="font-family:var(--serif);font-size:19px">${esc(st.refLabel)}</b>${st.loading?'<span class="spin"></span>':''}</div>
    <div id="studyBody">${st.err?`<p class="muted">${esc(st.err)}</p>`:(st.text?md(st.text):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>')}</div>
    ${st.loading?'<div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="stopStudy">Stop</button></div>':
-   (st.text?`<div class="row" style="margin-top:10px">${METHODS[st.tool]?'<button class="btn sm pri" data-act="saveMethod">📓 Save to Journal</button>':''}<button class="btn sm ${METHODS[st.tool]?'':'pri'}" data-act="saveStudy">＋ Save to my notes</button><button class="btn sm" data-act="insertStudy">🗂️ Make insert</button><button class="btn sm" data-act="copyStudy">⧉ Copy</button><button class="btn sm ghost" data-act="redoStudy">↻ Redo</button></div>`:'')}</div>
+   (st.text?studyActions(st.key,1):'')}</div>
    <p class="small muted">Study helps are written by Claude — test them against Scripture (Acts 17:11) and a trusted pastor or commentary.</p>`}
 const STUDY_ICON=t=>t==='q'?'💬':(TL(t)||['📘'])[0];
 function keepStudy(st){if(!st||!st.text)return;const ex=!st.question&&Store.list('y_').find(y=>y.tool===st.tool&&y.refCode===st.refCode&&!y.question);
@@ -826,12 +827,12 @@ function studyListHtml(){const all=Store.list('y_').sort((a,b)=>(b.at||0)-(a.at|
   const types=[...new Set(all.map(y=>y.tool))];const F=S.studyFilter||'all';const q=(S.studyQ||'').toLowerCase();
   const list=all.filter(y=>(F==='all'||y.tool===F)&&(!q||(y.refLabel+' '+y.title+' '+y.question).toLowerCase().includes(q)));
   return `<div class="row" style="margin:20px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">📚 My studies</h2><span class="small muted">${all.length} saved</span></div>
-   <p class="small muted" style="margin:0 2px 8px">Everything you study is saved here automatically. Tap one to open or close it.</p>
+   <div class="howto">ℹ️ Every study is kept here automatically. Tap one to open it. 💾 saves it somewhere else too, 🗑 deletes it.</div>
    <input class="f" id="studyQ" placeholder="Search your studies…" value="${esc(S.studyQ||'')}" style="margin-bottom:6px">
    <div class="chips"><button class="chip ${F==='all'?'on':''}" data-act="studyFilter" data-f="all">All</button>${types.map(t=>`<button class="chip ${F===t?'on':''}" data-act="studyFilter" data-f="${t}">${STUDY_ICON(t)} ${t==='q'?'Questions':esc((TL(t)||[,'Study'])[1])}</button>`).join('')}</div>
    ${list.map(y=>{const open=S.openStudy===y.key;return `<div class="plan ${open?'open':''}" id="st-${y.key}"><div class="planhead" data-act="toggleStudy" data-k="${y.key}" role="button"><span class="pico">${STUDY_ICON(y.tool)}</span>
      <div class="grow" style="min-width:0"><div class="ptitle">${esc(y.refLabel)}</div><div class="small muted">${esc(y.question?'Q: '+y.question:y.title)} · ${new Date(y.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div></div><span class="chev">${open?'▴':'▾'}</span></div>
-     ${open?`<div class="planbody"><div class="out">${md(y.text)}</div><div class="row planfoot">${METHODS[y.tool]?`<button class="btn sm pri" data-act="saveMethod" data-k="${y.key}">📓 Save to Journal</button>`:''}<button class="btn sm" data-act="saveStudy" data-k="${y.key}">＋ My notes</button><button class="btn sm" data-act="insertStudy" data-k="${y.key}">🗂️ Make insert</button><button class="btn sm" data-act="copyStudy" data-k="${y.key}">⧉ Copy</button><button class="btn sm" data-act="redoStudyK" data-k="${y.key}">🔄 Redo</button><button class="btn sm danger" data-act="delStudy" data-k="${y.key}">🗑 Delete</button><button class="btn sm ghost" data-act="toggleStudy" data-k="${y.key}">▴ Close</button></div></div>`:''}</div>`}).join('')||'<div class="empty">No studies match.</div>'}`}
+     ${open?`<div class="planbody"><div class="out">${md(y.text)}</div>${studyActions(y.key,0)}</div>`:''}</div>`}).join('')||'<div class="empty">No studies match.</div>'}`}
 function updateStudyOut(){const o=$('#studyOut');if(o&&S.tab==='study')o.innerHTML=studyOutHtml()}
 async function runStudy(tool,refText,question,force){
   refText=(refText||'').trim();if(!refText){toast('Type a passage first');return}
@@ -954,6 +955,8 @@ function loadedColors(el){const hs=Store.list('h_');
   <p class="small muted">Tip: draw a small color key on the inside cover of your Bible so you remember what each color means.</p>`;
   $$('input[data-label]',el).forEach(i=>i.addEventListener('change',()=>{const l=Object.assign({},settings().labels);l[i.dataset.label]=i.value.trim();saveSettings({labels:l});toast('Color key saved')}))}
 function insKindOf(x){return x.kind==='study'?'study':x.kind&&INS_TYPES.some(t=>t[0]===x.kind)&&x.kind!=='custom'?x.kind:'own'}
+function paperSheet(title,sub,prompt,pre=''){openSheet(`<h3>${title}</h3><p class="small muted">${esc(sub||'')}</p>${pre}<div class="howto">✨ Made for your paper Bible:</div><div id="paperOut" class="out"><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div><div class="row" style="margin-top:10px"><button class="btn sm grow" data-act="paperCopy">⧉ Copy</button><button class="btn sm pri grow" data-act="closeSheet">✓ Done</button></div>`);
+  ai(prompt,t=>{const o=$('#paperOut');if(o)o.innerHTML=md(t)},null,'default').then(r=>{const o=$('#paperOut');if(o){o.innerHTML=md(r.text);o.dataset.t=r.text}}).catch(e=>{const o=$('#paperOut');if(o)o.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`})}
 function whereSheet(title,intro,crumbs,openAttrs){openSheet(`<div style="text-align:center"><div style="font-size:44px">✅</div><h3 style="margin:4px 0">Saved!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
    <div class="card"><div class="small muted" style="margin-bottom:6px">${intro}</div><div class="inspath">${crumbs.map((c,i)=>i===crumbs.length-1?`<b>${c}</b>`:`<span>${c}</span><i>›</i>`).join('')}</div></div>
    <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" ${openAttrs}>Open it now →</button></div>`)}
@@ -972,7 +975,7 @@ function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)
   <div class="chips">${INSERT_TEMPLATES.map((t,i)=>`<button class="chip" data-act="newInsert" data-i="${i}">＋ ${esc(t[0])}</button>`).join('')}<button class="chip" data-act="newInsert" data-i="-1">＋ Blank card</button></div>
   ${ins.length?ins.map(x=>`<div class="insert" style="--gc:${x.ref&&parseRef(x.ref)?GENRES[BM[parseRef(x.ref).b].genre][1]:'var(--gold)'}"><div class="row"><h4 class="grow">${esc(x.title||'Untitled')}</h4>${x.ref?`<a class="ref small" data-act="openRef" data-ref="${esc(x.ref)}">${esc(codeToLabel(x.ref))}</a>`:''}</div>
     <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
-    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm pri" data-act="insHow" data-k="${x.key}">🖊️ Put it in my Bible</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
    :`<div class="empty">${K==='all'?'No insert cards yet — generate one or start with a template above.':'Nothing here yet — tap ✨ Generate above.'}</div>`}`}
 /* ----- ✒️ Margin symbols ----- */
 const DEF_SYMBOLS=[['✝','Jesus / salvation'],['♡','God’s love'],['△','God, Father Son and Spirit'],['🕊','The Holy Spirit'],['☆','A promise to hold onto'],['!','A command to obey'],['?','A question I still have'],['☁','Heaven / eternity'],['⚠','A warning'],['🙏','Prayer'],['→','Cross-reference: see the next verse'],['📅','A date God spoke to me']];
@@ -1156,7 +1159,7 @@ function jPrayers(el){const es=Store.list('j_').filter(e=>e.type==='prayed').sor
        <button class="iconbtn" data-act="prFav" data-k="${e.key}" title="Keep at the top">${f.fav?'⭐':'☆'}</button><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
      <div class="small muted">Saved ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}${f.prayed?` · prayed ${f.prayed}×${f.lastPrayed?', last '+fmtDate(f.lastPrayed):''}`:''}</div>
      <div class="praytext ${open?'open':''}" data-act="prToggle" data-k="${e.key}">${md(f.body||'')}</div>
-     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div></div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
+     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="btn sm" data-act="prayBible" data-k="${e.key}">🖊️ In my Bible</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div></div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
 function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sort((a,b)=>b.date-a.date);
   el.innerHTML=`${jHead('⛪','Sermon notes','Notes you write while listening to a sermon, at church or online.',newBtn('newJournal','data-t="sermon"'))}
    ${es.length?es.map(journalItem).join(''):'<div class="empty">No sermon notes yet.</div>'}`}
@@ -1292,6 +1295,35 @@ const A={
   /* study */
   useCurrent:()=>{const s=settings();S.studyRef=S.sel.size?refLabel(s.book,s.ch,selVerses()):refLabel(s.book,s.ch,[]);$('#studyRef').value=S.studyRef},
   study:el=>runStudy(el.dataset.tool,$('#studyRef').value),
+  paperCopy:()=>{const o=$('#paperOut');copyText(plain(o&&o.dataset.t||''))},
+  studyPick:el=>{S.studyPick=el.dataset.p;renderView()},
+  studySaveTo:el=>{const k=el.dataset.k;const st=k?Store.get(k):S.study;if(!st)return;
+    openSheet(`<h3>💾 Where do you want to save it?</h3><p class="small muted">It’s already kept in 📚 My studies. Save it here too:</p>
+     <button class="savecard" data-act="saveStudy" data-k="${k}"><span>🔖</span><div><b>My notes</b><small>Shows next to the verse in 📖 Online Bible › My notes</small></div></button>
+     <button class="savecard" data-act="saveMethod" data-k="${k}"><span>📓</span><div><b>Journal</b><small>${st.tool==='soap'?'Saved as a S.O.A.P. in 📓 Journal › Timeline':'Saved in 📓 Journal › 📝 Writings'}</small></div></button>
+     <button class="savecard" data-act="insertStudy" data-k="${k}"><span>🗂️</span><div><b>Insert card</b><small>A card to tuck in your Bible, in 🧰 Bible Kit › Inserts › From Study</small></div></button>`)},
+  studyDel:el=>{const k=el.dataset.k;confirmSheet('Delete this study? You can’t undo this.','🗑 Delete',()=>{if(k)Store.del(k);if(S.study&&(!k||S.study.key===k))S.study=null;closeSheet();toast('Deleted');renderView()})},
+  paperStudy:el=>{const k=el.dataset.k;const st=k?Store.get(k):S.study;if(!st)return;const m=mainSet();
+    paperSheet('🖊️ Put it in your paper Bible',st.refLabel,`Turn this Bible study into simple steps for marking a PAPER Bible. Passage: ${st.refLabel}.
+${m&&m.topics.length?'Their highlighter colors mean: '+m.topics.map(t=>{const pc=PALETTE.find(x=>x[0]===t.color);return (pc?pc[1]:t.color)+' = '+t.name}).join(', ')+'. Use these colors.':''}
+Use these headings: "### 🖍 Highlight" (2 to 4 verses: verse, which color, why in a few words), "### ✎ Write in the margin" (2 to 3 notes, max 12 words each, say next to which verse), "### 🔗 Link" (1 to 3 cross-references to write in the margin), "### ✍️ At the top of the page" (one short heading). Easy words. Only use what the study says.
+The study:
+${(st.text||'').slice(0,5000)}`)},
+  insHow:el=>{const x=Store.get(el.dataset.k);if(!x)return;const p=x.ref&&parseRef(x.ref);const where=p?`${BM[p.b].name} ${p.c}`:'';
+    openSheet(`<h3>🖊️ How to put this insert in your Bible</h3><p class="small muted">${esc(x.title||'')}</p>
+     <ol class="howsteps"><li><b>Pick your paper.</b> A 3×5 index card or a piece of thin paper cut a bit smaller than your Bible page. Bookmarks: a 5 cm wide strip.</li>
+     <li><b>Copy the text.</b> <button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy text</button> Write it out by hand with a fine pen, or print it and cut it out.</li>
+     <li><b>Where it goes.</b> ${where?`Put it at <b>${esc(where)}</b>, the passage it’s about.`:'Put it next to the passage or book it’s about, or in the back of your Bible with your other inserts.'}</li>
+     <li><b>Attach it.</b> Use a thin strip of washi tape or a glue stick only on the inside edge (1 cm), so it folds like a page. Or just tuck it in loose.</li>
+     <li><b>Leave a sign.</b> Write a small 🗂️ or "see insert" in the margin, so you know there’s more there.</li></ol>`)},
+  prayBible:el=>{const x=Store.get(el.dataset.k);if(!x)return;const f=x.fields||{};const p=f.ref&&parseRef(f.ref);
+    paperSheet('🖊️ Put this prayer in your Bible',f.title||'Prayer',`Make this prayer short enough to hand-write in a Bible margin: max 25 words, first person, keep its heart. ${p?'Say it goes next to '+codeToLabel(f.ref)+'.':'Suggest one verse it fits next to (Book chapter:verse).'} Format:
+**Write next to:** the verse
+**Margin prayer:** the short prayer
+**Add:** today’s date and leave room to write "✓ answered" later
+The prayer:
+${(f.body||'').slice(0,3000)}`,`<ol class="howsteps"><li><b>Short version in the margin</b> next to the verse it’s based on (see below).</li><li><b>Full prayer on a card</b> in the back of your Bible, your “prayer pages”. <button class="btn sm" data-act="prCopyK" data-k="${x.key}">⧉ Copy full prayer</button></li><li><b>Date it.</b> When God answers, write “✓” and the date next to it. That becomes your testimony.</li></ol>`)},
+
   ask:()=>{const q=$('#askQ').value.trim();if(!q){toast('Type a question');return}runStudy(null,$('#studyRef').value||'the Bible',q)},
   stopStudy:()=>{S.studyCtrl&&S.studyCtrl.abort()},
   redoStudy:()=>{const st=S.study;if(!st)return;if(st.question)runStudy(null,st.refLabel,st.question);else{Cache.drop('studies',st.tool+'__'+st.refCode.replace(/[^A-Za-z0-9:\-]/g,'_'));runStudy(st.tool,st.refLabel,null,true)}},
@@ -1820,8 +1852,8 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   saveMethod:el=>{const st=el&&el.dataset&&el.dataset.k?Object.assign({},Store.get(el.dataset.k)):S.study;const t=st.text||'';const p=parseRef(st.refCode);const ref=p?rc(p):st.refCode;
     if(st.tool==='soap'){const sec={};let cur=null;t.split('\n').forEach(l=>{const m=l.match(/^#{1,4}\s*([SOAP])\b/i);if(m){cur=m[1].toUpperCase();sec[cur]='';return}if(cur)sec[cur]+=l+'\n'});
       const c=x=>plain((sec[x]||'').trim());Store.set('j_'+newId(),{type:'soap',date:Date.now(),fields:{ref,scripture:c('S'),obs:c('O'),app:c('A'),prayer:c('P')}})}
-    else Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:`${METHODS[st.tool][1]}: ${st.refLabel}`,ref,body:plain(t)}});
-    jSaved(st.tool==='soap'?'soap':'reflect',`${METHODS[st.tool][1]}: ${st.refLabel}`)},
+    else Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:`${(TL(st.tool)||[,st.title||'Study'])[1]}: ${st.refLabel}`,ref,body:plain(t)}});
+    jSaved(st.tool==='soap'?'soap':'reflect',`${(TL(st.tool)||[,st.title||'Study'])[1]}: ${st.refLabel}`)},
   symAdd:()=>{const sy=$('#symS').value.trim(),m=$('#symM').value.trim();if(!sy||!m){toast('Add a symbol and what it means');return}Store.set('symbols',{list:[...symList(),{s:sy,m}]});toast('Symbol added ✒️')},
   symDel:el=>{const L=symList().slice();L.splice(+el.dataset.i,1);Store.set('symbols',{list:L})},
   symReset:()=>confirmSheet('Go back to the starter set of symbols? Your own symbols will be removed.','Reset',()=>{Store.del('symbols');renderView()}),
