@@ -139,6 +139,28 @@ export default {
     const { pathname } = new URL(request.url);
     if (!pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
 
+    // Real Bible text for public-domain translations (cached for 30 days)
+    if (pathname === '/api/bible' && request.method === 'GET') {
+      const u = new URL(request.url);
+      const t = (u.searchParams.get('t') || '').toLowerCase();
+      const q = (u.searchParams.get('q') || '').slice(0, 60);
+      if (!['web', 'bbe', 'kjv'].includes(t) || !/^[0-9A-Za-z ]+$/.test(q)) return new Response(JSON.stringify({ error: 'bad_request' }), { status: 400, headers: { 'content-type': 'application/json' } });
+      const cache = caches.default;
+      const ck = new Request('https://bible-cache.local/' + t + '/' + encodeURIComponent(q.toLowerCase()));
+      const hit = await cache.match(ck);
+      if (hit) return hit;
+      try {
+        const r = await fetch('https://bible-api.com/' + encodeURIComponent(q) + '?translation=' + t, { headers: { 'accept': 'application/json' } });
+        if (!r.ok) return new Response(JSON.stringify({ error: 'upstream' }), { status: 502, headers: { 'content-type': 'application/json' } });
+        const d = await r.json();
+        const out = new Response(JSON.stringify({ verses: (d.verses || []).map(v => [v.verse, String(v.text || '').trim()]) }), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=2592000' } });
+        await cache.put(ck, out.clone());
+        return out;
+      } catch (e) {
+        return new Response(JSON.stringify({ error: 'upstream' }), { status: 502, headers: { 'content-type': 'application/json' } });
+      }
+    }
+
     const ip = request.headers.get('CF-Connecting-IP') || 'x';
     const limits = env.STORE.get(env.STORE.idFromName('limits'));
     const L = async (path, payload) => (await limits.fetch('https://do' + path, { method: 'POST', body: JSON.stringify(payload) })).json();
