@@ -372,6 +372,8 @@ details.grp[open]>summary::after{content:"▴"}
 .pp-mem{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.pp-mem span{font-size:13.5px;padding:3px 9px;border-radius:999px;background:var(--soft)}
 .pp-ded{font-style:italic;font-size:15.5px;line-height:1.55;color:var(--ink)}
 .lifesugg{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.lifesugg b{display:block;font-size:14px}.lifesugg span{font-size:12.5px;color:var(--muted)}
+.paperlist{margin-top:12px;padding:12px;border-radius:14px;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 5%,var(--card))}
+.plh{font-weight:700;font-size:15px}.paperlist .item{margin:6px 0 0}
 .savecard{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-top:8px;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.savecard span{font-size:26px}.savecard b{display:block;font-size:15.5px}.savecard small{color:var(--muted);font-size:12.5px}
 .howsteps{padding-left:20px;margin:8px 0}.howsteps li{margin:0 0 10px;line-height:1.45}
 .studyacts{margin-top:10px;flex-wrap:wrap}
@@ -814,7 +816,7 @@ function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.bo
   $('#studyRef').oninput=e=>S.studyRef=e.target.value;wireStudyList();
   if(st&&st.loading)$('#studyOut').scrollIntoView({block:'start'});
 }
-const studyActions=(k,pri)=>`<div class="row studyacts"><button class="btn sm pri grow" data-act="studySaveTo" data-k="${k||''}">💾 Save to…</button><button class="btn sm grow" data-act="paperStudy" data-k="${k||''}">🖊️ Put it in my Bible</button><button class="iconbtn" data-act="copyStudy" data-k="${k||''}" title="Copy">⧉</button>${pri?'<button class="iconbtn" data-act="redoStudy" title="Do it again">↻</button>':''}<button class="iconbtn" data-act="studyDel" data-k="${k||''}" title="Delete">🗑</button></div>`;
+const studyActions=(k,pri)=>`${paperBtns(k,'study')}<div class="row studyacts"><button class="btn sm grow" data-act="studySaveTo" data-k="${k||''}">💾 Save to…</button><button class="iconbtn" data-act="copyStudy" data-k="${k||''}" title="Copy">⧉</button>${pri?'<button class="iconbtn" data-act="redoStudy" title="Do it again">↻</button>':''}<button class="iconbtn" data-act="studyDel" data-k="${k||''}" title="Delete">🗑</button></div>${paperBlock(k)}`;
 function wireStudyList(){const q=$('#studyQ');if(q)q.oninput=()=>{S.studyQ=q.value;const l=$('#studyList');const pos=q.selectionStart;l.innerHTML=studyListHtml();wireStudyList();const q2=$('#studyQ');q2.focus();q2.setSelectionRange(pos,pos)}}
 function studyOutHtml(){const st=S.study;if(!st)return '';
   return `<div class="card out"><div class="row" style="margin-bottom:6px"><span class="tag">${esc(st.title)}</span><b class="grow" style="font-family:var(--serif);font-size:19px">${esc(st.refLabel)}</b>${st.loading?'<span class="spin"></span>':''}</div>
@@ -957,19 +959,51 @@ function loadedColors(el){const hs=Store.list('h_');
   <p class="small muted">Tip: draw a small color key on the inside cover of your Bible so you remember what each color means.</p>`;
   $$('input[data-label]',el).forEach(i=>i.addEventListener('change',()=>{const l=Object.assign({},settings().labels);l[i.dataset.label]=i.value.trim();saveSettings({labels:l});toast('Color key saved')}))}
 function insKindOf(x){return x.kind==='study'?'study':x.kind&&INS_TYPES.some(t=>t[0]===x.kind)&&x.kind!=='custom'?x.kind:'own'}
+const recPaper=k=>{const r=Store.get(k);return r?(r.paper||(r.fields&&r.fields.paper)||null):null};
+function setPaper(k,paper){const r=JSON.parse(JSON.stringify(Store.get(k)));if(k.startsWith('j_')){r.fields=r.fields||{};if(paper)r.fields.paper=paper;else delete r.fields.paper}else{if(paper)r.paper=paper;else delete r.paper}Store.set(k,r)}
+function colorFor(name){const m=mainSet();const n=String(name||'').toLowerCase().trim();const t=m&&m.topics.find(t=>t.name.toLowerCase()===n||n.includes(t.name.toLowerCase()));if(t)return t.color;const pc=PALETTE.find(x=>x[1]===n||n.includes(x[1]));return pc?pc[0]:'y'}
+const PICON={heading:'✍️',highlight:'🖍',margin:'✎',link:'🔗',card:'🗂️',date:'📅'};
+function paperBlock(k){if(!k)return '';const P=recPaper(k);const busy=S.paperBusy&&S.paperBusy[k];
+  if(busy)return `<div class="paperlist"><div class="plh">🖊️ Making your checklist…</div><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div>`;
+  if(!P)return '';const st=P.steps||[];const d=P.done||{};const n=st.filter((_,i)=>d[i]).length;
+  return `<div class="paperlist" id="pl-${k}"><div class="row"><div class="plh grow">🖊️ In your physical Bible <span class="small muted">· ${n}/${st.length} done</span></div><button class="iconbtn" data-act="paperRedo" data-k="${k}" title="Make a new list">↻</button><button class="iconbtn" data-act="paperDel" data-k="${k}" title="Remove list">🗑</button></div>
+   <div class="prog" style="margin:6px 0 8px"><i style="width:${st.length?n/st.length*100:0}%"></i></div>
+   ${st.map((x,i)=>`<div class="item step ${d[i]?'done':''}"><button class="tick" data-act="paperTick" data-k="${k}" data-i="${i}" aria-label="Mark done">${d[i]?'✓':''}</button><div class="grow"><div class="stxt">${PICON[x.type]||'•'} ${x.verse?`<a class="ref" data-act="openRef" data-ref="${esc(x.verse)}">${esc(codeToLabel(x.verse))}</a> `:''}${x.color?`<span class="swatch sw-${ck(x.color)}"></span> `:''}${x.html}</div></div></div>`).join('')}
+   ${P.online?'<div class="small muted" style="margin-top:6px">✓ Also added to your 📖 Online Bible</div>':''}</div>`}
+function paperBtns(k,kind){return `<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="paperGo" data-k="${k||''}" data-kind="${kind}">🖊️ Put in physical Bible</button><button class="btn sm grow" data-act="onlineGo" data-k="${k||''}" data-kind="${kind}">📖 Put in online Bible</button></div>`}
+async function makePaper(k,kind){S.paperBusy=S.paperBusy||{};S.paperBusy[k]=true;renderView();const r0=Store.get(k);const m=mainSet();
+  const colors=m&&m.topics.length?'Their highlighter colors mean: '+m.topics.map(t=>{const pc=PALETTE.find(x=>x[0]===t.color);return (pc?pc[1]:t.color)+' = '+t.name}).join(', ')+'. For "color" use one of these topic names.':'For "color" use a simple color name (yellow, green, blue, pink, orange, purple).';
+  let prompt;
+  if(kind==='prayer'){const f=r0.fields||{};prompt=JSYS+`Help someone put this prayer into their PAPER Bible. ${f.ref?'It is based on '+codeToLabel(f.ref)+'.':'Pick one verse it fits best.'} Return JSON: {"verse":"Book chapter:verse","margin":"the prayer shortened to max 25 words, first person","color":"..."}. ${colors}\nThe prayer:\n${(f.body||'').slice(0,3000)}`}
+  else prompt=JSYS+`Turn this Bible study into a short checklist for marking a PAPER Bible. Passage: ${r0.refLabel}. ${colors}
+Return JSON: {"heading":"a short heading for the top of the page, max 6 words","steps":[{"type":"highlight","verse":"Book chapter:verse","color":"...","why":"max 8 words"},{"type":"margin","verse":"Book chapter:verse","note":"max 12 words"},{"type":"link","verse":"Book chapter:verse","to":"Book chapter:verse","why":"max 6 words"}]}. Give 2-4 highlights, 2-3 margin notes and 1-3 links. Easy words. Only use what the study says.
+The study:\n${(r0.text||'').slice(0,5000)}`;
+  try{const r=await ai(prompt,null,null,'default');const j=parseJSON(r.text);const steps=[];const vc=x=>{const p=parseRef(String(x||''));return p?rc(p):''};
+    if(kind==='prayer'){const v=vc(j.verse);const f=r0.fields||{};
+      steps.push({type:'margin',verse:v,color:colorFor(j.color),html:`Write next to it: <i>“${esc(j.margin||'')}”</i>`,note:j.margin||''});
+      steps.push({type:'card',html:'Write the full prayer on a card and tuck it in the back of your Bible (your prayer pages).'});
+      steps.push({type:'date',html:`Write today’s date (${new Date().toLocaleDateString()}) next to it. When God answers, add ✓ and the date.`});
+      if(!f.ref&&v){const r2=JSON.parse(JSON.stringify(Store.get(k)));r2.fields.ref=v;Store.set(k,r2)}}
+    else{if(j.heading)steps.push({type:'heading',verse:'',html:`At the top of the page write: <b>${esc(j.heading)}</b>`,note:j.heading});
+      (j.steps||[]).forEach(x=>{const v=vc(x.verse);if(x.type==='highlight')steps.push({type:'highlight',verse:v,color:colorFor(x.color),html:`Highlight it${x.why?' — '+esc(x.why):''}`});
+        else if(x.type==='margin')steps.push({type:'margin',verse:v,html:`Write in the margin: <i>${esc(x.note||'')}</i>`,note:x.note||''});
+        else if(x.type==='link'){const t=vc(x.to);steps.push({type:'link',verse:v,to:t,html:`Write in the margin: <b>→ ${esc(t?codeToLabel(t):x.to||'')}</b>${x.why?' ('+esc(x.why)+')':''}`,note:x.why||''})}})}
+    setPaper(k,{steps,done:{},at:Date.now()})}catch(e){toast(aiErr(e))}
+  S.paperBusy[k]=false;renderView();setTimeout(()=>{const el=document.getElementById('pl-'+k);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},80)}
 function paperSheet(title,sub,prompt,pre=''){openSheet(`<h3>${title}</h3><p class="small muted">${esc(sub||'')}</p>${pre}<div class="howto">✨ Made for your paper Bible:</div><div id="paperOut" class="out"><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div><div class="row" style="margin-top:10px"><button class="btn sm grow" data-act="paperCopy">⧉ Copy</button><button class="btn sm pri grow" data-act="closeSheet">✓ Done</button></div>`);
   ai(prompt,t=>{const o=$('#paperOut');if(o)o.innerHTML=md(t)},null,'default').then(r=>{const o=$('#paperOut');if(o){o.innerHTML=md(r.text);o.dataset.t=r.text}}).catch(e=>{const o=$('#paperOut');if(o)o.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`})}
 function whereSheet(title,intro,crumbs,openAttrs){openSheet(`<div style="text-align:center"><div style="font-size:44px">✅</div><h3 style="margin:4px 0">Saved!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
    <div class="card"><div class="small muted" style="margin-bottom:6px">${intro}</div><div class="inspath">${crumbs.map((c,i)=>i===crumbs.length-1?`<b>${c}</b>`:`<span>${c}</span><i>›</i>`).join('')}</div></div>
    <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" ${openAttrs}>Open it now →</button></div>`)}
 const notesSaved=title=>whereSheet(title,'You can find it here:',['📖 Online Bible','🔖 My notes & highlights'],'data-act="goNotes"');
-function insSavedSheet(kind,title){const kk=INS_KINDS().find(x=>x[0]===kind)||['own','✍️','My own & other'];
+const TOOL_INS={context:'chapter',meaning:'chapter',words:'topic',xref:'topic',apply:'chapter',questions:'qa',christ:'gospel',outline:'chapter',soap:'chapter',inductive:'chapter',hear:'chapter',mapping:'memory',fivew:'chapter',q:'qa'};
+function insSavedSheet(kind,title,alsoStudy){const kk=INS_KINDS().find(x=>x[0]===kind)||['own','✍️','My own & other'];
   openSheet(`<div style="text-align:center"><div style="font-size:44px">🗂️</div><h3 style="margin:4px 0">Saved as an insert!</h3><p class="small muted" style="margin:0 0 12px">${esc(title||'')}</p></div>
-   <div class="card"><div class="small muted" style="margin-bottom:6px">You can find it here:</div><div class="inspath"><span>🧰 Bible Kit</span><i>›</i><span>🏷️ Tabs</span><i>›</i><span>🗂️ Inserts</span><i>›</i><b>${kk[1]} ${esc(kk[2])}</b></div></div>
+   <div class="card"><div class="small muted" style="margin-bottom:6px">You can find it here:</div><div class="inspath"><span>🧰 Bible Kit</span><i>›</i><span>🏷️ Tabs</span><i>›</i><span>🗂️ Inserts</span><i>›</i><b>${kk[1]} ${esc(kk[2])}</b></div>${alsoStudy?'<div class="small muted" style="margin-top:8px">It\u2019s also in 🗂️ Inserts › 🔎 From Study.</div>':''}</div>
    <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" data-act="insOpenKind" data-k="${kind}">Open it now →</button></div>`)}
 const INS_KINDS=()=>INS_TYPES.filter(t=>t[0]!=='custom').map(t=>[t[0],t[1],({book:'Book overviews',chapter:'Chapter summaries',memory:'Memory verses',topic:'Topic studies',person:'Characters',timeline:'Timelines',gospel:'Gospel',prayer:'Prayer guides',qa:'Tough questions'})[t[0]]||t[2]]).concat([['study','🔎','From Study'],['own','✍️','My own & other']]);
 function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)-(a.updated||0));const K=S.insKind||'all';const kinds=INS_KINDS();
-  const cnt=k=>all.filter(x=>insKindOf(x)===k).length;const ins=K==='all'?all:all.filter(x=>insKindOf(x)===K);const kk=kinds.find(x=>x[0]===K);
+  const inK=(x,k)=>k==='study'?(x.src==='study'||x.kind==='study'):insKindOf(x)===k;const cnt=k=>all.filter(x=>inK(x,k)).length;const ins=K==='all'?all:all.filter(x=>inK(x,K));const kk=kinds.find(x=>x[0]===K);
   el.innerHTML=`
   <div class="inskinds"><button class="inskind ${K==='all'?'on':''}" data-act="insKind" data-k="all"><span>🗂️</span><b>All</b><small>${all.length}</small></button>${kinds.map(([k,e,n])=>`<button class="inskind ${K===k?'on':''} ${cnt(k)?'':'zero'}" data-act="insKind" data-k="${k}"><span>${e}</span><b>${esc(n)}</b><small>${cnt(k)}</small></button>`).join('')}</div>
   ${K!=='all'?`<h3 style="font-size:22px;margin:14px 2px 4px">${kk[1]} ${esc(kk[2])}</h3>`:''}
@@ -977,7 +1011,7 @@ function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)
   <div class="chips">${INSERT_TEMPLATES.map((t,i)=>`<button class="chip" data-act="newInsert" data-i="${i}">＋ ${esc(t[0])}</button>`).join('')}<button class="chip" data-act="newInsert" data-i="-1">＋ Blank card</button></div>
   ${ins.length?ins.map(x=>`<div class="insert" style="--gc:${x.ref&&parseRef(x.ref)?GENRES[BM[parseRef(x.ref).b].genre][1]:'var(--gold)'}"><div class="row"><h4 class="grow">${esc(x.title||'Untitled')}</h4>${x.ref?`<a class="ref small" data-act="openRef" data-ref="${esc(x.ref)}">${esc(codeToLabel(x.ref))}</a>`:''}</div>
     <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
-    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm pri" data-act="insHow" data-k="${x.key}">🖊️ Put it in my Bible</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm pri" data-act="insHow" data-k="${x.key}">🖊️ Physical Bible</button><button class="btn sm" data-act="insOnline" data-k="${x.key}">📖 Online Bible</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
    :`<div class="empty">${K==='all'?'No insert cards yet — generate one or start with a template above.':'Nothing here yet — tap ✨ Generate above.'}</div>`}`}
 /* ----- ✒️ Margin symbols ----- */
 const DEF_SYMBOLS=[['✝','Jesus / salvation'],['♡','God’s love'],['△','God, Father Son and Spirit'],['🕊','The Holy Spirit'],['☆','A promise to hold onto'],['!','A command to obey'],['?','A question I still have'],['☁','Heaven / eternity'],['⚠','A warning'],['🙏','Prayer'],['→','Cross-reference: see the next verse'],['📅','A date God spoke to me']];
@@ -1161,7 +1195,7 @@ function jPrayers(el){const es=Store.list('j_').filter(e=>e.type==='prayed').sor
        <button class="iconbtn" data-act="prFav" data-k="${e.key}" title="Keep at the top">${f.fav?'⭐':'☆'}</button><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
      <div class="small muted">Saved ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}${f.prayed?` · prayed ${f.prayed}×${f.lastPrayed?', last '+fmtDate(f.lastPrayed):''}`:''}</div>
      <div class="praytext ${open?'open':''}" data-act="prToggle" data-k="${e.key}">${md(f.body||'')}</div>
-     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="btn sm" data-act="prayBible" data-k="${e.key}">🖊️ In my Bible</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div></div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
+     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div>${paperBtns(e.key,'prayer').replace('margin-top:10px','margin-top:6px')}${paperBlock(e.key)}</div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
 function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sort((a,b)=>b.date-a.date);
   el.innerHTML=`${jHead('⛪','Sermon notes','Notes you write while listening to a sermon, at church or online.',newBtn('newJournal','data-t="sermon"'))}
    ${es.length?es.map(journalItem).join(''):'<div class="empty">No sermon notes yet.</div>'}`}
@@ -1297,6 +1331,22 @@ const A={
   /* study */
   useCurrent:()=>{const s=settings();S.studyRef=S.sel.size?refLabel(s.book,s.ch,selVerses()):refLabel(s.book,s.ch,[]);$('#studyRef').value=S.studyRef},
   study:el=>runStudy(el.dataset.tool,$('#studyRef').value),
+  paperGo:async el=>{let k=el.dataset.k;if(!k&&S.study)k=S.study.key;if(!k){toast('Wait until the study is finished');return}if(recPaper(k)){const e2=document.getElementById('pl-'+k);if(e2)e2.scrollIntoView({behavior:'smooth',block:'center'});return}
+    if(el.dataset.kind==='prayer'){S.prOpen=k}else if(S.tab==='study'&&(!S.study||S.study.key!==k))S.openStudy=k;await makePaper(k,el.dataset.kind)},
+  paperRedo:el=>makePaper(el.dataset.k,el.dataset.k.startsWith('j_')?'prayer':'study'),
+  paperDel:el=>confirmSheet('Remove this checklist?','🗑 Remove',()=>{setPaper(el.dataset.k,null);closeSheet();renderView()}),
+  paperTick:el=>{const k=el.dataset.k,i=el.dataset.i;const P=JSON.parse(JSON.stringify(recPaper(k)));P.done=P.done||{};if(P.done[i])delete P.done[i];else{P.done[i]=true;touch()}setPaper(k,P);if(P.steps.length&&Object.keys(P.done).length===P.steps.length)toast('All done! Your Bible is loaded 🎉')},
+  onlineGo:async el=>{let k=el.dataset.k;if(!k&&S.study)k=S.study.key;if(!k){toast('Wait until the study is finished');return}const kind=el.dataset.kind;
+    if(!recPaper(k))await makePaper(k,kind);const P=recPaper(k);if(!P){return}const r=Store.get(k);let first='';
+    P.steps.forEach(x=>{const p=x.verse&&parseRef(x.verse);if(!p)return;if(!first)first=x.verse;const vs=p.v1?vrange(p):[];
+      if(x.type==='highlight'&&vs.length)applyHL(p.b,p.c,vs,x.color||'y','');
+      else if(x.type==='margin')addNote(p.b,p.c,vs,kind==='prayer'?'🙏 '+((r.fields||{}).title||'Prayer'):'✎ Margin note',kind==='prayer'?((r.fields||{}).body||x.note):x.note);
+      else if(x.type==='link')addNote(p.b,p.c,vs,'🔗 Link',`${x.to?codeToLabel(x.to):''}${x.note?' — '+x.note:''}`)});
+    const hd=P.steps.find(x=>x.type==='heading');const rp=parseRef((r.refCode)||'');if(hd&&rp)addNote(rp.b,rp.c,[],'✍️ Heading',hd.note||'');
+    const P2=JSON.parse(JSON.stringify(P));P2.online=true;setPaper(k,P2);touch();
+    const target=first||(r.refCode)||'';whereSheet('Added to your Online Bible','Highlights and notes are now in:',['📖 Online Bible','📖 Read',esc(target?codeToLabel(target):'')],`data-act="openRef" data-ref="${esc(target)}"`)},
+  insOnline:el=>{const x=Store.get(el.dataset.k);const p=x&&x.ref&&parseRef(x.ref);if(!p){toast('This insert has no verse. Tap Edit and add one first.');return}
+    addNote(p.b,p.c,p.v1?vrange(p):[],'🗂️ '+(x.title||'Insert'),x.body||'',!!x.md);touch();whereSheet(x.title,'It’s now a note in:',['📖 Online Bible','📖 Read',esc(codeToLabel(x.ref))],`data-act="openRef" data-ref="${esc(x.ref)}"`)},
   paperCopy:()=>{const o=$('#paperOut');copyText(plain(o&&o.dataset.t||''))},
   studyPick:el=>{S.studyPick=el.dataset.p;renderView()},
   studySaveTo:el=>{const k=el.dataset.k;const st=k?Store.get(k):S.study;if(!st)return;
@@ -1312,7 +1362,7 @@ Use these headings: "### 🖍 Highlight" (2 to 4 verses: verse, which color, why
 The study:
 ${(st.text||'').slice(0,5000)}`)},
   insHow:el=>{const x=Store.get(el.dataset.k);if(!x)return;const p=x.ref&&parseRef(x.ref);const where=p?`${BM[p.b].name} ${p.c}`:'';
-    openSheet(`<h3>🖊️ How to put this insert in your Bible</h3><p class="small muted">${esc(x.title||'')}</p>
+    openSheet(`<h3>🖊️ Put this insert in your physical Bible</h3><p class="small muted">${esc(x.title||'')}</p>
      <ol class="howsteps"><li><b>Pick your paper.</b> A 3×5 index card or a piece of thin paper cut a bit smaller than your Bible page. Bookmarks: a 5 cm wide strip.</li>
      <li><b>Copy the text.</b> <button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy text</button> Write it out by hand with a fine pen, or print it and cut it out.</li>
      <li><b>Where it goes.</b> ${where?`Put it at <b>${esc(where)}</b>, the passage it’s about.`:'Put it next to the passage or book it’s about, or in the back of your Bible with your other inserts.'}</li>
@@ -1331,7 +1381,7 @@ ${(f.body||'').slice(0,3000)}`,`<ol class="howsteps"><li><b>Short version in the
   redoStudy:()=>{const st=S.study;if(!st)return;if(st.question)runStudy(null,st.refLabel,st.question);else{Cache.drop('studies',st.tool+'__'+st.refCode.replace(/[^A-Za-z0-9:\-]/g,'_'));runStudy(st.tool,st.refLabel,null,true)}},
   saveStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const p=parseRef(st.refCode);const vs=p&&p.v1?Array.from({length:(p.v2||p.v1)-p.v1+1},(_,i)=>p.v1+i):[];
     Store.set('n_'+newId(),{ref:p?st.refCode:'',b:p?p.b:null,c:p?p.c:null,vs,title:st.question?('Q: '+st.question):st.title,text:st.text,md:true,created:Date.now(),updated:Date.now()});notesSaved(st.question?('Q: '+st.question):st.title)},
-  insertStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const title=`${st.title} — ${st.refLabel}`;Store.set('i_'+newId(),{title,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,kind:'study',updated:Date.now()});insSavedSheet('study',title)},
+  insertStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;const title=`${st.title} — ${st.refLabel}`;const kind=TOOL_INS[st.tool]||'own';Store.set('i_'+newId(),{title,ref:parseRef(st.refCode)?st.refCode:'',body:st.text,md:true,kind,src:'study',updated:Date.now()});insSavedSheet(kind,title,true)},
   insOpenKind:el=>{closeSheet();S.loadedSub='inserts';S.insKind=el.dataset.k;setTab('tabs');window.scrollTo(0,0)},
   copyStudy:el=>{const st=el&&el.dataset&&el.dataset.k?Store.get(el.dataset.k):S.study;copyText(`${st.title} — ${st.refLabel}\n\n${plain(st.text)}`)},
   toggleStudy:el=>{const k=el.dataset.k;S.openStudy=S.openStudy===k?null:k;const l=$('#studyList');if(l)l.innerHTML=studyListHtml();wireStudyList();const c=document.getElementById('st-'+k);if(c&&S.openStudy)c.scrollIntoView({behavior:'smooth',block:'start'})},
