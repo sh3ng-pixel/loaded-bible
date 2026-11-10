@@ -387,6 +387,19 @@ details.grp[open]>summary::after{content:"▴"}
 .pgicon{width:44px;height:44px;flex:none;display:grid;place-items:center;font-size:24px;border-radius:12px;background:var(--soft)}
 .pgstat{flex:none;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--muted)}.pgcard.done .pgstat{background:var(--accent);color:var(--accent-ink)}
 .pgacts{margin-top:10px}.pgacts .btn{white-space:nowrap}.pgacts2{margin-top:6px}
+.todayhead{display:flex;align-items:flex-end;gap:10px;margin:10px 2px 8px}.todayhead h2{margin:2px 0 0;font-size:27px}
+.tstreak{text-align:center;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:6px 12px}.tstreak b{display:block;font-size:20px}.tstreak span{font-size:11px;color:var(--muted)}
+.tgoal{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.tgoal .prog{margin:0}
+.tcard{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;margin:10px 0}.tcard.warn{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,var(--card))}
+.tcard .th{display:flex;align-items:center;gap:8px}.tcard .th>span{font-size:22px}.tcard .th b{font-size:16px}
+.votdc{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 12%,var(--card)),var(--card))}
+.tverse{font-family:var(--serif);font-size:19px;line-height:1.5;margin:4px 0}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}.tchip{padding:6px 12px;border-radius:999px;background:var(--soft);font-weight:600;font-size:14px;cursor:pointer;color:var(--ink)}
+.tquick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.tquick button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:12px;font-weight:600;cursor:pointer}.tquick span{font-size:22px}
+.tour{text-align:center;padding:6px 4px}.tour h3{font-size:24px;margin:6px 0}.tour p{font-size:16px;line-height:1.5;color:var(--ink)}.tourdots{display:flex;justify-content:center;gap:6px;margin-bottom:10px}.tourdots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.tourdots i.on{background:var(--accent);width:22px;border-radius:4px}
+.srchg{font-weight:700;color:var(--ink);margin:12px 2px 4px;font-size:13px}
+.srchr{display:block;width:100%;text-align:left;padding:9px 11px;margin:4px 0;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.srchr b{display:block;font-size:15px}.srchr span{font-size:13px;color:var(--muted)}.srchr mark{background:color-mix(in srgb,var(--accent) 25%,transparent);color:inherit;border-radius:3px}
+.supply{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin:8px 0}.supply h3{margin:0 0 4px;font-size:18px}.supply p,.supply li{font-size:14.5px;line-height:1.5}.supply ul{margin:4px 0;padding-left:20px}
 .nszrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:6px 0 2px}
 .subtabs button{transition:color .2s,border-color .25s}
 #studyPanel.slidel{animation:slidel .28s ease}#studyPanel.slider{animation:slider .28s ease}
@@ -437,12 +450,14 @@ details.more{margin-top:8px}details.more summary{cursor:pointer;color:var(--mute
   <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
   <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
   <button class="codechip" id="codeChip" data-act="tab" data-tab="account" style="display:none" aria-label="My Bible code"></button>
+  <button class="hbtn" data-act="search" aria-label="Search">🔎</button>
   <button class="hbtn" data-act="donate" aria-label="Donate">❤️</button>
   <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
 </header>
 <main id="view"></main>
 <div id="selbar"></div>
 <nav class="bottom" id="nav">
+  <button data-act="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</button>
   <button data-act="tab" data-tab="load"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 3 1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2 2.2.7-2.2.8L19 21l-.8-2.5L16 17.7l2.2-.7z"/></svg>Load</button>
   <button data-act="tab" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Study</button>
   <button data-act="tab" data-tab="tabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M19 7h2M19 11h2M19 15h2"/><path d="M9 8h6M9 12h6"/></svg>Bible Kit</button>
@@ -704,13 +719,13 @@ function changed(){if(rq)return;rq=true;requestAnimationFrame(()=>{rq=false;
 
 /* ---------- router ---------- */
 const isReading=()=>S.tab==='online'&&S.onlineSub==='read';
-function setTab(t){if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['load','study','tabs','journal','online','account'].includes(t))t='load';S.tab=t;updateAvatar();
+function setTab(t){if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['today','load','study','tabs','journal','online','account'].includes(t))t='today';S.tab=t;updateAvatar();
   try{if(location.hash!=='#'+t)history.replaceState(null,'','#'+t)}catch(e){}
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderView();window.scrollTo(0,0)}
 window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
 
 function renderView(){const v=$('#view');
-  ({load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,online:viewOnline,account:viewAccount})[S.tab](v);
+  ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,online:viewOnline,account:viewAccount})[S.tab](v);
   renderSelbar()}
 
 /* ---------- ONLINE BIBLE ---------- */
@@ -881,7 +896,7 @@ async function runStudy(tool,refText,question,force){
 }
 
 /* ---------- LOADED BIBLE ---------- */
-const KHELP={key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📄','Page maker','Make any page for your paper Bible: a first page, a prayer page, a book intro and more. Then copy it in by hand or print it.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
+const KHELP={supplies:['🖊️','Pens & supplies','What to use so nothing bleeds through your thin Bible pages, and how to test it first.'],key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📄','Page maker','Make any page for your paper Bible: a first page, a prayer page, a book intro and more. Then copy it in by hand or print it.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
 const PAGE_TYPES=[['first','📖','First page','Name, life verse, color key'],['book','📚','Book intro','Before a book starts'],['topic','💭','Topic page','What the Bible says about…'],['prayer','🙏','Prayer page','People & things to pray for'],['promises','☆','Promises page','God’s promises on a theme'],['person','👤','Bible character','Life, lessons, key verses'],['timeline','🕰️','Timeline page','Events in order'],['answered','🎉','Answered prayers','From your prayer list'],['memory','🧠','Memory verses','From your memory list'],['custom','✨','Anything else','Describe your page']];
 const PAGE_ASK={book:['Which book?','book'],topic:['Which topic?','e.g. forgiveness, fear, hope'],prayer:['Who or what is this page for? (optional)','e.g. my family, my friends, my school'],promises:['Which theme?','e.g. peace, provision, strength'],person:['Which person?','e.g. David, Ruth, Peter'],timeline:['Timeline of what?','e.g. the life of Jesus, Genesis, the kings of Israel'],answered:['A title (optional)','e.g. What God has done'],memory:['A title (optional)','e.g. Hidden in my heart'],custom:['Describe the page you want','e.g. a page about the fruit of the Spirit with space to write']};
 function loadedCover(el){const PM=S.pm||(S.pm={type:'first',subj:'',book:'JHN',size:'full',busy:false,cur:null});const T=PAGE_TYPES.find(x=>x[0]===PM.type);
@@ -904,7 +919,7 @@ function pageView(C,fresh){if(!C)return `<div class="paperwrap" style="margin-to
    ${C.verse&&C.verse.text?`<div class="pp-verse">“${esc(C.verse.text)}”<div class="pp-ref">${esc(C.verse.ref||'')}</div></div>`:''}
    ${(C.sections||[]).map(x=>`<div class="pp-h">${esc(x.heading||'')}</div>${(x.lines||[]).map(l=>/^_{3,}$/.test(String(l).trim())?'<div class="pp-write"></div>':`<div class="pp-line" style="justify-content:center;text-align:center"><span>${inline(String(l))}</span></div>`).join('')}`).join('')}
    ${C.footer?`<div class="pp-orn">✦</div><div class="pp-ded">${esc(C.footer)}</div>`:''}</div></div>
-   ${fresh?`<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm pri grow" data-act="pmSave">💾 Save page</button><button class="iconbtn" data-act="pmGo" title="Make a new one">↻</button><button class="iconbtn" data-act="pmCopy" title="Copy">⧉</button><button class="iconbtn" data-act="pmDiscard" title="Throw away">🗑</button></div>`:''}`}
+   ${fresh?`<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm pri grow" data-act="pmSave">💾 Save page</button><button class="iconbtn" data-act="printPage" title="Print">🖨️</button><button class="iconbtn" data-act="pmGo" title="Make a new one">↻</button><button class="iconbtn" data-act="pmCopy" title="Copy">⧉</button><button class="iconbtn" data-act="pmDiscard" title="Throw away">🗑</button></div>`:''}`}
 function pageText(C){const L=[];if(C.subtitle)L.push(C.subtitle.toUpperCase());L.push(C.title||'');if(C.verse&&C.verse.text)L.push('','“'+C.verse.text+'” — '+(C.verse.ref||''));(C.sections||[]).forEach(x=>{L.push('',String(x.heading||'').toUpperCase());(x.lines||[]).forEach(l=>L.push(/^_{3,}$/.test(String(l).trim())?'______________________':String(l).replace(/\*\*/g,'')))});if(C.footer)L.push('',C.footer);return L.join('\n')}
 function pagesSaved(pages){const f=S.pmFilter||'all';const types=PAGE_TYPES.filter(t=>pages.some(p=>p.type===t[0]));const list=f==='all'?pages:pages.filter(p=>p.type===f);const done=pages.filter(p=>p.inBible).length;
   if(!pages.length)return jHead('📚','My pages','Pages you make and save show up here.')+`<div class="empty">No pages yet.<br><button class="btn pri" style="margin-top:10px" data-act="pmView" data-v="make">✨ Make your first page</button></div><p class="small muted" style="text-align:center">Your 📖 First page is made in ✨ Make a page and saves itself.</p>`;
@@ -914,7 +929,7 @@ function pagesSaved(pages){const f=S.pmFilter||'all';const types=PAGE_TYPES.filt
    ${list.map(pg=>{const T=PAGE_TYPES.find(x=>x[0]===pg.type)||PAGE_TYPES[9];const open=S.pmOpen===pg.key;const secs=(pg.page.sections||[]).length;
      return `<div class="pgcard ${pg.inBible?'done':''} ${open?'open':''}"><div class="pghead" data-act="pmToggle" data-k="${pg.key}"><span class="pgicon">${T[1]}</span><div class="grow"><b>${esc(pg.page.title||T[2])}</b><div class="small muted">${esc(T[2])} · ${fmtDate(pg.at)} · ${secs} section${secs===1?'':'s'}</div></div><span class="pgstat">${pg.inBible?'✓ In my Bible':'✍️ To write'}</span></div>
       ${open?pageView(pg.page,false):''}
-      <div class="row pgacts"><button class="btn sm ${open?'':'pri'} grow" data-act="pmToggle" data-k="${pg.key}">${open?'▴ Close':'👁 View'}</button><button class="btn sm grow" data-act="pmHow" data-k="${pg.key}">🖊️ Add to Bible</button></div><div class="row pgacts2"><button class="btn sm ${pg.inBible?'':'ghost'}" data-act="pmDone" data-k="${pg.key}">${pg.inBible?'↺ Not written yet':'✓ I wrote it in'}</button><span class="grow"></span><button class="iconbtn" data-act="pmCopyK" data-k="${pg.key}" title="Copy">⧉</button><button class="iconbtn" data-act="delItem" data-k="${pg.key}" title="Delete">🗑</button></div></div>`}).join('')}`}
+      <div class="row pgacts"><button class="btn sm ${open?'':'pri'} grow" data-act="pmToggle" data-k="${pg.key}">${open?'▴ Close':'👁 View'}</button><button class="btn sm grow" data-act="pmHow" data-k="${pg.key}">🖊️ Add to Bible</button></div><div class="row pgacts2"><button class="btn sm ${pg.inBible?'':'ghost'}" data-act="pmDone" data-k="${pg.key}">${pg.inBible?'↺ Not written yet':'✓ I wrote it in'}</button><span class="grow"></span><button class="iconbtn" data-act="printPage" data-k="${pg.key}" title="Print">🖨️</button><button class="iconbtn" data-act="sharePage" data-k="${pg.key}" title="Share as picture">📤</button><button class="iconbtn" data-act="pmCopyK" data-k="${pg.key}" title="Copy">⧉</button><button class="iconbtn" data-act="delItem" data-k="${pg.key}" title="Delete">🗑</button></div></div>`}).join('')}`}
 function pagesList(pages){if(!pages.length)return '';return `<div class="stepl" style="margin-top:18px"><span>📚</span> My pages <small>${pages.length} saved</small></div>
   ${pages.map(pg=>{const open=S.pmOpen===pg.key;const T=PAGE_TYPES.find(x=>x[0]===pg.type)||PAGE_TYPES[9];return `<div class="item"><div class="h"><span>${T[1]}</span><b class="grow" data-act="pmToggle" data-k="${pg.key}" style="cursor:pointer">${esc(pg.page.title||T[2])}</b><button class="iconbtn" data-act="pmToggle" data-k="${pg.key}">${open?'▴':'▾'}</button><button class="iconbtn" data-act="delItem" data-k="${pg.key}" title="Delete">🗑</button></div>
    <div class="small muted">${esc(T[2])} · ${fmtDate(pg.at)}</div>${open?pageView(pg.page,false)+`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="pmHow" data-k="${pg.key}">🖊️ Put in physical Bible</button><button class="iconbtn" data-act="pmCopyK" data-k="${pg.key}" title="Copy">⧉</button></div>`:''}</div>`}).join('')}`}
@@ -943,7 +958,7 @@ function firstPageMaker(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?
      ${sec('plan',d.plan?`<div class="pp-h">Reading plan</div><div class="pp-line"><span>${esc(d.plan)}</span></div>`:'')}
      ${sec('dedication',c.dedication?`<div class="pp-orn">✦</div><div class="pp-ded">${esc(c.dedication).replace(/\n/g,'<br>')}</div>`:'')}
    </div></div>
-   <div class="row" style="margin:10px 0"><button class="btn pri grow" data-act="coverCopy">⧉ Copy the text</button></div>
+   <div class="row" style="margin:10px 0"><button class="btn pri grow" data-act="coverCopy">⧉ Copy the text</button><button class="btn grow" data-act="printCover">🖨️ Print</button></div>
    <div class="card"><b style="font-family:var(--serif);font-size:18px">✏️ Make it yours</b>
      <div class="small muted" style="margin:6px 0 4px">Show on the page (tap to turn on/off)</div>
      <div class="chips">${COVER_PARTS.map(([k,l])=>`<button class="chip ${sh[k]?'on':''}" data-act="coverShow" data-k="${k}">${l}</button>`).join('')}</div>
@@ -959,7 +974,7 @@ function firstPageMaker(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?
   const on=(id,fn)=>{const i=$('#'+id,el);if(i)i.addEventListener('change',()=>fn(i.value))};
   on('cvOwner',v=>saveCover({owner:v.trim()}));on('cvStart',v=>saveCover({started:v}));on('cvDed',v=>saveCover({dedication:v.trim()}));
   on('cvLife',v=>{const p=parseRef(v);if(v.trim()&&!p){toast('Type a verse like John 3:16');return}saveCover({life:p?rc(p):''})})}
-const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✍️','Write-ins',[['cover','📄 Page maker'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
+const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts'],['supplies','🖊️ Supplies']]],['mark','✍️','Write-ins',[['cover','📄 Page maker'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
 function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub==='symbols'?'cover':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
   v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Set up and keep track of your paper Bible.</p></div>
   <div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
@@ -967,7 +982,7 @@ function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key'
   ${KHELP[sub]?jHead(...KHELP[sub]):''}
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
-  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,symbols:loadedSymbols,chains:loadedChains,cover:loadedCover,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
+  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,symbols:loadedSymbols,chains:loadedChains,cover:loadedCover,supplies:loadedSupplies,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
 function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
   for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
     let g=null;
@@ -1029,7 +1044,7 @@ const PICON={heading:'✍️',highlight:'🖍',margin:'✎',link:'🔗',card:'�
 function paperBlock(k){if(!k)return '';const P=recPaper(k);const busy=S.paperBusy&&S.paperBusy[k];
   if(busy)return `<div class="paperlist"><div class="plh">🖊️ Making your checklist…</div><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div>`;
   if(!P)return '';const st=P.steps||[];const d=P.done||{};const n=st.filter((_,i)=>d[i]).length;
-  return `<div class="paperlist" id="pl-${k}"><div class="row"><div class="plh grow">🖊️ In your physical Bible <span class="small muted">· ${n}/${st.length} done</span></div><button class="iconbtn" data-act="paperRedo" data-k="${k}" title="Make a new list">↻</button><button class="iconbtn" data-act="paperDel" data-k="${k}" title="Remove list">🗑</button></div>
+  return `<div class="paperlist" id="pl-${k}"><div class="row"><div class="plh grow">🖊️ In your physical Bible <span class="small muted">· ${n}/${st.length} done</span></div><button class="iconbtn" data-act="printNotes" data-k="${k}" title="Print the notes">🖨️</button><button class="iconbtn" data-act="paperRedo" data-k="${k}" title="Make a new list">↻</button><button class="iconbtn" data-act="paperDel" data-k="${k}" title="Remove list">🗑</button></div>
    <div class="prog" style="margin:6px 0 8px"><i style="width:${st.length?n/st.length*100:0}%"></i></div>
    ${sizeChips('paperSize',k,P.size||'margin')}
    ${st.map((x,i)=>{const pk=k+'|'+i;const pm=(S.ppPanel||{})[pk];const ex=((P.extra||{})[i])||{};const busy=m=>S.ppBusy===pk+'|'+m;const content=pm?((S.ppStream||{})[pk+'|'+pm]!=null?S.ppStream[pk+'|'+pm]:ex[pm]):'';const tools=['highlight','margin','link','heading'].includes(x.type);
@@ -1078,7 +1093,7 @@ function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)
   <div class="chips">${INSERT_TEMPLATES.map((t,i)=>`<button class="chip" data-act="newInsert" data-i="${i}">＋ ${esc(t[0])}</button>`).join('')}<button class="chip" data-act="newInsert" data-i="-1">＋ Blank card</button></div>
   ${ins.length?ins.map(x=>`<div class="insert" style="--gc:${x.ref&&parseRef(x.ref)?GENRES[BM[parseRef(x.ref).b].genre][1]:'var(--gold)'}"><div class="row"><h4 class="grow">${esc(x.title||'Untitled')}</h4>${x.ref?`<a class="ref small" data-act="openRef" data-ref="${esc(x.ref)}">${esc(codeToLabel(x.ref))}</a>`:''}</div>
     <div class="b">${x.md?md(String(x.body||'').replace(/^\s*#{1,3}\s+.+\n?/,'')):esc(x.body)}</div>
-    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm pri" data-act="insHow" data-k="${x.key}">🖊️ Physical Bible</button><button class="btn sm" data-act="insOnline" data-k="${x.key}">📖 Online Bible</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="editInsert" data-k="${x.key}">Edit</button><button class="btn sm pri" data-act="insHow" data-k="${x.key}">🖊️ Physical Bible</button><button class="btn sm" data-act="insOnline" data-k="${x.key}">📖 Online Bible</button><button class="btn sm" data-act="printInsert" data-k="${x.key}">🖨️ Print</button><button class="btn sm" data-act="copyInsert" data-k="${x.key}">⧉ Copy</button><button class="btn sm danger" data-act="delItem" data-k="${x.key}">🗑 Delete</button></div></div>`).join('')
    :`<div class="empty">${K==='all'?'No insert cards yet — generate one or start with a template above.':'Nothing here yet — tap ✨ Generate above.'}</div>`}`}
 /* ----- ✒️ Margin symbols ----- */
 const DEF_SYMBOLS=[['✝','Jesus / salvation'],['♡','God’s love'],['△','God, Father Son and Spirit'],['🕊','The Holy Spirit'],['☆','A promise to hold onto'],['!','A command to obey'],['?','A question I still have'],['☁','Heaven / eternity'],['⚠','A warning'],['🙏','Prayer'],['→','Cross-reference: see the next verse'],['📅','A date God spoke to me']];
@@ -1154,7 +1169,7 @@ function loadedMemory(el){const L=memList();const learned=L.filter(v=>v.learned)
      <div class="chips" style="flex-wrap:wrap;margin-top:8px">${MEM_SUGGEST.filter(r=>!L.some(v=>v.ref===r)).slice(0,8).map(r=>`<button class="chip" data-act="memAddRef" data-r="${r}">＋ ${esc(codeToLabel(r))}</button>`).join('')}</div></div>
    ${L.length?`<div class="row" style="margin:8px 2px"><b class="grow">${L.length} verse${L.length===1?'':'s'} · ${learned} learned</b><button class="btn sm pri" data-act="memPractice">🧠 Practice</button></div>
      <div class="prog" style="margin:0 2px 8px"><i style="width:${learned/L.length*100}%"></i></div>
-     ${L.map((v,i)=>`<div class="item"><div class="h">${refA(v.ref,codeToLabel(v.ref))}<span class="grow"></span>${v.learned?'<span class="pstat done">✓ Learned</span>':'<span class="tag">learning</span>'}<button class="btn sm ghost" data-act="memToggle" data-i="${i}" title="${v.learned?'Mark as learning':'Mark as learned'}">${v.learned?'↺':'✓'}</button><button class="btn sm ghost" data-act="memDel" data-i="${i}" aria-label="Remove">🗑</button></div></div>`).join('')}`
+     ${L.map((v,i)=>`<div class="item"><div class="h">${refA(v.ref,codeToLabel(v.ref))}<span class="grow"></span>${v.learned?'<span class="pstat done">✓ Learned</span>':'<span class="tag">learning</span>'}<button class="btn sm ghost" data-act="memToggle" data-i="${i}" title="${v.learned?'Mark as learning':'Mark as learned'}">${v.learned?'↺':'✓'}</button><button class="btn sm ghost" data-act="shareMem" data-r="${v.ref}" aria-label="Share">📤</button><button class="btn sm ghost" data-act="memDel" data-i="${i}" aria-label="Remove">🗑</button></div></div>`).join('')}`
    :'<div class="empty">No memory verses yet — add one above.</div>'}`;
   const i=$('#memAdd',el);if(i)i.addEventListener('keydown',e=>{if(e.key==='Enter')A.memAdd()})}
 function loadedProgress(el){const pr=progress();const read=Object.values(pr).reduce((a,x)=>a+x.length,0);
@@ -1262,7 +1277,7 @@ function jPrayers(el){const es=Store.list('j_').filter(e=>e.type==='prayed').sor
        <button class="iconbtn" data-act="prFav" data-k="${e.key}" title="Keep at the top">${f.fav?'⭐':'☆'}</button><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
      <div class="small muted">Saved ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}${f.prayed?` · prayed ${f.prayed}×${f.lastPrayed?', last '+fmtDate(f.lastPrayed):''}`:''}</div>
      <div class="praytext ${open?'open':''}" data-act="prToggle" data-k="${e.key}">${md(f.body||'')}</div>
-     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div>${paperBtns(e.key,'prayer').replace('margin-top:10px','margin-top:6px')}${paperBlock(e.key)}</div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
+     <div class="row" style="margin-top:8px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${e.key}">🙏 I prayed this</button><button class="iconbtn" data-act="sharePrayer" data-k="${e.key}" title="Share as picture">📤</button><button class="iconbtn" data-act="prCopyK" data-k="${e.key}" title="Copy">⧉</button><button class="btn sm ghost" data-act="prToggle" data-k="${e.key}">${open?'Show less':'Read all'}</button></div>${paperBtns(e.key,'prayer').replace('margin-top:10px','margin-top:6px')}${paperBlock(e.key)}</div>`}).join(''):'<div class="empty">No saved prayers yet. Write one in ✨ Pray and tap 💾 Save.</div>'}`}
 function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sort((a,b)=>b.date-a.date);
   el.innerHTML=`${jHead('⛪','Sermon notes','Notes you write while listening to a sermon, at church or online.',newBtn('newJournal','data-t="sermon"'))}
    ${es.length?es.map(journalItem).join(''):'<div class="empty">No sermon notes yet.</div>'}`}
@@ -1271,7 +1286,7 @@ function journalItem(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields|
   return `<div class="item jitem" data-act="editJournal" data-k="${e.key}"><div class="h"><span>${f.mood||t.icon}</span><span class="grow">${esc(title)}</span><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Open">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
    <div class="small muted"><span class="tbadge">${esc(t.name)}</span> ${fmtDate(e.date)}${e.type==='prayer'?(f.answered?' · ✓ answered':' · praying'):''}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>
    ${S.jRead===e.key?`<div class="jfull" data-act="jRead" data-k="${e.key}">${jFull(e)}</div>`:snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}
-   ${jHasMore(e)?`<button class="readall" data-act="jRead" data-k="${e.key}">${S.jRead===e.key?'▴ Show less':'▾ Read all'}</button>`:''}</div>`}
+   <div class="row" style="gap:10px">${jHasMore(e)?`<button class="readall" data-act="jRead" data-k="${e.key}">${S.jRead===e.key?'▴ Show less':'▾ Read all'}</button>`:''}${['testimony','reflect','prayed'].includes(e.type)?`<button class="readall" data-act="shareJournal" data-k="${e.key}">📤 Share</button>`:''}</div></div>`}
 function jFull(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};
   return t.fields.filter(x=>x[2]!=='check'&&x[0]!=='title'&&f[x[0]]).map(([k,l])=>k==='ref'?`<div class="jf"><div class="jfl">${esc(l)}</div>${refA(f.ref,codeToLabel(f.ref))}</div>`:`<div class="jf"><div class="jfl">${esc(l)}</div><div class="jfb">${esc(String(f[k])).replace(/\n/g,'<br>')}</div></div>`).join('')+(e.type==='goal'&&f.steps&&f.steps.length?`<div class="jf"><div class="jfl">Steps</div>${f.steps.map(x=>`<div>${x.d?'✓':'○'} ${esc(x.t)}</div>`).join('')}</div>`:'')}
 function jHasMore(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const all=t.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean);return all.join(' · ').length>=180||all.length>1||(e.type==='goal'&&(f.steps||[]).length)}
@@ -1622,6 +1637,40 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   prCopy:()=>copyText(S.pray.out.replace(/\*\*/g,'')),
   goNotes:()=>{closeSheet();S.onlineSub='notes';setTab('online');window.scrollTo(0,0)},
   jRead:el=>{S.jRead=S.jRead===el.dataset.k?null:el.dataset.k;renderView()},
+  goKit:el=>{S.loadedSub=el.dataset.s;setTab('tabs')},
+  tMem:()=>{S.tMemShow=true;renderView()},
+  tContinue:el=>{S.build.planKey=el.dataset.k;setTab('load');setTimeout(()=>scrollToPlan(el.dataset.k),100)},
+  tGratSave:()=>{const i=$('#tGrat');const v=(i&&i.value||'').trim();if(!v){toast('Write one thing first');return}const k='j_grat_'+todayStr();const old=Store.get(k);const items=old?(old.fields.body||'').split('\n').filter(Boolean):[];items.push(v);Store.set(k,Object.assign({type:'grat',date:Date.now()},old||{},{fields:{body:items.join('\n')},updated:Date.now()}));touch();i.value='';toast('Thank You, Lord! 🙌 Saved in Journal › Thanks')},
+  codeOk:()=>{saveSettings({codeOk:true});renderView()},
+  shareVerse:async el=>{const r=el.dataset.r;if(!KJV)await loadKJV().catch(()=>{});shareImage({kicker:'Verse of the day',text:kjvText(r)||codeToLabel(r),ref:codeToLabel(r)})},
+  shareMem:el=>shareImage({kicker:'Hidden in my heart',text:kjvText(el.dataset.r)||'',ref:codeToLabel(el.dataset.r)}),
+  sharePage:el=>{const pg=Store.get(el.dataset.k);const C=pg.page;shareImage({kicker:C.subtitle||'',title:C.title,text:(C.verse&&C.verse.text?'“'+C.verse.text+'”  ':'')+(C.sections||[]).map(x=>x.heading+': '+(x.lines||[]).filter(l=>!/^_+$/.test(l)).join(' · ')).join('   '),ref:C.verse&&C.verse.ref})},
+  sharePrayer:el=>{const e=Store.get(el.dataset.k);shareImage({kicker:'A prayer',title:e.fields.title||'',text:e.fields.body||'',ref:e.fields.ref?codeToLabel(e.fields.ref):''})},
+  shareJournal:el=>{const e=Store.get(el.dataset.k);const f=e.fields||{};const T=JTYPES[e.type]||JTYPES.reflect;shareImage({kicker:T.name,title:f.title||'',text:[f.before,f.god,f.now,f.body].filter(Boolean).join('  '),ref:f.ref?codeToLabel(f.ref):''})},
+  doPrint:el=>{const P=S._print;closeSheet();if(P)printDoc(P.title,P.html,el.dataset.z)},
+  printPage:el=>{const C=el.dataset.k?Store.get(el.dataset.k).page:S.pm.cur;printSheet(C.title,pagePrintHtml(C),'full')},
+  printCover:()=>{printSheet('First page',coverText().split('\n').map(l=>l?(/^[A-Z][A-Z :()]+$/.test(l)?`<h2>${esc(l)}</h2>`:`<p style="text-align:center">${esc(l)}</p>`):'<br>').join(''),'full')},
+  printInsert:el=>{const x=Store.get(el.dataset.k);printSheet(x.title,x.md?mdPrint(x.title,x.ref?codeToLabel(x.ref):'',x.body):`<h1>${esc(x.title)}</h1><p>${esc(x.body).replace(/\n/g,'<br>')}</p>`,'card')},
+  printSnote:()=>printSheet('Study note: '+snRefLabel(),mdPrint('Study note',snRefLabel(),S.snote.out),S.snote.size==='page'?'half':'card'),
+  printLapp:()=>printSheet('Life application: '+laRefLabel(),mdPrint('Life application',laRefLabel(),S.lapp.out),S.lapp.size==='page'?'half':'card'),
+  printNotes:el=>{const P=recPaper(el.dataset.k);const ns=P.steps.filter(x=>x.type==='margin');if(!ns.length){toast('No notes to print in this list');return}printSheet('My notes',ns.map(x=>`<p><b>${esc(x.verse?codeToLabel(x.verse):'')}</b><br>${esc(x.note||'')}</p><hr style="border:0;border-top:1px dashed #bbb">`).join(''),'card')},
+  backupDl:()=>{if(downloadFile(`loaded-bible-backup-${todayStr()}.json`,backupJSON(),'application/json'))toast('Backup downloaded 💾 Keep the file somewhere safe');saveSettings({lastBackup:Date.now()})},
+  backupCopy:()=>{copyText(backupJSON());toast('Backup copied. Paste it into a note to keep it safe');saveSettings({lastBackup:Date.now()})},
+  backupRestore:()=>{openSheet(`<h3>⬆️ Restore a backup</h3><p class="small muted">Choose your backup file, or paste the backup text.</p><input type="file" id="bkFile" accept=".json,application/json,text/plain" class="f"><textarea class="f" id="bkText" placeholder="…or paste the backup text here" style="min-height:90px"></textarea><button class="btn pri wide" data-act="backupRestoreGo" style="margin-top:8px">Restore</button>`);
+    $('#bkFile').onchange=async e=>{const f=e.target.files[0];if(f)restoreFrom(await f.text())}},
+  backupRestoreGo:()=>{const t=$('#bkText').value.trim();if(!t){toast('Choose a file or paste the backup text');return}restoreFrom(t)},
+  tourGo:el=>showTour(+el.dataset.i),
+  tourEnd:()=>{saveSettings({toured:true});closeSheet()},
+  tourAgain:()=>showTour(0),
+  search:()=>searchSheet(),
+  srchGo:el=>{const t=el.dataset.t,k=el.dataset.k;closeSheet();
+    if(t==='note'){const n=Store.get(k);if(n&&n.ref&&parseRef(n.ref))openRefCode(n.ref);else{S.onlineSub='notes';setTab('online')}}
+    else if(t==='journal'){setTab('journal');A.editJournal({dataset:{k}})}
+    else if(t==='study'){S.openStudy=k;setTab('study');setTimeout(()=>{const c=document.getElementById('st-'+k);if(c)c.scrollIntoView({behavior:'smooth',block:'start'})},150)}
+    else if(t==='page'){S.loadedSub='cover';S.pmView='saved';S.pmFilter='all';S.pmOpen=k;setTab('tabs')}
+    else if(t==='insert'){S.loadedSub='inserts';S.insKind='all';setTab('tabs')}
+    else if(t==='plan'){S.build.planKey=k;setTab('load');setTimeout(()=>scrollToPlan(k),120)}
+    else if(t==='topic'){S.loadedSub='key';setTab('tabs')}},
   jOpen:el=>{closeSheet();S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0)},
   jwFresh:()=>{S.jDraft=null;S.jSub='write';renderView()},
   prDiscard:()=>confirmSheet('Throw away this prayer? (It isn’t saved.)','🗑 Throw away',()=>{S.pray.out='';S.pray.edit=false;closeSheet();renderView()}),
@@ -1737,7 +1786,7 @@ function lappForm(){const N=S.lapp||(S.lapp={v1:'',v2:'',areas:[],situ:'',size:'
    <label class="l">How big?</label><div class="chips">${SN_SIZES.map(([k,l,d])=>`<button class="chip ${N.size===k?'on':''}" data-act="laSize" data-k="${k}">${l} <span class="muted small">· ${d}</span></button>`).join('')}</div>
    <button class="btn pri" style="width:100%;justify-content:center;margin-top:8px" data-act="laGo" ${N.busy?'disabled':''}>${N.busy?'<span class="spin"></span> Writing…':'🌱 Show me how to live it'}</button>
    ${N.out||N.busy?`<div class="snotecard"><div class="small muted" style="margin-bottom:4px">🌱 ${esc(laRefLabel())}</div><div id="laOut" class="out">${md(N.out)}</div>
-     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm pri grow" data-act="laSave">💾 My notes</button><button class="btn sm grow" data-act="laJournal">📓 Journal</button><button class="iconbtn" data-act="laGo" title="New one">🔁</button><button class="iconbtn" data-act="laCopy" title="Copy">⧉</button><button class="iconbtn" data-act="laDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`}
+     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm pri grow" data-act="laSave">💾 My notes</button><button class="btn sm grow" data-act="laJournal">📓 Journal</button><button class="iconbtn" data-act="laGo" title="New one">🔁</button><button class="iconbtn" data-act="printLapp" title="Print">🖨️</button><button class="iconbtn" data-act="laCopy" title="Copy">⧉</button><button class="iconbtn" data-act="laDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`}
 function laRefLabel(){const B=S.build,N=S.lapp;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);return `${BM[B.book].name} ${B.ch}${a?':'+a+(b>a?'–'+b:''):''}`}
 function bindLapp(v){const N=S.lapp;[['laV1','v1'],['laV2','v2'],['laSitu','situ']].forEach(([id,k])=>{const i=$('#'+id,v);if(i)i.oninput=()=>{N[k]=i.value}})}
 const SN_KINDS=[['sum','📝 Summary','What happens, in short'],['explain','💡 Explanation','What it means, made simple'],['life','🌱 For my life','What it means for me today'],['all','✨ All three','Summary, meaning and life']];
@@ -1751,7 +1800,7 @@ function snoteForm(){const N=S.snote||(S.snote={kind:'all',size:'card',v1:'',v2:
    <label class="l">How big?</label><div class="chips">${SN_SIZES.map(([k,l,d])=>`<button class="chip ${N.size===k?'on':''}" data-act="snSize" data-k="${k}">${l} <span class="muted small">· ${d}</span></button>`).join('')}</div>
    <button class="btn pri" style="width:100%;justify-content:center;margin-top:8px" data-act="snGo" ${N.busy?'disabled':''}>${N.busy?'<span class="spin"></span> Writing your note…':'✨ Write my study note'}</button>
    ${N.out||N.busy?`<div class="snotecard"><div class="small muted" style="margin-bottom:4px">📝 ${esc(snRefLabel())}</div><div id="snOut" class="out">${md(N.out)}</div>
-     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="snSave">💾 Save to my notes</button><button class="btn sm grow" data-act="snGo">🔁 New one</button><button class="iconbtn" data-act="snCopy" title="Copy">⧉</button><button class="iconbtn" data-act="snDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`}
+     ${N.out&&!N.busy?`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="snSave">💾 Save to my notes</button><button class="btn sm grow" data-act="snGo">🔁 New one</button><button class="iconbtn" data-act="printSnote" title="Print">🖨️</button><button class="iconbtn" data-act="snCopy" title="Copy">⧉</button><button class="iconbtn" data-act="snDiscard" title="Throw away">🗑</button></div>`:''}</div>`:''}`}
 function snRefLabel(){const B=S.build,N=S.snote;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);return `${BM[B.book].name} ${B.ch}${a?':'+a+(b>a?'–'+b:''):''}`}
 function bindSnote(v){const N=S.snote;[['snV1','v1'],['snV2','v2']].forEach(([id,k])=>{const i=$('#'+id,v);if(i)i.oninput=()=>{N[k]=i.value}})}
 function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.book;B.ch=s.ch}if(!B.bookOnly)B.bookOnly=s.book;
@@ -2153,6 +2202,116 @@ const BADGES=[
  ['nt','🕊️','New Testament','Read the whole New Testament',s=>s.ntRead>=260],
 ];
 
+/* ===== 🏠 TODAY ===== */
+function dayIdx(n){return n?Math.floor(Date.now()/864e5)%n:0}
+function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().getHours();const hi=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  const goal=pf.goal||5;const nm=pf.name||'';
+  const vref=VOTD[(dayIdx(VOTD.length)+(S.votdOff||0)+VOTD.length*10)%VOTD.length];const vt=kjvText(vref);if(!KJV&&!S.todayKjv){S.todayKjv=1;loadKJV().catch(()=>{}).then(()=>{S.todayKjv=2;if(S.tab==='today')renderView()})}
+  // reading
+  const rp=Store.get('readplan');let reading='';
+  if(rp&&rp.id){const P=RPLANS.find(x=>x[0]===rp.id);const days=planDays(rp.id);const t=Math.max(0,Math.min(days.length-1,dayNum(rp.start)));const done=(rp.done||{})[t];
+    reading=`<div class="tcard"><div class="th"><span>📅</span><b class="grow">Today’s reading</b><span class="small muted">Day ${t+1} of ${days.length}</span></div>
+     <div class="small muted" style="margin:2px 0 6px">${esc(P[2])}</div><div class="tchips">${days[t].map(([b,c])=>`<a class="tchip" data-act="openCh" data-b="${b}" data-c="${c}">${esc(BM[b].name)} ${c}</a>`).join('')||'<span class="muted">Rest day</span>'}</div>
+     <button class="btn sm ${done?'':'pri'} wide" style="margin-top:8px" data-act="rpTick" data-d="${t}">${done?'✓ Done today (tap to undo)':'✓ I read it today'}</button></div>`}
+  else reading=`<div class="tcard"><div class="th"><span>📅</span><b class="grow">Read every day</b></div><p class="small muted" style="margin:4px 0 8px">Pick a reading plan and it shows up here every day.</p><button class="btn sm pri" data-act="goKit" data-s="plans">Choose a reading plan →</button></div>`;
+  // memory
+  const ml=memList();const todo=ml.filter(x=>!x.learned);const mv=(todo.length?todo:ml)[dayIdx((todo.length?todo:ml).length)];
+  const mem=mv?`<div class="tcard"><div class="th"><span>🧠</span><b class="grow">Memory verse</b><span class="small muted">${ml.filter(x=>x.learned).length}/${ml.length} learned</span></div>
+    <h3 style="margin:6px 0 2px;font-size:21px">${esc(codeToLabel(mv.ref))}</h3>${S.tMemShow?`<p class="tverse">${esc(kjvText(mv.ref)||'…')}</p>`:`<p class="small muted" style="margin:2px 0 6px">Say it out loud, then check.</p>`}
+    <div class="row">${S.tMemShow?'':`<button class="btn sm grow" data-act="tMem">👁 Show it</button>`}<button class="btn sm grow" data-act="goKit" data-s="memory">🧠 Practice all</button></div></div>`
+    :`<div class="tcard"><div class="th"><span>🧠</span><b class="grow">Memory verse</b></div><p class="small muted" style="margin:4px 0 8px">Save a verse to learn by heart. Today’s verse is a good start!</p><button class="btn sm" data-act="memAddRef" data-r="${vref}">＋ Learn ${esc(codeToLabel(vref))}</button></div>`;
+  // prayer
+  const prs=Store.list('j_').filter(e=>e.type==='prayed');const fav=prs.filter(e=>e.fields.fav);const pr=(fav.length?fav:prs)[dayIdx((fav.length?fav:prs).length)];const reqs=Store.list('j_').filter(e=>e.type==='prayer'&&!(e.fields||{}).answered).length;
+  const pray=`<div class="tcard"><div class="th"><span>🙏</span><b class="grow">Pray today</b>${reqs?`<a class="small" data-act="jOpen" data-s="list">${reqs} request${reqs===1?'':'s'} →</a>`:''}</div>
+    ${pr?`<b style="font-family:var(--serif);font-size:17px">${esc(pr.fields.title||'Prayer')}</b><div class="praytext" style="max-height:3.2em">${md(pr.fields.body||'')}</div><div class="row" style="margin-top:6px"><button class="btn sm pri grow" data-act="prPrayed" data-k="${pr.key}">🙏 I prayed this</button><button class="btn sm grow" data-act="jOpen" data-s="prayers">Open</button></div>`
+      :`<p class="small muted" style="margin:4px 0 8px">Let a prayer be written with you, in your own style.</p><button class="btn sm pri" data-act="jOpen" data-s="pray">✨ Write a prayer</button>`}</div>`;
+  // continue loading
+  const open=loadPlans().map(pl=>({pl,pp:planProg(pl)})).filter(r=>!r.pp.done&&r.pp.total)[0];
+  const cont=open?`<div class="tcard"><div class="th"><span>🖍</span><b class="grow">Keep loading</b><span class="small muted">${open.pp.dn}/${open.pp.total} steps</span></div><b style="font-family:var(--serif);font-size:18px">${esc(planTitle(open.pl))}</b><div class="prog" style="margin:6px 0 8px"><i style="width:${open.pp.pct}%"></i></div><button class="btn sm pri" data-act="tContinue" data-k="${open.pl.key}">Continue →</button></div>`:'';
+  const codeNag=STANDALONE&&Code.value&&!settings().codeOk?`<div class="tcard warn"><div class="th"><span>🔑</span><b class="grow">Save your Bible code!</b></div><p class="small" style="margin:4px 0 8px">It’s the only way to get your progress back on another phone. Screenshot it or write it in the back of your Bible.</p><div class="bigcode small-code" style="margin:0 0 8px">${esc(Code.value)}</div><div class="row"><button class="btn sm pri grow" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm grow" data-act="codeOk">✓ I saved it</button></div></div>`:'';
+  v.innerHTML=`<div class="todayhead"><div class="grow"><div class="small muted">${new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div><h2>${hi}${nm?', '+esc(nm):''}!</h2></div><div class="tstreak"><b>🔥 ${st.streak}</b><span>day streak</span></div></div>
+   <div class="tgoal"><span class="small"><b>Today:</b> ${Math.min(st.today,goal)}/${goal} things done</span><div class="prog grow"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div></div>
+   ${codeNag}
+   <div class="tcard votdc"><div class="th"><span>☀️</span><b class="grow">Verse of the day</b><button class="iconbtn" data-act="votdNext" title="Another verse">🎲</button></div>
+     <h3 style="margin:6px 0 2px;font-size:22px">${refA(vref,codeToLabel(vref))}</h3>${vt?`<p class="tverse">${esc(vt)}</p>`:KJV||S.todayKjv===2?'<p class="small muted">Tap the reference to read it.</p>':'<p class="small muted">Loading the verse…</p>'}
+     <div class="row" style="margin-top:6px"><button class="btn sm pri grow" data-act="votdLoad" data-r="${vref}">✨ Load it</button><button class="btn sm grow" data-act="shareVerse" data-r="${vref}">📤 Share</button></div></div>
+   ${reading}${cont}${pray}${mem}
+   <div class="tcard"><div class="th"><span>🙌</span><b class="grow">One thing I’m thankful for</b></div><div class="row" style="margin-top:6px"><input class="f grow" id="tGrat" placeholder="Today I’m thankful for…" style="margin:0"><button class="btn sm pri" data-act="tGratSave">Save</button></div></div>
+   <div class="tquick"><button data-act="tab" data-tab="load"><span>🖍</span>Load a chapter</button><button data-act="tab" data-tab="study"><span>🔎</span>Study</button><button data-act="jOpen" data-s="write"><span>✍️</span>Write</button><button data-act="search"><span>🔍</span>Search</button></div>
+   <p class="small muted" style="text-align:center;margin:14px 0 4px"><a data-act="tourAgain" style="cursor:pointer;text-decoration:underline">Show me around the app</a></p>`;
+  const gi=$('#tGrat',v);if(gi)gi.addEventListener('keydown',e=>{if(e.key==='Enter')A.tGratSave()})}
+/* ===== 🖨️ PRINT ===== */
+const PSIZES=[['card','🗒️ Index card','3 × 5 in','76mm 127mm'],['bookmark','🔖 Bookmark','2 × 6 in','51mm 152mm'],['half','📃 Half page','A6','105mm 148mm'],['full','📄 Full page','A5','148mm 210mm']];
+function printSheet(title,html,def){S._print={title,html};openSheet(`<h3>🖨️ Print it</h3><p class="small muted">${esc(title||'')}</p><div class="small muted" style="margin:4px 0">What size? It prints with a dotted line to cut along.</div>
+  ${PSIZES.map(([k,l,d])=>`<button class="savecard" data-act="doPrint" data-z="${k}"><span>${l.split(' ')[0]}</span><div><b>${l.replace(/^\S+\s/,'')}</b><small>${d}${k===def?' · recommended':''}</small></div></button>`).join('')}
+  <p class="small muted" style="margin-top:10px">Tip: print on thin paper, cut along the dots and glue only the inside edge into your Bible.</p>`)}
+function printDoc(title,html,z){const sz=(PSIZES.find(x=>x[0]===z)||PSIZES[3])[3].split(' ');const fs={card:11,bookmark:10,half:12,full:13}[z]||12;
+  const doc=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title||'Loaded Bible')}<\/title><style>@page{size:A4;margin:12mm}body{margin:0;font-family:Georgia,'Times New Roman',serif;color:#222}
+  .cut{width:${sz[0]};min-height:${sz[1]};box-sizing:border-box;border:1.5px dashed #999;padding:5mm;font-size:${fs}pt;line-height:1.4;page-break-inside:avoid}
+  h1{font-size:${fs+6}pt;margin:0 0 2mm;font-style:italic;text-align:center}h2{font-size:${fs}pt;text-transform:uppercase;letter-spacing:.08em;margin:3mm 0 1mm;color:#8b2e24;text-align:center}
+  .small{font-size:${fs-2}pt;color:#777;text-align:center;text-transform:uppercase;letter-spacing:.08em}.verse{font-style:italic;text-align:center;margin:2mm 0}.ref{display:block;font-style:normal;font-size:${fs-2}pt;color:#777}
+  .line{border-bottom:1px solid #bbb;height:${fs*1.6}pt}p{margin:1mm 0}ul{margin:1mm 0;padding-left:5mm}.note{text-align:center;color:#999;font:9pt sans-serif;margin-top:3mm}<\/style><\/head><body><div class="cut">${html}</div><div class="note">✂ Cut along the dotted line · Loaded Bible</div><\/body><\/html>`;
+  let w=null;try{w=window.open('','_blank')}catch(e){}
+  if(w&&w.document){w.document.open();w.document.write(doc);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400);return}
+  try{const f=document.createElement('iframe');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(f);f.contentDocument.open();f.contentDocument.write(doc);f.contentDocument.close();
+    setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){downloadFile((title||'page')+'.html',doc,'text/html')}setTimeout(()=>f.remove(),60000)},400)}catch(e){downloadFile((title||'page')+'.html',doc,'text/html')}}
+function downloadFile(name,text,type){try{const b=new Blob([text],{type:type||'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name.replace(/[\\/:*?"<>|]+/g,'-');document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},2000);return true}catch(e){toast('Download is blocked here — use Copy instead');return false}}
+function pagePrintHtml(C){return `${C.subtitle?`<div class="small">${esc(C.subtitle)}</div>`:''}<h1>${esc(C.title||'')}</h1>${C.verse&&C.verse.text?`<p class="verse">“${esc(C.verse.text)}”<span class="ref">${esc(C.verse.ref||'')}</span></p>`:''}
+  ${(C.sections||[]).map(x=>`<h2>${esc(x.heading||'')}</h2>${(x.lines||[]).map(l=>/^_{3,}$/.test(String(l).trim())?'<div class="line"></div>':`<p style="text-align:center">${esc(String(l).replace(/\*\*/g,''))}</p>`).join('')}`).join('')}${C.footer?`<p class="verse">${esc(C.footer)}</p>`:''}`}
+const mdPrint=(title,ref,text)=>`<h1>${esc(title||'')}</h1>${ref?`<div class="small">${esc(ref)}</div>`:''}${md(text||'')}`;
+/* ===== 📤 SHARE AS IMAGE ===== */
+async function shareImage(o){const cs=getComputedStyle(document.documentElement);const C=k=>cs.getPropertyValue(k).trim()||'#888';
+  const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  g.fillStyle=C('--paper');g.fillRect(0,0,W,H);g.fillStyle=C('--card');const r=40,x0=70,y0=90,w0=W-140,h0=H-200;g.beginPath();g.moveTo(x0+r,y0);g.arcTo(x0+w0,y0,x0+w0,y0+h0,r);g.arcTo(x0+w0,y0+h0,x0,y0+h0,r);g.arcTo(x0,y0+h0,x0,y0,r);g.arcTo(x0,y0,x0+w0,y0,r);g.closePath();g.fill();
+  g.fillStyle=C('--accent');g.fillRect(x0,y0,w0,16);
+  const serif='Georgia, "Times New Roman", serif';g.textAlign='center';let y=y0+130;
+  if(o.kicker){g.fillStyle=C('--accent');g.font=`700 30px system-ui, sans-serif`;g.fillText(o.kicker.toUpperCase(),W/2,y);y+=70}
+  if(o.title){g.fillStyle=C('--ink');g.font=`italic 64px ${serif}`;y=wrapText(g,o.title,W/2,y,w0-120,74,3)+30}
+  const body=String(o.text||'').replace(/\*\*/g,'').replace(/#+\s/g,'');let fs=body.length>500?34:body.length>250?40:48;g.font=`${fs}px ${serif}`;g.fillStyle=C('--ink');y=wrapText(g,body,W/2,y+20,w0-140,fs*1.45,Math.floor((y0+h0-200-y)/(fs*1.45)))+20;
+  if(o.ref){g.fillStyle=C('--muted');g.font=`600 34px system-ui, sans-serif`;g.fillText('— '+o.ref,W/2,Math.min(y+30,y0+h0-110))}
+  g.fillStyle=C('--muted');g.font=`600 28px system-ui, sans-serif`;g.fillText('📖 Loaded Bible',W/2,H-60);
+  const blob=await new Promise(res=>cv.toBlob(res,'image/png'));const file=blob&&new File([blob],'loaded-bible.png',{type:'image/png'});
+  try{if(file&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:o.title||'Loaded Bible'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  const url=cv.toDataURL('image/png');openSheet(`<h3>📤 Share it</h3><p class="small muted">Press and hold the picture to save or share it.</p><img src="${url}" style="width:100%;border-radius:14px;border:1px solid var(--line)" alt="Share image"><div class="row" style="margin-top:10px"><a class="btn sm pri grow" href="${url}" download="loaded-bible.png">⬇️ Download</a><button class="btn sm grow" data-act="closeSheet">Done</button></div>`)}
+function wrapText(g,t,x,y,mw,lh,maxL){const words=String(t).split(/\s+/);let line='',n=0;for(let i=0;i<words.length;i++){const test=line?line+' '+words[i]:words[i];if(g.measureText(test).width>mw&&line){g.fillText(line,x,y);y+=lh;n++;line=words[i];if(maxL&&n>=maxL-1){let rest=words.slice(i).join(' ');while(g.measureText(rest+'…').width>mw&&rest.length)rest=rest.slice(0,-1);g.fillText(rest+(rest.length<words.slice(i).join(' ').length?'…':''),x,y);return y+lh}}else line=test}if(line){g.fillText(line,x,y);y+=lh}return y}
+/* ===== 💾 BACKUP ===== */
+function backupJSON(){const items={};for(const [k,v] of Store.items)if(isItemKey(k))items[k]=v;return JSON.stringify({app:'loaded-bible',v:1,at:new Date().toISOString(),items})}
+function restoreFrom(text){let d;try{d=JSON.parse(text)}catch(e){toast('That isn’t a Loaded Bible backup file');return}if(!d||d.app!=='loaded-bible'||!d.items){toast('That isn’t a Loaded Bible backup file');return}
+  const keys=Object.keys(d.items).filter(isItemKey);confirmSheet(`Restore ${keys.length} items from ${d.at?new Date(d.at).toLocaleDateString():'this backup'}? Things with the same name are replaced; everything else stays.`,'⬆️ Restore',()=>{keys.forEach(k=>Store.set(k,d.items[k]));closeSheet();toast(`Restored ${keys.length} items ✓`);renderView()})}
+/* ===== 👋 TOUR ===== */
+const TOUR=[['👋','Welcome to Loaded Bible','This app helps you fill your paper Bible with highlights, notes, tabs and inserts, step by step. Here’s a 30-second tour.'],
+ ['☀️','Today','Your daily start: the verse of the day, today’s reading, a prayer and your memory verse.'],
+ ['🖍','Load','Pick a chapter, a feeling or a book. You get a to-do list of what to highlight and write in your paper Bible. Tick off each step.'],
+ ['🔎','Study','Understand a passage: background, meaning, word studies or a full study method. Then put it in your physical or online Bible.'],
+ ['🧰','Bible Kit','Your topic tabs and color key, inserts, the page maker, reading plans and memory verses.'],
+ ['✏️','Journal','Prayers, free writing, thanks, goals and sermon notes. Everything is saved and easy to find with 🔎 Search.'],
+ ['📖','Online Bible','Read the Bible here too. Everything you add shows up next to the verse. Ready? Grab your Bible and a pen!']];
+function showTour(i){const t=TOUR[i];openSheet(`<div class="tour"><div class="tourdots">${TOUR.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><div style="font-size:56px">${t[0]}</div><h3>${t[1]}</h3><p>${t[2]}</p>
+  <div class="row" style="margin-top:14px">${i<TOUR.length-1?`<button class="btn grow" data-act="tourEnd">Skip</button><button class="btn pri grow" data-act="tourGo" data-i="${i+1}">Next →</button>`:`<button class="btn pri wide" data-act="tourEnd">Let’s go! 🎉</button>`}</div></div>`)}
+function maybeTour(){if(settings().toured)return;if(document.querySelector('#auth')&&getComputedStyle(document.querySelector('#auth')).display!=='none'&&document.querySelector('#auth').innerHTML.trim())return;saveSettings({toured:true});showTour(0)}
+/* ===== 🔍 SEARCH ===== */
+function searchSheet(){openSheet(`<h3>🔍 Search everything</h3><input class="f" id="srchIn" placeholder="Search notes, prayers, studies, pages…" value="${esc(S.srchQ||'')}" autocomplete="off"><div id="srchOut" class="small muted" style="margin-top:8px">Type at least 2 letters.</div>`);
+  const i=$('#srchIn');i.focus();i.addEventListener('input',()=>{S.srchQ=i.value;runSearch(i.value)});if(S.srchQ)runSearch(S.srchQ)}
+function runSearch(q){const o=$('#srchOut');if(!o)return;q=q.trim().toLowerCase();if(q.length<2){o.innerHTML='Type at least 2 letters.';return}
+  const hit=t=>String(t||'').toLowerCase().includes(q);const snip=t=>{t=plain(String(t||''));const i=t.toLowerCase().indexOf(q);if(i<0)return esc(t.slice(0,90));const a=Math.max(0,i-40);return (a?'…':'')+esc(t.slice(a,i))+'<mark>'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length,i+q.length+60))+'…'};
+  const R=[];
+  Store.list('n_').forEach(n=>{if(hit(n.title)||hit(n.text)||hit(codeToLabel(n.ref)))R.push(['🔖 Notes',n.title||codeToLabel(n.ref),snip(n.text),`data-act="srchGo" data-t="note" data-k="${n.key}"`])});
+  Store.list('j_').forEach(e=>{const f=e.fields||{};const all=Object.values(f).filter(x=>typeof x==='string').join(' ');if(hit(all)){const T=JTYPES[e.type]||JTYPES.reflect;R.push(['✏️ Journal',(f.title||T.name),snip(all),`data-act="srchGo" data-t="journal" data-k="${e.key}"`])}});
+  Store.list('y_').forEach(y=>{if(hit(y.title)||hit(y.text)||hit(y.refLabel)||hit(y.question))R.push(['🔎 Studies',`${y.title||'Study'} — ${y.refLabel||''}`,snip(y.text),`data-act="srchGo" data-t="study" data-k="${y.key}"`])});
+  Store.list('p_').forEach(pg=>{const t=pageText(pg.page||{});if(hit(t))R.push(['📄 Pages',pg.page.title||'Page',snip(t),`data-act="srchGo" data-t="page" data-k="${pg.key}"`])});
+  Store.list('i_').forEach(x=>{if(hit(x.title)||hit(x.body))R.push(['🗂️ Inserts',x.title||'Insert',snip(x.body),`data-act="srchGo" data-t="insert" data-k="${x.key}"`])});
+  loadPlans().forEach(pl=>{if(hit(planTitle(pl))||hit(JSON.stringify(pl.data||{})))R.push(['🖍 Loadings',planTitle(pl),snip(JSON.stringify(pl.data||{}).replace(/["{}\[\]]/g,' ')),`data-act="srchGo" data-t="plan" data-k="${pl.key}"`])});
+  const m=mainSet();(m&&m.topics||[]).forEach(t=>{if(hit(t.name))R.push(['🏷️ Topic tabs',t.name,`${(t.verses||[]).length} verses`,`data-act="srchGo" data-t="topic" data-k=""`])});
+  if(!R.length){o.innerHTML='Nothing found. Try another word.';return}
+  const groups=[...new Set(R.map(r=>r[0]))];o.innerHTML=`<div class="muted">${R.length} found</div>`+groups.map(g=>`<div class="srchg">${g}</div>`+R.filter(r=>r[0]===g).slice(0,15).map(r=>`<button class="srchr" ${r[3]}><b>${esc(r[1])}</b><span>${r[2]}</span></button>`).join('')).join('')}
+/* ===== 🖊️ SUPPLIES ===== */
+function loadedSupplies(el){el.innerHTML=`
+  <div class="supply"><h3>🧪 First: test your pens</h3><p>Bible paper is very thin. Use the blank page at the very back of your Bible as a test page. Try every pen and highlighter there first and wait a day.</p>
+   <ul><li><b>Bleeding:</b> ink soaks through to the other side. Don’t use that pen.</li><li><b>Ghosting:</b> you can see a shadow from the other side. A little is normal.</li></ul></div>
+  <div class="supply"><h3>🖊️ Pens</h3><ul><li>Use a <b>very fine archival pen</b> (0.2 mm or finer). Pigma Micron 005 or 01 is a popular choice.</li><li>Pigment ink is better than gel or ballpoint, because it doesn’t smudge or bleed as much.</li><li>A <b>pencil</b> is always safe. Use it to plan before you write in pen.</li></ul></div>
+  <div class="supply"><h3>🖍 Highlighters</h3><ul><li><b>Dry highlighters</b> (crayon-style) never bleed through. Bible Hi-Glider is one popular example.</li><li>Soft, light colors are safer than strong neon ones. Test first, some can ghost.</li><li>Use <b>one color per topic</b> so your color key stays clear (see 🏷️ Topics).</li><li>Wet highlighters: use a light touch and one quick stroke.</li></ul></div>
+  <div class="supply"><h3>🗂️ Tabs, inserts & other tools</h3><ul><li><b>Clear sticky notes</b> let you write on top of a page without writing in it.</li><li><b>Washi tape</b> or a glue stick on the inside edge (1 cm) to add insert pages.</li><li>A <b>small ruler</b> for straight underlines.</li><li>Book tabs: start at Genesis and step them down the page so they don’t overlap.</li></ul></div>
+  <div class="supply"><h3>💡 Tips</h3><ul><li>Write small and leave space. You’ll want to add more later.</li><li>Date your notes. In a few years it becomes your own story with God.</li><li>Don’t aim for perfect. A well-used Bible is a beautiful Bible.</li></ul></div>`}
 function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);const got=BADGES.filter(b=>b[4](st));
   const goal=pf.goal||5;const vi=(Math.floor(Date.now()/864e5)+(S.votdOff||0))%VOTD.length;const vref=VOTD[(vi+VOTD.length)%VOTD.length];const vp=parseRef(vref);
   const vtxt=KJV&&vp?vrange(vp).map(n=>plainV((KJV[vp.b]&&KJV[vp.b][vp.c]||[])[n-1]||'')).join(' '):'';
@@ -2190,6 +2349,9 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
 
    <div class="card"><p style="margin:0">${STANDALONE?'💾 Your progress is saved online with your <b>Bible code</b>, so it\u2019s the same on every phone or computer where you log in.':'💾 Your progress is saved to <b>your Claude account</b> automatically.'}</p>
      <div class="row" style="margin-top:10px"><button class="btn sm" data-act="copyAll">⧉ Back up my notes as text</button></div></div>
+   <div class="card"><b>💾 Backup</b><p class="small muted" style="margin:4px 0 8px">Download everything you made into one file. If you ever lose your code or your phone, you can restore it.${settings().lastBackup?' Last backup: '+fmtDate(settings().lastBackup)+'.':''}</p>
+     <div class="row" style="flex-wrap:wrap"><button class="btn sm pri" data-act="backupDl">⬇️ Download my backup</button><button class="btn sm" data-act="backupCopy">⧉ Copy as text</button><button class="btn sm" data-act="backupRestore">⬆️ Restore</button></div></div>
+   <div class="card"><div class="row"><b class="grow">👋 App tour</b><button class="btn sm" data-act="tourAgain">Show me around</button></div></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
   const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
   const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
@@ -2538,7 +2700,7 @@ function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24
    <button class="linkbtn" data-act="codeBack">← Back</button>`);
   const i=$('#codeIn2');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
 function codeLost(){Code.clear();Store.disconnect();Store.items.clear();clearLocal();showWelcome('That Bible code wasn’t found. Start fresh or try your code again.')}
-function startCode(){hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
+function startCode(){setTimeout(maybeTour,1200);hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
 Object.assign(A,{
   codeNew:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Making your code…';
     try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
@@ -2601,8 +2763,8 @@ Object.assign(A,{
 });
 /* ---------- boot ---------- */
 (function(){const m=location.hash.match(/^#lbsync=([A-Za-z0-9_-]+)$/);if(m){S.pendingSync=m[1];try{history.replaceState(null,'',location.pathname+'#load')}catch(e){location.hash='#load'}}})();
-if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#load').slice(1));updateAvatar();if(Code.value)startCode();else showWelcome('')}
-else{Store.loadLocal();applyTheme();setTab((location.hash||'#load').slice(1));Store.connect()}
+if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#today').slice(1));updateAvatar();if(Code.value)startCode();else showWelcome('')}
+else{Store.loadLocal();applyTheme();setTab((location.hash||'#today').slice(1));Store.connect();setTimeout(maybeTour,1500)}
 Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});
 </script>
 <script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));</script>
