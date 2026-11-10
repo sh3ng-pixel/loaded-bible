@@ -371,6 +371,7 @@ details.grp[open]>summary::after{content:"▴"}
 .pp-line{display:flex;justify-content:space-between;gap:8px;font-size:14.5px;border-bottom:1px dashed var(--line);padding:5px 0;text-align:left}
 .pp-mem{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.pp-mem span{font-size:13.5px;padding:3px 9px;border-radius:999px;background:var(--soft)}
 .pp-ded{font-style:italic;font-size:15.5px;line-height:1.55;color:var(--ink)}
+.pp-write{height:22px;border-bottom:1px solid var(--line);margin:4px 10px}
 .lifesugg{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.lifesugg b{display:block;font-size:14px}.lifesugg span{font-size:12.5px;color:var(--muted)}
 .paperlist{margin-top:12px;padding:12px;border-radius:14px;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 5%,var(--card))}
 .plh{font-weight:700;font-size:15px}.paperlist .item{margin:6px 0 0}
@@ -639,7 +640,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -860,7 +861,32 @@ async function runStudy(tool,refText,question,force){
 }
 
 /* ---------- LOADED BIBLE ---------- */
-const KHELP={key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📖','First page','A designed first page for your paper Bible. Make it yours below, then copy it onto the first blank page or inside cover.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
+const KHELP={key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📄','Page maker','Make any page for your paper Bible: a first page, a prayer page, a book intro and more. Then copy it in by hand or print it.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
+const PAGE_TYPES=[['first','📖','First page','Name, life verse, color key'],['book','📚','Book intro','Before a book starts'],['topic','💭','Topic page','What the Bible says about…'],['prayer','🙏','Prayer page','People & things to pray for'],['promises','☆','Promises page','God’s promises on a theme'],['person','👤','Bible character','Life, lessons, key verses'],['timeline','🕰️','Timeline page','Events in order'],['answered','🎉','Answered prayers','From your prayer list'],['memory','🧠','Memory verses','From your memory list'],['custom','✨','Anything else','Describe your page']];
+const PAGE_ASK={book:['Which book?','book'],topic:['Which topic?','e.g. forgiveness, fear, hope'],prayer:['Who or what is this page for? (optional)','e.g. my family, my friends, my school'],promises:['Which theme?','e.g. peace, provision, strength'],person:['Which person?','e.g. David, Ruth, Peter'],timeline:['Timeline of what?','e.g. the life of Jesus, Genesis, the kings of Israel'],answered:['A title (optional)','e.g. What God has done'],memory:['A title (optional)','e.g. Hidden in my heart'],custom:['Describe the page you want','e.g. a page about the fruit of the Spirit with space to write']};
+function loadedCover(el){const PM=S.pm||(S.pm={type:'first',subj:'',book:'JHN',size:'full',busy:false,cur:null});const T=PAGE_TYPES.find(x=>x[0]===PM.type);
+  const pages=Store.list('p_').sort((a,b)=>(b.at||0)-(a.at||0));
+  let h=`<div class="card"><div class="stepl" style="margin-top:0"><span>1</span> What page do you want to make?</div>
+   <div class="modegrid">${PAGE_TYPES.map(([k,e,l,d])=>`<button class="modecard ${PM.type===k?'on':''}" data-act="pmType" data-k="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div></div>`;
+  if(PM.type==='first'){el.innerHTML=h+'<div class="stepl"><span>2</span> Make it yours</div><div id="fpm"></div>'+pagesList(pages);firstPageMaker($('#fpm',el));return}
+  const ask=PAGE_ASK[PM.type];const C=PM.cur;
+  h+=`<div class="card"><div class="stepl" style="margin-top:0"><span>2</span> ${esc(ask[0])}</div>
+    ${ask[1]==='book'?`<select class="f" id="pmBook">${BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===PM.book?'selected':''}>${esc(b.name)}</option>`).join('')}</select>`:`<input class="f" id="pmSubj" value="${esc(PM.subj)}" placeholder="${esc(ask[1])}">`}
+    <div class="stepl"><span>3</span> How big?</div><div class="chips">${[['full','📄 Full page'],['half','📃 Half page'],['card','🗒️ Card']].map(([k,l])=>`<button class="chip ${PM.size===k?'on':''}" data-act="pmSize" data-k="${k}">${l}</button>`).join('')}</div>
+    <button class="btn pri wide" style="margin-top:10px" data-act="pmGo" ${PM.busy?'disabled':''}>${PM.busy?'<span class="spin"></span> Making your page…':`✨ Make my ${esc(T[2].toLowerCase())}`}</button></div>`;
+  if(C||PM.busy)h+=pageView(C,true);
+  el.innerHTML=h+pagesList(pages);
+  const sj=$('#pmSubj',el);if(sj)sj.oninput=()=>{PM.subj=sj.value};const bk=$('#pmBook',el);if(bk)bk.onchange=()=>{PM.book=bk.value}}
+function pageView(C,fresh){if(!C)return `<div class="paperwrap" style="margin-top:12px"><div class="paperpage"><div class="loadingline"></div><div class="loadingline" style="width:70%"></div><div class="loadingline"></div></div></div>`;
+  return `<div class="paperwrap" style="margin-top:12px"><div class="paperpage">${C.subtitle?`<div class="pp-small">${esc(C.subtitle)}</div>`:''}<div class="pp-name" style="font-size:26px">${esc(C.title||'')}</div>
+   ${C.verse&&C.verse.text?`<div class="pp-verse">“${esc(C.verse.text)}”<div class="pp-ref">${esc(C.verse.ref||'')}</div></div>`:''}
+   ${(C.sections||[]).map(x=>`<div class="pp-h">${esc(x.heading||'')}</div>${(x.lines||[]).map(l=>/^_{3,}$/.test(String(l).trim())?'<div class="pp-write"></div>':`<div class="pp-line" style="justify-content:center;text-align:center"><span>${inline(String(l))}</span></div>`).join('')}`).join('')}
+   ${C.footer?`<div class="pp-orn">✦</div><div class="pp-ded">${esc(C.footer)}</div>`:''}</div></div>
+   ${fresh?`<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn sm pri grow" data-act="pmSave">💾 Save page</button><button class="iconbtn" data-act="pmGo" title="Make a new one">↻</button><button class="iconbtn" data-act="pmCopy" title="Copy">⧉</button><button class="iconbtn" data-act="pmDiscard" title="Throw away">🗑</button></div>`:''}`}
+function pageText(C){const L=[];if(C.subtitle)L.push(C.subtitle.toUpperCase());L.push(C.title||'');if(C.verse&&C.verse.text)L.push('','“'+C.verse.text+'” — '+(C.verse.ref||''));(C.sections||[]).forEach(x=>{L.push('',String(x.heading||'').toUpperCase());(x.lines||[]).forEach(l=>L.push(/^_{3,}$/.test(String(l).trim())?'______________________':String(l).replace(/\*\*/g,'')))});if(C.footer)L.push('',C.footer);return L.join('\n')}
+function pagesList(pages){if(!pages.length)return '';return `<div class="stepl" style="margin-top:18px"><span>📚</span> My pages <small>${pages.length} saved</small></div>
+  ${pages.map(pg=>{const open=S.pmOpen===pg.key;const T=PAGE_TYPES.find(x=>x[0]===pg.type)||PAGE_TYPES[9];return `<div class="item"><div class="h"><span>${T[1]}</span><b class="grow" data-act="pmToggle" data-k="${pg.key}" style="cursor:pointer">${esc(pg.page.title||T[2])}</b><button class="iconbtn" data-act="pmToggle" data-k="${pg.key}">${open?'▴':'▾'}</button><button class="iconbtn" data-act="delItem" data-k="${pg.key}" title="Delete">🗑</button></div>
+   <div class="small muted">${esc(T[2])} · ${fmtDate(pg.at)}</div>${open?pageView(pg.page,false)+`<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="pmHow" data-k="${pg.key}">🖊️ Put in physical Bible</button><button class="iconbtn" data-act="pmCopyK" data-k="${pg.key}" title="Copy">⧉</button></div>`:''}</div>`}).join('')}`}
 const COVER_PARTS=[['owner','👤 Name'],['life','💛 Life verse'],['key','🖍 Color key'],['chains','🔗 Chains'],['memory','🧠 Memory verses'],['plan','📅 Reading plan'],['dedication','🙏 Dedication']];
 const coverDoc=()=>Object.assign({show:{owner:1,life:1,key:1,chains:1,memory:1,plan:1,dedication:1},owner:'',started:'',life:'',dedication:''},Store.get('cover')||{});
 function saveCover(p){const c=coverDoc();Store.set('cover',Object.assign(c,p))}
@@ -875,7 +901,7 @@ function coverText(){const d=coverData(),sh=d.c.show,L=[];
   if(sh.plan&&d.plan)L.push('READING PLAN: '+d.plan,'');
   if(sh.dedication&&d.c.dedication)L.push(d.c.dedication);
   return L.join('\n').trim()}
-function loadedCover(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?kjvText(d.life):'';if(d.life&&!lt&&!KJV&&!S.coverKjv){S.coverKjv=1;loadKJV().catch(()=>{}).then(()=>{if(S.loadedSub==='cover')renderView()})}
+function firstPageMaker(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?kjvText(d.life):'';if(d.life&&!lt&&!KJV&&!S.coverKjv){S.coverKjv=1;loadKJV().catch(()=>{}).then(()=>{if(S.loadedSub==='cover')renderView()})}
   const sec=(k,html)=>sh[k]?html:'';
   el.innerHTML=`<div class="paperwrap"><div class="paperpage">
      ${sec('owner',`<div class="pp-small">This Bible belongs to</div><div class="pp-name">${esc(d.owner)||'<span class="pp-blank">your name</span>'}</div><div class="pp-small">Started loading ${new Date(d.started+'T12:00').toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})}</div><div class="pp-orn">✦ ✦ ✦</div>`)}
@@ -902,7 +928,7 @@ function loadedCover(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?kjv
   const on=(id,fn)=>{const i=$('#'+id,el);if(i)i.addEventListener('change',()=>fn(i.value))};
   on('cvOwner',v=>saveCover({owner:v.trim()}));on('cvStart',v=>saveCover({started:v}));on('cvDed',v=>saveCover({dedication:v.trim()}));
   on('cvLife',v=>{const p=parseRef(v);if(v.trim()&&!p){toast('Type a verse like John 3:16');return}saveCover({life:p?rc(p):''})})}
-const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✍️','Write-ins',[['cover','📖 First page'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
+const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✍️','Write-ins',[['cover','📄 Page maker'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
 function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub==='symbols'?'cover':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
   v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Set up and keep track of your paper Bible.</p></div>
   <div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
@@ -1417,6 +1443,28 @@ ${(f.body||'').slice(0,3000)}`,`<ol class="howsteps"><li><b>Short version in the
   newJournal:el=>journalForm(el.dataset.t),
   editJournal:el=>{const e=Store.get(el.dataset.k);if(!e)return;if(e.type==='goal'){goalSheet(el.dataset.k);return}if(e.type==='reflect'){const f=e.fields||{};S.jDraft={title:f.title||'',ref:f.ref?codeToLabel(f.ref):'',body:f.body||'',mood:f.mood||'',prompt:f.prompt||JPROMPTS[0],key:el.dataset.k};S.jSub='write';if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0);return}journalForm(e.type,el.dataset.k)},
   coverCopy:()=>copyText(coverText()),
+  pmType:el=>{S.pm.type=el.dataset.k;S.pm.cur=null;renderView()},
+  pmSize:el=>{S.pm.size=el.dataset.k;renderView()},
+  pmGo:async()=>{const PM=S.pm;if(PM.busy)return;const T=PAGE_TYPES.find(x=>x[0]===PM.type);let subj=PM.type==='book'?BM[PM.book].name:PM.subj.trim();
+    if(['topic','promises','person','timeline','custom'].includes(PM.type)&&!subj){toast('Fill in step 2 first');return}
+    let data='';if(PM.type==='answered'){const a=Store.list('j_').filter(e=>e.type==='prayer'&&e.fields&&e.fields.answered);if(!a.length){toast('You have no answered prayers yet. Mark one in Journal › Requests.');return}data='Their answered prayers: '+a.map(e=>`${e.fields.title}${e.fields.answer?' (how God answered: '+e.fields.answer+')':''}${e.fields.answeredAt?' on '+new Date(e.fields.answeredAt).toLocaleDateString():''}`).join('; ')+'. Use these exactly; do not invent any.'}
+    if(PM.type==='memory'){const m=memList();if(!m.length){toast('Add memory verses in Bible Kit › Habits › Memory first');return}data='Their memory verses: '+m.map(v=>codeToLabel(v.ref)).join(', ')+'. Write each verse out briefly (KJV).'}
+    if(PM.type==='prayer'){const r=Store.list('j_').filter(e=>e.type==='prayer'&&!(e.fields||{}).answered);if(r.length)data='Their open prayer requests: '+r.map(e=>e.fields.title+(e.fields.who?' (for '+e.fields.who+')':'')).join('; ')+'.'}
+    const size={full:'a full Bible page: 3 to 5 sections',half:'a half page: 2 to 3 short sections',card:'a small card: 1 to 2 short sections'}[PM.size];
+    const prompt=JSYS+`Design ${size} for someone to hand-write into their paper Bible. Page type: ${T[2]} (${T[3]}).${subj?' Subject: '+subj+'.':''} ${data}
+Use easy, warm words. Keep lines short (max 12 words) so they fit a Bible page. Use "Book chapter:verse" for references. Where the person should fill something in themselves, use a line with just "____".
+Return JSON: {"subtitle":"small label above the title","title":"page title, max 6 words","verse":{"ref":"Book chapter:verse","text":"key verse text, KJV"},"sections":[{"heading":"short heading","lines":["line","line"]}],"footer":"one short closing line or prayer"}`;
+    PM.busy=true;PM.cur=null;renderView();
+    try{const r=await ai(prompt,null,null,'default');PM.cur=parseJSON(r.text)}catch(e){toast(aiErr(e))}PM.busy=false;renderView()},
+  pmSave:()=>{const PM=S.pm;if(!PM.cur)return;const k='p_'+newId();Store.set(k,{type:PM.type,page:PM.cur,at:Date.now()});touch();S.pmOpen=k;const t=PM.cur.title;PM.cur=null;renderView();
+    whereSheet(t,'You can find it here:',['🧰 Bible Kit','✍️ Write-ins','📄 Page maker','📚 My pages'],'data-act="closeSheet"')},
+  pmCopy:()=>copyText(pageText(S.pm.cur||{})),
+  pmCopyK:el=>copyText(pageText((Store.get(el.dataset.k)||{}).page||{})),
+  pmDiscard:()=>{S.pm.cur=null;renderView()},
+  pmToggle:el=>{S.pmOpen=S.pmOpen===el.dataset.k?null:el.dataset.k;renderView()},
+  pmHow:el=>{const pg=Store.get(el.dataset.k);if(!pg)return;const T=PAGE_TYPES.find(x=>x[0]===pg.type)||PAGE_TYPES[9];const where={first:'the first blank page or the inside cover',book:`the blank space before ${esc((pg.page.title||'the book'))} starts, or on an insert page there`,prayer:'the blank pages at the back of your Bible',answered:'the blank pages at the back, next to your prayer page',memory:'the inside back cover'}[pg.type]||'a blank page near the passage it’s about, or on an insert page';
+    openSheet(`<h3>🖊️ Put this page in your physical Bible</h3><p class="small muted">${esc(pg.page.title||T[2])}</p>
+     <ol class="howsteps"><li><b>Where it goes:</b> ${where}.</li><li><b>Sketch it in pencil first,</b> so the spacing fits. Titles big, lines small.</li><li><b>Copy the text.</b> <button class="btn sm" data-act="pmCopyK" data-k="${pg.key}">⧉ Copy text</button> Write it with a fine Bible-safe pen, or print it on thin paper and glue the inside edge in as an insert.</li><li><b>Add color</b> with your highlighters: verses in your color key colors.</li><li><b>Leave the ____ lines</b> open for you to fill in over time.</li></ol>`)},
   coverShow:el=>{const c=coverDoc();c.show=Object.assign({},c.show,{[el.dataset.k]:!c.show[el.dataset.k]});saveCover({show:c.show})},
   coverLifePick:el=>{saveCover({life:el.dataset.r});S.coverLife=null;toast('Life verse set 💛')},
   coverLifeAI:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span>';const m=mainSet();
