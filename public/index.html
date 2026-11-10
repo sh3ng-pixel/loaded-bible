@@ -401,6 +401,9 @@ details.grp[open]>summary::after{content:"▴"}
 .mlegend{display:flex;justify-content:center;gap:12px;margin:12px 0;font-size:12px;color:var(--muted)}.mlegend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px;border:1px solid var(--line)}
 .mlegend .l0{background:var(--card)}.mlegend .l1{background:color-mix(in srgb,var(--accent) 15%,var(--card))}.mlegend .l3{background:color-mix(in srgb,var(--accent) 55%,var(--card))}.mlegend .l4{background:var(--accent)}
 .chgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}.chgrid button{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}.chgrid button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.projbar{display:flex;align-items:center;gap:8px;margin:8px 0;padding:8px 8px 8px 14px;border-radius:14px;background:color-mix(in srgb,var(--gold) 18%,var(--card));border:1.5px solid var(--gold);font-size:14px}
+.jseg.kseg{grid-template-columns:repeat(4,1fr)}.jseg.kseg button{font-size:13px;padding:9px 2px}
+.settab .star{border:0;background:none;color:var(--gold);font-size:16px;padding:0 0 0 8px;cursor:pointer}
 .planfoot2{margin-top:6px;gap:6px}
 .maplink{display:flex;align-items:center;gap:12px;width:100%;color:var(--ink);font:inherit;cursor:pointer}
 #undobar{position:fixed;left:12px;right:12px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);border-radius:14px;padding:10px 10px 10px 16px;font-weight:600;transform:translateY(140%);opacity:0;transition:.25s}
@@ -663,7 +666,7 @@ const Store={
   loadLocal(){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(this.LS))this.items.set(k.slice(this.LS.length),JSON.parse(localStorage.getItem(k)))}}catch(e){}},
   get(k){return this.items.get(k)},
   list(prefix){const o=[];for(const [k,v] of this.items)if(k.startsWith(prefix))o.push(Object.assign({key:k},v));return o},
-  set(k,v){this.items.set(k,v);this.persist(k,v);if(/^(n|h|b|j|t|i)_/.test(k)||k==='progress')touch();changed()},
+  set(k,v){if(/^(k|i|p)_/.test(k)&&v&&typeof v==='object'&&!Array.isArray(v)&&!this.items.has(k)&&!('proj' in v)){const pj=curProj();if(pj)v=Object.assign({},v,{proj:pj})}this.items.set(k,v);this.persist(k,v);if(/^(n|h|b|j|t|i)_/.test(k)||k==='progress')touch();changed()},
   del(k){this.items.delete(k);this.persist(k,null);changed()},
   persist(k,v){try{v==null?localStorage.removeItem(this.LS+k):localStorage.setItem(this.LS+k,JSON.stringify(v))}catch(e){}
     if(!this.col)return;clearTimeout(this.timers.get(k));
@@ -701,7 +704,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p)_/.test(k)||['projects','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -928,11 +931,11 @@ async function runStudy(tool,refText,question,force){
 }
 
 /* ---------- LOADED BIBLE ---------- */
-const KHELP={map:['🗺️','My Bible map','Every book of the Bible. The more you load, the more it fills up with color.'],supplies:['🖊️','Pens & supplies','What to use so nothing bleeds through your thin Bible pages, and how to test it first.'],key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📄','Page maker','Make any page for your paper Bible: a first page, a prayer page, a book intro and more. Then copy it in by hand or print it.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Chapters read','Which chapters you’ve read. Tap a chapter to mark it.']};
+const KHELP={projects:['📚','My Bibles','Loading more than one Bible? Each one gets its own main key, loadings, inserts, pages and map. Your journal, prayers and studies are shared.'],map:['🗺️','My Bible map','Every book of the Bible. The more you load, the more it fills up with color.'],supplies:['🖊️','Pens & supplies','What to use so nothing bleeds through your thin Bible pages, and how to test it first.'],key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📄','Page maker','Make any page for your paper Bible: a first page, a prayer page, a book intro and more. Then copy it in by hand or print it.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Chapters read','Which chapters you’ve read. Tap a chapter to mark it.']};
 const PAGE_TYPES=[['first','📖','First page','Name, life verse, color key'],['book','📚','Book intro','Before a book starts'],['topic','💭','Topic page','What the Bible says about…'],['prayer','🙏','Prayer page','People & things to pray for'],['promises','☆','Promises page','God’s promises on a theme'],['person','👤','Bible character','Life, lessons, key verses'],['timeline','🕰️','Timeline page','Events in order'],['answered','🎉','Answered prayers','From your prayer list'],['memory','🧠','Memory verses','From your memory list'],['custom','✨','Anything else','Describe your page']];
 const PAGE_ASK={book:['Which book?','book'],topic:['Which topic?','e.g. forgiveness, fear, hope'],prayer:['Who or what is this page for? (optional)','e.g. my family, my friends, my school'],promises:['Which theme?','e.g. peace, provision, strength'],person:['Which person?','e.g. David, Ruth, Peter'],timeline:['Timeline of what?','e.g. the life of Jesus, Genesis, the kings of Israel'],answered:['A title (optional)','e.g. What God has done'],memory:['A title (optional)','e.g. Hidden in my heart'],custom:['Describe the page you want','e.g. a page about the fruit of the Spirit with space to write']};
 function loadedCover(el){const PM=S.pm||(S.pm={type:'first',subj:'',book:'JHN',size:'full',busy:false,cur:null});const T=PAGE_TYPES.find(x=>x[0]===PM.type);
-  const pages=Store.list('p_').sort((a,b)=>(b.at||0)-(a.at||0));const view=S.pmView||'make';
+  const pages=Store.list('p_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0));const view=S.pmView||'make';
   const tog=`<div class="pmtog">${[['make','✨ Make a page'],['saved',`📚 My pages${pages.length?' <span class="cnt">'+pages.length+'</span>':''}`]].map(([k,l])=>`<button class="${view===k?'on':''}" data-act="pmView" data-v="${k}">${l}</button>`).join('')}</div>`;
   if(view==='saved'){el.innerHTML=tog+pagesSaved(pages);return}
   let h=tog+`<div class="card"><div class="stepl" style="margin-top:0"><span>1</span> What page do you want to make?</div>
@@ -1006,15 +1009,15 @@ function firstPageMaker(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?
   const on=(id,fn)=>{const i=$('#'+id,el);if(i)i.addEventListener('change',()=>fn(i.value))};
   on('cvOwner',v=>saveCover({owner:v.trim()}));on('cvStart',v=>saveCover({started:v}));on('cvDed',v=>saveCover({dedication:v.trim()}));
   on('cvLife',v=>{const p=parseRef(v);if(v.trim()&&!p){toast('Type a verse like John 3:16');return}saveCover({life:p?rc(p):''})})}
-const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts'],['supplies','🖊️ Supplies']]],['mark','✍️','Write-ins',[['cover','📄 Page maker'],['chains','🔗 Chains']]],['habit','📅','Habits',[['map','🗺️ Map'],['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Read']]]];
+const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts'],['supplies','🖊️ Supplies']]],['mark','✍️','Write-ins',[['cover','📄 Page maker'],['chains','🔗 Chains']]],['habit','📅','Habits',[['map','🗺️ Map'],['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Read']]],['proj','📚','Projects',[['projects','📚 My Bibles']]]];
 function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub==='symbols'?'cover':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
   v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Set up and keep track of your paper Bible.</p></div>
-  <div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
+  ${projBar()}<div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
   <div class="subtabs">${KG[3].map(([k,l])=>`<button class="${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
   ${KHELP[sub]?jHead(...KHELP[sub]):''}
   <div id="loadedBody"></div>`;
   const body=$('#loadedBody');
-  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,chains:loadedChains,cover:loadedCover,supplies:loadedSupplies,map:loadedMap,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
+  ({key:loadedKey,books:loadedBooks,topics:loadedKey,colors:loadedKey,inserts:loadedInserts,chains:loadedChains,cover:loadedCover,supplies:loadedSupplies,map:loadedMap,projects:loadedProjects,plans:loadedPlans,memory:loadedMemory,progress:loadedProgress})[sub](body)}
 function loadedBooks(el){const pr=progress();let h='<p class="small muted">Tip: buy one color of tab per section and stick them down the page edge in order. Tap a book for its theme, key verse and a ✨ guide to load it.</p>';
   for(const nt of [false,true]){h+=`<h2 class="sec">${nt?'New Testament':'Old Testament'}</h2>`;
     let g=null;
@@ -1116,7 +1119,7 @@ function insSavedSheet(kind,title,alsoStudy){const kk=INS_KINDS().find(x=>x[0]==
    <div class="card"><div class="small muted" style="margin-bottom:6px">You can find it here:</div><div class="inspath"><span>🧰 Bible Kit</span><i>›</i><span>🏷️ Tabs</span><i>›</i><span>🗂️ Inserts</span><i>›</i><b>${kk[1]} ${esc(kk[2])}</b></div>${alsoStudy?'<div class="small muted" style="margin-top:8px">It\u2019s also in 🗂️ Inserts › 🔎 From Study.</div>':''}</div>
    <div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">OK</button><button class="btn pri grow" data-act="insOpenKind" data-k="${kind}">Open it now →</button></div>`)}
 const INS_KINDS=()=>INS_TYPES.filter(t=>t[0]!=='custom').map(t=>[t[0],t[1],({book:'Book overviews',chapter:'Chapter summaries',memory:'Memory verses',topic:'Topic studies',person:'Characters',timeline:'Timelines',gospel:'Gospel',prayer:'Prayer guides',qa:'Tough questions'})[t[0]]||t[2]]).concat([['study','🔎','From Study'],['own','✍️','My own & other']]);
-function loadedInserts(el){const all=Store.list('i_').sort((a,b)=>(b.updated||0)-(a.updated||0));const K=S.insKind||'all';const kinds=INS_KINDS();
+function loadedInserts(el){const all=Store.list('i_').filter(inProj).sort((a,b)=>(b.updated||0)-(a.updated||0));const K=S.insKind||'all';const kinds=INS_KINDS();
   const inK=(x,k)=>k==='study'?(x.src==='study'||x.kind==='study'):insKindOf(x)===k;const cnt=k=>all.filter(x=>inK(x,k)).length;const ins=K==='all'?all:all.filter(x=>inK(x,K));const kk=kinds.find(x=>x[0]===K);
   el.innerHTML=`
   <div class="inskinds"><button class="inskind ${K==='all'?'on':''}" data-act="insKind" data-k="all"><span>🗂️</span><b>All</b><small>${all.length}</small></button>${kinds.map(([k,e,n])=>`<button class="inskind ${K===k?'on':''} ${cnt(k)?'':'zero'}" data-act="insKind" data-k="${k}"><span>${e}</span><b>${esc(n)}</b><small>${cnt(k)}</small></button>`).join('')}</div>
@@ -1666,6 +1669,19 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     if(d.kind==='plan'){S.build.planKey=k;setTab('load');setTimeout(()=>scrollToPlan(k),150)}else if(d.kind==='page'){S.loadedSub='cover';S.pmView='saved';S.pmOpen=k;setTab('tabs')}else{S.loadedSub='inserts';S.insKind='all';setTab('tabs')}toast('Added to your Loaded Bible 🎁')},
   simpleToggle:()=>{saveSettings({simple:!settings().simple});applyTheme();renderView();toast(settings().simple?'Simple mode on 🌱':'Simple mode off')},
   toTop:()=>window.scrollTo({top:0,behavior:'smooth'}),
+  projUse:el=>{saveSettings({proj:el.dataset.p||''});S.build.planKey=null;S.keySet='main';const pj=curProjObj();renderView();toast(pj?`Now working on ${pj.name} 📖`:'Back to My Bible 📖')},
+  projNew:()=>openSheet(`<h3>📚 New project Bible</h3><label class="l">Name</label><input class="f" id="pjName" maxlength="40" placeholder="e.g. Gift Bible for Mom"><label class="l">Emoji</label><div class="chips">${['📗','📘','📙','📕','🎁','👧','👦','✍️','🌸','⛪'].map((e,i)=>`<button class="chip ${i?'':'on'}" data-act="pjEmo" data-e="${e}">${e}</button>`).join('')}</div>
+    <label class="l">Color key for this Bible</label><select class="f" id="pjKey">${allSets().map(x=>`<option value="${esc(x.id)}">${x.id==='main'?'⭐ A copy of my main key':esc(x.name)}</option>`).join('')}<option value="__empty">Start with an empty key</option></select>
+    <label class="l">Note (optional)</label><input class="f" id="pjNote" maxlength="60" placeholder="e.g. Christmas gift, NIV journaling Bible">
+    <button class="btn pri wide" style="margin-top:12px" data-act="projCreate">Create</button>`),
+  pjEmo:el=>{$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.toggle('on',b===el));S._pjEmo=el.dataset.e},
+  projCreate:()=>{const n=$('#pjName').value.trim();if(!n){toast('Give it a name');return}const id='p'+newId();const kid=$('#pjKey').value;const src=kid==='__empty'?{topics:[]}:getSet(kid);
+    const L=projList().concat([{id,name:n,emoji:S._pjEmo||'📗',note:$('#pjNote').value.trim(),at:Date.now()}]);Store.set('projects',{list:L});
+    Store.set('s_main_'+id,{name:n+' key',main:true,topics:JSON.parse(JSON.stringify(src.topics||[]))});S._pjEmo=null;saveSettings({proj:id});S.keySet='main';closeSheet();renderView();toast(`Created ${n} 📚 You’re working in it now`)},
+  projEdit:el=>{const p=projList().find(x=>x.id===el.dataset.p);openSheet(`<h3>✏️ Rename</h3><input class="f" id="pjName" maxlength="40" value="${esc(p.name)}"><input class="f" id="pjNote" maxlength="60" value="${esc(p.note||'')}" placeholder="Note (optional)" style="margin-top:8px"><button class="btn pri wide" style="margin-top:12px" data-act="projEditGo" data-p="${p.id}">Save</button>`)},
+  projEditGo:el=>{const L=projList().map(x=>x.id===el.dataset.p?Object.assign({},x,{name:$('#pjName').value.trim()||x.name,note:$('#pjNote').value.trim()}):x);Store.set('projects',{list:L});closeSheet();renderView()},
+  projDel:el=>{const id=el.dataset.p;const p=projList().find(x=>x.id===id);confirmSheet(`Delete “${p.name}” and its loadings, inserts, pages and key? Your journal, prayers and studies stay.`,'🗑 Delete project',()=>{
+    ['k_','i_','p_'].forEach(pre=>Store.list(pre).filter(x=>x.proj===id).forEach(x=>Store.del(x.key)));Store.del('s_main_'+id);Store.set('projects',{list:projList().filter(x=>x.id!==id)});if(curProj()===id)saveSettings({proj:''});closeSheet();renderView();toast('Project deleted')})},
   goKit:el=>{S.loadedSub=el.dataset.s;setTab('tabs')},
   tMem:()=>{S.tMemShow=true;renderView()},
   tContinue:el=>{S.build.planKey=el.dataset.k;setTab('load');setTimeout(()=>scrollToPlan(el.dataset.k),100)},
@@ -1808,7 +1824,7 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
   }
   return items}
 
-function loadPlans(){return Store.list('k_').sort((a,b)=>(b.at||0)-(a.at||0))}
+function loadPlans(){return Store.list('k_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0))}
 function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
 const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in']];
@@ -1865,7 +1881,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const plans=loadPlans();
   if(B.mode==='snote'){setTimeout(()=>bindSnote(v),0)}
   if(B.mode==='life'){setTimeout(()=>bindLapp(v),0)}
-  v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
+  v.innerHTML=`${projBar()}<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
   <div class="card">
     <div class="stepl" style="margin-top:0"><span>1</span> What do you want to load?</div>
     <div class="modegrid">${LOAD_MODES.map(([k,e,l,d])=>`<button class="modecard ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div>
@@ -2248,6 +2264,14 @@ function mapData(mode){const M={};const add=(b,c)=>{if(!b||!BM[b]||!c)return;(M[
   else{Store.list('h_').forEach(h=>add(h.b,h.c));Store.list('n_').forEach(n=>add(n.b,n.c));Store.list('b_').forEach(x=>add(x.b,x.c))}
   return M}
 const MAPSHORT={Deuteronomy:'Deut',Leviticus:'Lev',Ecclesiastes:'Eccl','Song of Solomon':'Song',Lamentations:'Lam',Zephaniah:'Zeph',Zechariah:'Zech',Galatians:'Gal',Ephesians:'Eph',Philippians:'Phil',Colossians:'Col','1 Thessalonians':'1 Thess','2 Thessalonians':'2 Thess','1 Timothy':'1 Tim','2 Timothy':'2 Tim','1 Corinthians':'1 Cor','2 Corinthians':'2 Cor',Revelation:'Rev',Nehemiah:'Neh','1 Chronicles':'1 Chron','2 Chronicles':'2 Chron'};
+function projBar(){const pj=curProjObj();return pj?`<div class="projbar"><span class="grow">${esc(pj.emoji||'📖')} Working on <b>${esc(pj.name)}</b></span><button class="btn sm" data-act="projUse" data-p="">↩ My Bible</button></div>`:''}
+function projStats(id){const f=x=>(x.proj||'')===id;return {plans:Store.list('k_').filter(f).length,ins:Store.list('i_').filter(f).length,pages:Store.list('p_').filter(f).length}}
+function loadedProjects(el){const L=projList();const cur=curProj();const me=projStats('');
+  const card=(id,emoji,name,sub,st)=>`<div class="pgcard ${cur===id?'done':''}"><div class="pghead"><span class="pgicon">${esc(emoji)}</span><div class="grow"><b>${esc(name)}</b><div class="small muted">${esc(sub)} · ${st.plans} loading${st.plans===1?'':'s'} · ${st.ins} insert${st.ins===1?'':'s'} · ${st.pages} page${st.pages===1?'':'s'}</div></div>${cur===id?'<span class="pgstat">✓ Open now</span>':''}</div>
+    <div class="row pgacts">${cur===id?'<span class="small muted grow">You’re working in this Bible.</span>':`<button class="btn sm pri grow" data-act="projUse" data-p="${id}">📖 Work on this Bible</button>`}${id?`<button class="iconbtn" data-act="projEdit" data-p="${id}" title="Rename">✏️</button><button class="iconbtn" data-act="projDel" data-p="${id}" title="Delete">🗑</button>`:''}</div></div>`;
+  el.innerHTML=`${card('','📖','My Bible','Your main Bible',me)}${L.map(p=>card(p.id,p.emoji||'📗',p.name,p.note||'Project',projStats(p.id))).join('')}
+   <button class="btn pri wide" style="margin-top:10px" data-act="projNew">＋ New project Bible</button>
+   <div class="howto">💡 Ideas: a gift Bible for a friend, a journaling Bible, a Bible for your kids, a study Bible for one book.</div>`}
 function loadedMap(el){const mode=S.mapMode||'paper';const M=mapData(mode);const tot=BOOKS.reduce((a,b)=>a+b.chapters,0);const n=Object.values(M).reduce((a,x)=>a+x.size,0);const started=Object.keys(M).length;
   const tile=b=>{const c=(M[b.abbr]||new Set()).size;const pc=c/b.chapters;const lvl=pc===0?0:pc<.25?1:pc<.5?2:pc<1?3:4;const nm=b.name.length<=8?b.name:(MAPSHORT[b.name]||b.name.replace(/^(\d )?(\w{4}).*$/,'$1$2'));
     return `<button class="mtile l${lvl}" data-act="mapBook" data-b="${b.abbr}" title="${esc(b.name)}: ${c} of ${b.chapters}"><b>${esc(nm)}</b><span>${c}/${b.chapters}</span></button>`};
@@ -2571,10 +2595,15 @@ function defaultMain(){const labels=(Store.get('settings')||{}).labels||{};
   Store.list('t_').filter(t=>t.key.startsWith('t_u')).forEach((t,i)=>topics.push({id:t.key.slice(2),emoji:t.ic||'🏷️',name:t.name||'Topic',color:free[i%free.length]||'y',meaning:'',verses:vv(t.refs||[])}));
   return {id:'main',name:'My main key',main:true,topics}}
 function defaultStarter(){return {id:'starter',name:'Starter topics',builtin:true,topics:TOPICS.map(([id,ic,name,refs])=>({id,emoji:ic,name,color:STARTER_COLORS[id]||'y',meaning:'',verses:vv(refs)}))}}
-function getSet(id){const s=Store.get('s_'+id);if(s)return Object.assign({id},s);if(id==='main')return defaultMain();if(id==='starter')return defaultStarter();return null}
+function getSet(id){const s=Store.get(id==='main'?mainKey():'s_'+id);if(s)return Object.assign({id},s);if(id==='main')return defaultMain();if(id==='starter')return defaultStarter();return null}
 const mainSet=()=>getSet('main');
-function allSets(){const st=Store.get('s_starter');const out=[mainSet()];if(!(st&&st.deleted))out.push(getSet('starter'));Store.list('s_').filter(s=>s.key!=='s_main'&&s.key!=='s_starter').sort((a,b)=>(a.at||0)-(b.at||0)).forEach(s=>out.push(Object.assign({},s,{id:s.key.slice(2)})));return out}
-function updateSet(id,fn){const s=JSON.parse(JSON.stringify(getSet(id)));fn(s);delete s.key;Store.set('s_'+id,s);return s}
+function curProj(){try{const id=(Store.get('settings')||{}).proj||'';return id&&projList().some(p=>p.id===id)?id:''}catch(e){return ''}}
+function projList(){return ((Store.get('projects')||{}).list)||[]}
+const curProjObj=()=>projList().find(p=>p.id===curProj())||null;
+const mainKey=()=>{const pj=curProj();return pj?'s_main_'+pj:'s_main'};
+const inProj=x=>(x.proj||'')===curProj();
+function allSets(){const st=Store.get('s_starter');const out=[mainSet()];if(!(st&&st.deleted))out.push(getSet('starter'));Store.list('s_').filter(s=>!s.key.startsWith('s_main')&&s.key!=='s_starter').sort((a,b)=>(a.at||0)-(b.at||0)).forEach(s=>out.push(Object.assign({},s,{id:s.key.slice(2)})));return out}
+function updateSet(id,fn){const s=JSON.parse(JSON.stringify(getSet(id)));fn(s);delete s.key;delete s.id;Store.set(id==='main'?mainKey():'s_'+id,s);return s}
 const findTopic=(s,tid)=>(s.topics||[]).find(t=>t.id===tid);
 const sameName=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
 function normRef(r){const p=parseRef(r);return p?rc(p):null}
@@ -2586,10 +2615,10 @@ const swBig=(c,emoji)=>`<span class="kdot sw-${ck(c)}">${esc(emoji||'')}</span>`
 function keyLegend(s){return `<div class="legend">${(s.topics||[]).map(t=>`<span class="lg"><span class="swatch sw-${ck(t.color)}"></span>${esc(t.name)}</span>`).join('')}</div>`}
 
 function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.keySet='main';const s=getSet(S.keySet);const isMain=s.id==='main';
-  el.innerHTML=`<div class="chips settabs">${sets.map(x=>`<span class="chip settab ${x.id===s.id?'on':''}"><button data-act="keySet" data-s="${esc(x.id)}">${x.id==='main'?'⭐ ':x.id==='starter'?'🌱 ':'✨ '}${esc(x.name)}</button>${x.id==='main'?'':`<button class="x" data-act="keyDelSetId" data-s="${esc(x.id)}" aria-label="Delete ${esc(x.name)}">✕</button>`}</span>`).join('')}<button class="chip addchip" data-act="keyGenerate">＋ Generate a new set</button></div>
+  el.innerHTML=`<div class="chips settabs">${sets.map(x=>`<span class="chip settab ${x.id===s.id?'on':''}">${x.id==='main'?'':`<button class="star" data-act="keyUseMain" data-s="${esc(x.id)}" title="Make this my main key">☆</button>`}<button data-act="keySet" data-s="${esc(x.id)}">${x.id==='main'?'⭐ ':x.id==='starter'?'🌱 ':'✨ '}${esc(x.name)}${x.id==='main'?' <small style="opacity:.7">(main)</small>':''}</button>${x.id==='main'?'':`<button class="x" data-act="keyDelSetId" data-s="${esc(x.id)}" aria-label="Delete ${esc(x.name)}">✕</button>`}</span>`).join('')}<button class="chip addchip" data-act="keyGenerate">＋ Generate a new set</button></div>
    <div class="card keyhead ${isMain?'ismain':''}">
      <div class="row"><h3 class="grow" style="margin:0;font-size:22px">${isMain?'⭐ ':''}${esc(s.name)}</h3><span class="tag">${s.topics.length} topics</span></div>
-     <p class="small muted" style="margin:6px 0 8px">${isMain?'This is the key you use in your paper Bible: each topic has a highlighter color and its verses. Save verses or whole topics here from the other sets.':s.id==='starter'?'Ready-made topics to get you started. Tap ⭐ to save verses or topics into your main key.':`Generated${s.focus?' for “'+esc(s.focus)+'”':''}${s.at?' · '+new Date(s.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}. Compare the colors, then save what fits you with ⭐.`}</p>
+     <p class="small muted" style="margin:6px 0 8px">${isMain?'⭐ <b>Your main key.</b> Load, Study and the highlight colors in the Online Bible all use it. Tap ☆ on another set to make that your main key instead. This is the key you use in your paper Bible: each topic has a highlighter color and its verses. Save verses or whole topics here from the other sets.':s.id==='starter'?'Ready-made topics to get you started. Tap ⭐ to save verses or topics into your main key.':`Generated${s.focus?' for “'+esc(s.focus)+'”':''}${s.at?' · '+new Date(s.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}. Compare the colors, then save what fits you with ⭐.`}</p>
      ${keyLegend(s)}
      <div class="row" style="margin-top:10px">
        <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button>
@@ -2672,9 +2701,11 @@ Object.assign(A,{
       t.verses.forEach(v=>{if(!mt.verses.some(x=>x.ref===v.ref)){mt.verses.push({ref:v.ref,why:v.why||''});added++}})});
     toast(`⭐ “${t.name}” saved to your main key (${added} new verse${added===1?'':'s'})`)},
   keyRefresh:el=>refreshTopic(el.dataset.t),
-  keyUseMain:()=>{const s=getSet(S.keySet);confirmSheet(`Use “${s.name}” as your main key? Your current main key is kept as its own tab, so nothing is lost.`,'Use as main key',()=>{
-    const old=mainSet();const oid='g'+newId();Store.set('s_'+oid,{name:'Previous main key',at:Date.now(),topics:old.topics});
-    Store.set('s_main',{name:'My main key',main:true,topics:JSON.parse(JSON.stringify(s.topics))});S.keySet='main';renderView();toast('This is now your main key ⭐')})},
+  keyUseMain:el=>{const id=(el&&el.dataset&&el.dataset.s)||S.keySet;const sn=getSet(id);if(!sn||id==='main')return;const old=mainSet();
+    confirmSheet(`Make “${sn.name}” your main key ⭐? It will be used for Load, highlights and everything else. “${old.name}” moves to the other tabs, so nothing is lost.`,'⭐ Make it my main key',()=>{
+      Store.set('s_g'+newId(),{name:old.name==='My main key'?'Previous main key':old.name,at:Date.now(),topics:JSON.parse(JSON.stringify(old.topics||[]))});
+      Store.set(mainKey(),{name:sn.name,main:true,topics:JSON.parse(JSON.stringify(sn.topics||[]))});
+      if(id!=='starter')Store.del('s_'+id);S.keySet='main';closeSheet();renderView();toast(`“${sn.name}” is now your main key ⭐`)})},
   keyRename:()=>{const s=getSet(S.keySet);openSheet(`<h3>Rename set</h3><input class="f" id="setName" value="${esc(s.name)}" maxlength="40"><div class="row" style="margin-top:12px"><button class="btn pri grow" data-act="keyRenameGo">Save</button></div>`)},
   keyRenameGo:()=>{const n=$('#setName').value.trim();if(!n)return;updateSet(S.keySet,s=>{s.name=n});closeSheet();renderView()},
   keyDelSet:()=>A.keyDelSetId({dataset:{s:S.keySet}}),
