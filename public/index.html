@@ -404,6 +404,7 @@ details.grp[open]>summary::after{content:"▴"}
 .mtile{border-left:4px solid var(--gc)!important}
 .glegend{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;margin:12px 0 0;font-size:11.5px;color:var(--muted)}.glegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .chgrid button.rd{position:relative}.chgrid button.rd::after{content:'';position:absolute;bottom:4px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:currentColor;opacity:.75}
+.listenpill{border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600;font-size:14px;padding:7px 14px;border-radius:999px;cursor:pointer}
 .projbar{display:flex;align-items:center;gap:8px;margin:8px 0;padding:8px 8px 8px 14px;border-radius:14px;background:color-mix(in srgb,var(--gold) 18%,var(--card));border:1.5px solid var(--gold);font-size:14px}
 .jseg.kseg{grid-template-columns:repeat(4,1fr)}.jseg.kseg button{font-size:13px;padding:9px 2px}
 .settab .star{border:0;background:none;color:var(--gold);font-size:16px;padding:0 0 0 8px;cursor:pointer}
@@ -455,7 +456,7 @@ html[data-simple] #view{zoom:1.1}html[data-simple] .mini[data-m=deep],html[data-
 .subtabs{display:flex;border-bottom:1.5px solid var(--line);margin:0 0 12px}
 .subtabs button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:600;padding:10px 2px 9px;border-bottom:3px solid transparent;margin-bottom:-1.5px;cursor:pointer}
 .subtabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
-.iconbtn{white-space:nowrap;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;font-weight:600;min-width:36px;height:34px;padding:0 10px;border-radius:10px;cursor:pointer;flex:none}
+.iconbtn{width:auto;white-space:nowrap;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;font-weight:600;min-width:36px;height:34px;padding:0 10px;border-radius:10px;cursor:pointer;flex:none}
 .promptline{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:17px;padding:2px 2px 10px;border-bottom:1px dashed var(--line);margin-bottom:10px}
 .f.jsel{width:auto;flex:none;margin:0;padding:8px 10px;font-size:14px}
 details.more{margin-top:8px}details.more summary{cursor:pointer;color:var(--muted);font-size:14px;font-weight:600}
@@ -756,6 +757,7 @@ const isReading=()=>S.tab==='online'&&S.onlineSub==='read';
 function setTab(t){if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['today','load','study','tabs','journal','online','account'].includes(t))t='today';S.tab=t;updateAvatar();
   try{if(location.hash!=='#'+t)history.replaceState(null,'','#'+t)}catch(e){}
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderView();window.scrollTo(0,0)}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='pjEmoC'){const v=e.target.value.trim();const g=window.Intl&&Intl.Segmenter?[...new Intl.Segmenter().segment(v)].map(x=>x.segment):[...v];const em=g[0]||'';if(em){S._pjEmo=em;const pv=$('#pjEmoPrev');if(pv)pv.textContent=em;$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.remove('on'))}}});
 window.addEventListener('scroll',()=>{const t=document.getElementById('totop');if(t)t.classList.toggle('show',window.scrollY>1400)},{passive:true});
 window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
 
@@ -773,12 +775,12 @@ function viewRead(v){const s=settings();const b=BM[s.book];
     <button class="refbtn" data-act="pickBook">${esc(b.name)} ${s.ch} ▾</button>
     <button class="iconbtn" data-act="nextCh" aria-label="Next chapter">›</button>
     <select class="f" id="transSel" aria-label="Translation">${Object.keys(TRANS).map(t=>`<option value="${t}" ${t===s.trans?'selected':''}>${t}</option>`).join('')}</select>
-    <button class="iconbtn" data-act="listen" aria-label="Listen to this chapter">🎧</button>
     <button class="iconbtn" data-act="font" data-d="-1" aria-label="Smaller text" style="font-size:13px">A−</button>
     <button class="iconbtn" data-act="font" data-d="1" aria-label="Larger text">A+</button>
   </div>
   <article class="scripture" id="scripture" style="font-size:${s.font}px">
     <h2 class="chap-title"><span class="bk">${esc(b.name)}</span><span class="cn">${s.ch}</span></h2>
+    <div style="text-align:center;margin:-6px 0 12px"><button class="listenpill" data-act="listen">${TTS.on&&TTS.kind==='chapter'?'⏹ Stop listening':'🎧 Listen to this chapter'}</button></div>
     <div id="verses"></div>
   </article>`;
   $('#transSel').onchange=e=>{saveSettings({trans:e.target.value});S.verses=null;loadChapter(true)};
@@ -1255,7 +1257,7 @@ function jPray(el){const P=S.pray||(S.pray={topics:[],words:'',ref:'',who:'',sty
      <div class="chips" style="margin-top:8px">${PRAY_TOPICS.map(([k,l])=>`<button class="chip ${P.topics.includes(k)?'on':''}" data-act="prTopic" data-k="${k}">${l}</button>`).join('')}</div>
      <textarea class="f" id="prWords" placeholder="In your own words (optional)" style="min-height:64px">${esc(P.words)}</textarea>
      <details class="more" ${P.who||P.ref?'open':''}><summary>For someone, or with a verse</summary><div class="row" style="margin-top:6px"><input class="f grow" id="prWho" placeholder="For whom?" value="${esc(P.who)}"><input class="f grow" id="prRef" placeholder="Verse" value="${esc(P.ref)}"></div></details></div>
-   <div class="card"><div class="row"><b class="grow" style="font-family:var(--serif);font-size:19px">Style</b><button class="iconbtn" data-act="prStyleEdit" title="My prayer style">⭐ ${hasPs?'My style':'Set my style'}</button></div>
+   <div class="card"><div class="row"><b class="grow" style="font-family:var(--serif);font-size:19px">Style</b><button class="btn sm" data-act="prStyleEdit" title="My prayer style">⭐ My style</button></div>
      <div class="chips" style="margin-top:8px">${PRAY_STYLES.map(([k,l])=>`<button class="chip ${P.style===k?'on':''}" data-act="prStyle" data-k="${k}">${l}</button>`).join('')}</div>
      <div class="small muted" style="margin:0 2px">${P.style==='mine'&&hasPs?`Starts with \u201c${esc(ps.open||'…')}\u201d · ends with \u201c${esc(ps.close||'…')}\u201d`:esc((PRAY_STYLES.find(x=>x[0]===P.style)||PRAY_STYLES[0])[2])}${hasPs&&P.style!=='mine'?' · uses your start and end':''}</div></div>
    <button class="btn pri wide" data-act="prGo" ${P.busy?'disabled':''}>${P.busy?'<span class="spin"></span> Writing your prayer…':P.out?'🔁 Write a new one':'✨ Write my prayer'}</button>
@@ -1672,22 +1674,23 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     const on=toggleManual(b,c);if(on)touch();bookCard(b);if(S.tab==='tabs')setTimeout(()=>{const v=$('#loadedBody');if(v&&(S.loadedSub==='books'))loadedMap(v)},0)},
   mapCh:el=>{closeSheet();const b=el.dataset.b,c=+el.dataset.c;if((S.mapMode||'paper')==='paper'){const ex=loadPlans().find(pl=>pl.kind==='chapter'&&pl.b===b&&pl.c===c&&!pl.v1);if(ex){S.build.planKey=ex.key;setTab('load');setTimeout(()=>scrollToPlan(ex.key),120)}else{Object.assign(S.build,{mode:'chapter',book:b,ch:c,planKey:null,err:''});setTab('load');toast(`${BM[b].name} ${c} is ready — pick what to add and tap ✨`)}}else goTo(b,c)},
   friendShare:el=>shareFriend(el.dataset.t,el.dataset.k),
-  acceptShare:()=>{const d=S._incoming;if(!d)return;const pre={plan:'k_',page:'p_',insert:'i_'}[d.kind];if(!pre)return;const it=d.item;if(d.kind==='plan')it.at=Date.now();if(d.kind==='page')it.at=Date.now();if(d.kind==='insert')it.updated=Date.now();
+  friendTopic:el=>{const st=getSet(el.dataset.s);const t=findTopic(st,el.dataset.t);if(t)shareFriend('topic','',JSON.parse(JSON.stringify(t)))},
+  acceptShare:()=>{const d=S._incoming;if(!d)return;if(d.kind==='topic'){const t=d.item;let where='';updateSet('main',m=>{let x=m.topics.find(y=>sameName(y.name,t.name));if(!x){const used=new Set(m.topics.map(y=>y.color));const col=used.has(t.color)?((PALETTE.find(p=>!used.has(p[0]))||PALETTE[0])[0]):t.color;x={id:'t'+newId(),emoji:t.emoji,name:t.name,color:col,meaning:t.meaning||'',verses:[]};m.topics.push(x)}(t.verses||[]).forEach(v=>{if(!x.verses.some(y=>y.ref===v.ref))x.verses.push(v)});where=x.name});closeSheet();S._incoming=null;S.loadedSub='key';S.keySet='main';setTab('tabs');toast(`Added “${where}” to your main key 🎁`);return}const pre={plan:'k_',page:'p_',insert:'i_'}[d.kind];if(!pre)return;const it=d.item;if(d.kind==='plan')it.at=Date.now();if(d.kind==='page')it.at=Date.now();if(d.kind==='insert')it.updated=Date.now();
     const k=pre+newId();Store.set(k,it);touch();closeSheet();S._incoming=null;
     if(d.kind==='plan'){S.build.planKey=k;setTab('load');setTimeout(()=>scrollToPlan(k),150)}else if(d.kind==='page'){S.loadedSub='cover';S.pmView='saved';S.pmOpen=k;setTab('tabs')}else{S.loadedSub='inserts';S.insKind='all';setTab('tabs')}toast('Added to your Loaded Bible 🎁')},
   simpleToggle:()=>{saveSettings({simple:!settings().simple});applyTheme();renderView();toast(settings().simple?'Simple mode on 🌱':'Simple mode off')},
   toTop:()=>window.scrollTo({top:0,behavior:'smooth'}),
   projUse:el=>{saveSettings({proj:el.dataset.p||''});S.build.planKey=null;S.keySet='main';const pj=curProjObj();renderView();toast(pj?`Now working on ${pj.name} 📖`:'Back to My Bible 📖')},
-  projNew:()=>openSheet(`<h3>📚 New project Bible</h3><label class="l">Name</label><input class="f" id="pjName" maxlength="40" placeholder="e.g. Gift Bible for Mom"><label class="l">Emoji</label><div class="chips">${['📗','📘','📙','📕','🎁','👧','👦','✍️','🌸','⛪'].map((e,i)=>`<button class="chip ${i?'':'on'}" data-act="pjEmo" data-e="${e}">${e}</button>`).join('')}</div>
+  projNew:()=>openSheet(`<h3>📚 New project Bible</h3><label class="l">Name</label><input class="f" id="pjName" maxlength="40" placeholder="e.g. Gift Bible for Mom"><label class="l">Emoji</label>${emojiPicker('📗')}
     <label class="l">Color key for this Bible</label><select class="f" id="pjKey">${allSets().map(x=>`<option value="${esc(x.id)}">${x.id==='main'?'⭐ A copy of my main key':esc(x.name)}</option>`).join('')}<option value="__empty">Start with an empty key</option></select>
     <label class="l">Note (optional)</label><input class="f" id="pjNote" maxlength="60" placeholder="e.g. Christmas gift, NIV journaling Bible">
     <button class="btn pri wide" style="margin-top:12px" data-act="projCreate">Create</button>`),
-  pjEmo:el=>{$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.toggle('on',b===el));S._pjEmo=el.dataset.e},
+  pjEmo:el=>{$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.toggle('on',b===el));S._pjEmo=el.dataset.e;const c=$('#pjEmoC');if(c)c.value='';const pv=$('#pjEmoPrev');if(pv)pv.textContent=el.dataset.e},
   projCreate:()=>{const n=$('#pjName').value.trim();if(!n){toast('Give it a name');return}const id='p'+newId();const kid=$('#pjKey').value;const src=kid==='__empty'?{topics:[]}:getSet(kid);
     const L=projList().concat([{id,name:n,emoji:S._pjEmo||'📗',note:$('#pjNote').value.trim(),at:Date.now()}]);Store.set('projects',{list:L});
     Store.set('s_main_'+id,{name:n+' key',main:true,topics:JSON.parse(JSON.stringify(src.topics||[]))});S._pjEmo=null;saveSettings({proj:id});S.keySet='main';closeSheet();renderView();toast(`Created ${n} 📚 You’re working in it now`)},
-  projEdit:el=>{const p=projList().find(x=>x.id===el.dataset.p);openSheet(`<h3>✏️ Rename</h3><input class="f" id="pjName" maxlength="40" value="${esc(p.name)}"><input class="f" id="pjNote" maxlength="60" value="${esc(p.note||'')}" placeholder="Note (optional)" style="margin-top:8px"><button class="btn pri wide" style="margin-top:12px" data-act="projEditGo" data-p="${p.id}">Save</button>`)},
-  projEditGo:el=>{const L=projList().map(x=>x.id===el.dataset.p?Object.assign({},x,{name:$('#pjName').value.trim()||x.name,note:$('#pjNote').value.trim()}):x);Store.set('projects',{list:L});closeSheet();renderView()},
+  projEdit:el=>{const p=projList().find(x=>x.id===el.dataset.p);S._pjEmo=p.emoji||'📗';openSheet(`<h3>✏️ Edit project</h3><label class="l">Name</label><input class="f" id="pjName" maxlength="40" value="${esc(p.name)}"><label class="l">Emoji</label>${emojiPicker(p.emoji||'📗')}<input class="f" id="pjNote" maxlength="60" value="${esc(p.note||'')}" placeholder="Note (optional)" style="margin-top:8px"><button class="btn pri wide" style="margin-top:12px" data-act="projEditGo" data-p="${p.id}">Save</button>`)},
+  projEditGo:el=>{const L=projList().map(x=>x.id===el.dataset.p?Object.assign({},x,{name:$('#pjName').value.trim()||x.name,emoji:S._pjEmo||x.emoji,note:$('#pjNote').value.trim()}):x);S._pjEmo=null;Store.set('projects',{list:L});closeSheet();renderView()},
   projDel:el=>{const id=el.dataset.p;const p=projList().find(x=>x.id===id);confirmSheet(`Delete “${p.name}” and its loadings, inserts, pages and key? Your journal, prayers and studies stay.`,'🗑 Delete project',()=>{
     ['k_','i_','p_'].forEach(pre=>Store.list(pre).filter(x=>x.proj===id).forEach(x=>Store.del(x.key)));Store.del('s_main_'+id);Store.set('projects',{list:projList().filter(x=>x.id!==id)});if(curProj()===id)saveSettings({proj:''});closeSheet();renderView();toast('Project deleted')})},
   goKit:el=>{S.loadedSub=el.dataset.s;setTab('tabs')},
@@ -1889,7 +1892,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const plans=loadPlans();
   if(B.mode==='snote'){setTimeout(()=>bindSnote(v),0)}
   if(B.mode==='life'){setTimeout(()=>bindLapp(v),0)}
-  v.innerHTML=`${projBar()}<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
+  v.innerHTML=`${projBar()}<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, a highlighter and a fine pen. Pick what to load and get a step-by-step to-do list.</p></div>
   <div class="card">
     <div class="stepl" style="margin-top:0"><span>1</span> What do you want to load?</div>
     <div class="modegrid">${LOAD_MODES.map(([k,e,l,d])=>`<button class="modecard ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div>
@@ -2263,7 +2266,7 @@ function ttsNext(){$$('.v.speaking').forEach(x=>x.classList.remove('speaking'));
   u.onend=()=>{if(TTS.on&&!TTS.paused&&TTS.list[TTS.i]===it){TTS.i++;ttsNext()}};u.onerror=e=>{if(e.error!=='interrupted'&&e.error!=='canceled'){TTS.i++;ttsNext()}};
   if(it.v){const el=document.getElementById('v'+it.v);if(el){el.classList.add('speaking');el.scrollIntoView({behavior:'smooth',block:'center'})}}speechSynthesis.speak(u);ttsBar()}
 function ttsStop(){TTS.on=false;TTS.paused=false;try{speechSynthesis.cancel()}catch(e){}$$('.v.speaking').forEach(x=>x.classList.remove('speaking'));ttsBar()}
-function ttsBar(){let b=$('#ttsbar');if(!TTS.on){if(b)b.remove();return}if(!b){b=document.createElement('div');b.id='ttsbar';document.body.appendChild(b)}const it=TTS.list[TTS.i]||{};
+function ttsBar(){const lp=$('.listenpill');if(lp)lp.textContent=TTS.on&&TTS.kind==='chapter'?'⏹ Stop listening':'🎧 Listen to this chapter';let b=$('#ttsbar');if(!TTS.on){if(b)b.remove();return}if(!b){b=document.createElement('div');b.id='ttsbar';document.body.appendChild(b)}const it=TTS.list[TTS.i]||{};
   b.innerHTML=`<span class="grow">🎧 <b>${esc(TTS.label)}</b>${it.v?` <span class="muted">· verse ${it.v}</span>`:''}</span><button data-act="ttsPrev" aria-label="Back">⏮</button><button data-act="ttsPause" aria-label="Pause">${TTS.paused?'▶️':'⏸'}</button><button data-act="ttsRate" aria-label="Speed">${settings().ttsRate||1}×</button><button data-act="ttsStop" aria-label="Stop">⏹</button>`}
 /* ===== 🗺️ MY BIBLE MAP ===== */
 function manualMarks(){return (((Store.get('maploaded')||{})[curProj()||'_me'])||{})}
@@ -2276,6 +2279,8 @@ function mapData(mode){const M={};const add=(b,c)=>{if(!b||!BM[b]||!c)return;(M[
   else{Store.list('h_').forEach(h=>add(h.b,h.c));Store.list('n_').forEach(n=>add(n.b,n.c));Store.list('b_').forEach(x=>add(x.b,x.c))}
   return M}
 const MAPSHORT={Deuteronomy:'Deut',Leviticus:'Lev',Ecclesiastes:'Eccl','Song of Solomon':'Song',Lamentations:'Lam',Zephaniah:'Zeph',Zechariah:'Zech',Galatians:'Gal',Ephesians:'Eph',Philippians:'Phil',Colossians:'Col','1 Thessalonians':'1 Thess','2 Thessalonians':'2 Thess','1 Timothy':'1 Tim','2 Timothy':'2 Tim','1 Corinthians':'1 Cor','2 Corinthians':'2 Cor',Revelation:'Rev',Nehemiah:'Neh','1 Chronicles':'1 Chron','2 Chronicles':'2 Chron'};
+function emojiPicker(cur){S._pjEmo=cur;return `<div class="row" style="align-items:center;gap:10px"><span id="pjEmoPrev" class="pgicon" style="font-size:28px">${esc(cur)}</span><input class="f grow" id="pjEmoC" maxlength="8" placeholder="Type or paste any emoji" style="margin:0"></div>
+  <div class="chips" style="margin-top:6px">${['📗','📘','📙','📕','🎁','👧','👦','✍️','🌸','⛪','🕊️','❤️','🌻','🔥','⭐','🌿'].map(e=>`<button class="chip ${e===cur?'on':''}" data-act="pjEmo" data-e="${e}">${e}</button>`).join('')}</div>`}
 function projBar(){const pj=curProjObj();return pj?`<div class="projbar"><span class="grow">${esc(pj.emoji||'📖')} Working on <b>${esc(pj.name)}</b></span><button class="btn sm" data-act="projUse" data-p="">↩ My Bible</button></div>`:''}
 function projStats(id){const f=x=>(x.proj||'')===id;return {plans:Store.list('k_').filter(f).length,ins:Store.list('i_').filter(f).length,pages:Store.list('p_').filter(f).length}}
 function loadedProjects(el){const L=projList();const cur=curProj();const me=projStats('');
@@ -2295,15 +2300,15 @@ function loadedMap(el){const mode=S.mapMode||'paper';const M=mapData(mode);const
    <div class="glegend">${Object.entries(GENRES).map(([k,g])=>`<span><i style="background:${g[1]}"></i>${esc(g[0])}</span>`).join('')}</div>
    <div class="mlegend"><span><i class="l0"></i>none</span><span><i class="l1"></i>a little</span><span><i class="l3"></i>a lot</span><span><i class="l4"></i>full</span></div>`}
 /* ===== 🤝 SHARE WITH A FRIEND ===== */
-async function shareFriend(kind,key){const x=Store.get(key);if(!x)return;let title='',item=JSON.parse(JSON.stringify(x));
-  if(kind==='plan'){title=planTitle(x);item.checks={};item.extra={};delete item.key}else if(kind==='page'){title=x.page.title||'A page';item.inBible=false}else if(kind==='insert'){title=x.title||'An insert'}
+async function shareFriend(kind,key,obj){const x=obj||Store.get(key);if(!x)return;let title='',item=JSON.parse(JSON.stringify(x));
+  if(kind==='plan'){title=planTitle(x);item.checks={};item.extra={};delete item.key}else if(kind==='page'){title=x.page.title||'A page';item.inBible=false}else if(kind==='insert'){title=x.title||'An insert'}else if(kind==='topic'){title=(x.emoji||'')+' '+x.name}
   let packed;try{packed=b64u.enc(await gzip(JSON.stringify({app:'loadedbible-share',v:1,kind,title,item})))}catch(e){toast('Sharing isn’t supported on this device');return}
   const url=SITE_URL+'/#lbshare='+packed;const name=profile().name;
   const text=`${name?name+' shared':'I made'} “${title}” in Loaded Bible. Tap to add it to yours:`;
   try{if(navigator.share){await navigator.share({title:'Loaded Bible',text,url});return}}catch(e){if(e&&e.name==='AbortError')return}
   copyText(text+'\n'+url);openSheet(`<h3>🤝 Send to a friend</h3><p>The link is copied. Paste it in a message to your friend. When they open it, they can add <b>${esc(title)}</b> to their own Loaded Bible.</p><button class="btn pri wide" data-act="closeSheet">OK</button>`)}
 function showIncomingShare(){const raw=S.pendingShare;if(!raw)return;S.pendingShare=null;
-  gunzip(b64u.dec(raw)).then(t=>{const d=JSON.parse(t);if(d.app!=='loadedbible-share')throw 0;S._incoming=d;const nm={plan:'loading',page:'page',insert:'insert card'}[d.kind]||'item';
+  gunzip(b64u.dec(raw)).then(t=>{const d=JSON.parse(t);if(d.app!=='loadedbible-share')throw 0;S._incoming=d;const nm={plan:'loading',page:'page',insert:'insert card',topic:'topic tab'}[d.kind]||'item';
     openSheet(`<div style="text-align:center"><div style="font-size:52px">🎁</div><h3>A friend shared a ${nm} with you</h3><p style="font-family:var(--serif);font-size:19px">“${esc(d.title||'')}”</p></div><div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeSheet">No thanks</button><button class="btn pri grow" data-act="acceptShare">＋ Add to mine</button></div>`)}).catch(()=>toast('That share link didn’t work'))}
 /* ===== ↩️ UNDO ===== */
 function undoToast(msg,fn){let u=$('#undobar');if(!u){u=document.createElement('div');u.id='undobar';document.body.appendChild(u)}u.innerHTML=`<span class="grow">${esc(msg)}</span><button>Undo</button>`;u.classList.add('show');
@@ -2651,6 +2656,7 @@ function topicCard(s,t){const isMain=s.id==='main';const open=S.openTopic===s.id
    <div class="row" style="margin-top:10px"><button class="btn sm ${isMain?'':'pri'}" data-act="keyRefresh" data-t="${t.id}" ${busy?'disabled':''}>${busy?'<span class="spin"></span> Finding…':isMain?'✨ Suggest new verses':'🔄 New verses'}</button>
      ${!isMain?`<button class="btn sm" data-act="keySaveTopic" data-t="${t.id}">⭐ Save whole topic</button>`:''}
      <button class="btn sm" data-act="loadTopicPaper" data-n="${esc(t.name)}">✨ Load in my Bible</button>
+     <button class="btn sm" data-act="friendTopic" data-s="${esc(s.id)}" data-t="${t.id}">🤝 Send</button>
      <button class="btn sm" data-act="keyEditTopic" data-t="${t.id}">✏️ Edit</button><button class="btn sm danger" data-act="keyDelTopic" data-t="${t.id}">🗑</button></div></div></details>`}
 function topicSheet(tid){const s=getSet(S.keySet);const t=tid?findTopic(s,tid):{name:'',emoji:'🏷️',color:(PALETTE.find(p=>!s.topics.some(x=>x.color===p[0]))||PALETTE[0])[0],meaning:''};S._tColor=t.color;
   openSheet(`<h3>${tid?'Edit topic':'New topic'}</h3>
