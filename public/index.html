@@ -35,7 +35,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 a{color:var(--accent)}
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:10px}
 .brand{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
-.brand svg{color:var(--accent)}
+.brand svg{color:var(--accent);flex:none}
 .sync{margin-left:auto;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
 .sync.ok i{background:#4a9a5a}
@@ -331,7 +331,9 @@ details.grp[open]>summary::after{content:"▴"}
 .codecard{border:2px solid var(--gold)}
 .codechip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:800;font-family:ui-monospace,Menlo,monospace;color:var(--accent);white-space:nowrap}
 .vpreview{margin:10px 0 2px;background:var(--soft);border-radius:12px;padding:9px 12px;font-size:14.5px}
-@media (max-width:420px){.brand{font-size:19px!important}header.top{gap:6px;padding:10px 12px}.codechip{padding:5px 8px;font-size:11.5px}}
+.brand{white-space:nowrap;min-width:0}
+@media (max-width:420px){.codechip .cct{display:none}.codechip{padding:5px 7px!important}}
+@media (max-width:420px){.brand{font-size:17px!important}header.top{gap:6px;padding:10px 12px}.codechip{padding:5px 8px;font-size:11.5px}}
 .item.today{border:2px solid var(--accent)}
 .flipcard{background:var(--card);border:2px solid var(--gold);border-radius:20px;padding:26px 18px;text-align:center;min-height:220px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.1)}
 .fliptext{font-family:var(--serif);font-size:21px;line-height:1.5;margin:10px 0 0}
@@ -388,6 +390,9 @@ details.grp[open]>summary::after{content:"▴"}
 .pgstat{flex:none;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--muted)}.pgcard.done .pgstat{background:var(--accent);color:var(--accent-ink)}
 .pgacts{margin-top:10px}.pgacts .btn{white-space:nowrap}.pgacts2{margin-top:6px}
 .v.speaking{background:color-mix(in srgb,var(--accent) 16%,transparent);border-radius:8px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.searchpill{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px 0 10px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--muted);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;flex:none}.searchpill span{font-size:14px}
+@media (max-width:400px){.searchpill{padding:0 9px;height:32px}}@media (max-width:380px){.searchpill{font-size:0}.searchpill span{font-size:16px}}
+.todaysearch{display:flex;align-items:center;gap:10px;width:100%;margin:2px 0 10px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);font:inherit;font-size:15px;cursor:pointer;text-align:left}
 #ttsbar{position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:40;display:flex;align-items:center;gap:4px;background:var(--ink);color:var(--paper);border-radius:16px;padding:8px 8px 8px 14px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px}
 #ttsbar .muted{color:inherit;opacity:.7}#ttsbar button{border:0;background:rgba(255,255,255,.12);color:inherit;min-width:38px;height:36px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}
 .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.mtile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:4px 2px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
@@ -471,7 +476,7 @@ details.more{margin-top:8px}details.more summary{cursor:pointer;color:var(--mute
   <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
   <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
   <button class="codechip" id="codeChip" data-act="tab" data-tab="account" style="display:none" aria-label="My Bible code"></button>
-  <button class="hbtn" data-act="search" aria-label="Search">🔎</button>
+  <button class="searchpill" data-act="search" aria-label="Search"><span>🔍</span>Search</button>
   <button class="hbtn" data-act="donate" aria-label="Donate">❤️</button>
   <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
 </header>
@@ -2196,7 +2201,7 @@ function displayName(){const p=profile();return p.name||(Auth.user&&Auth.user.di
 function applyTheme(){const t=profile().theme;if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;if(settings().simple)document.documentElement.dataset.simple='1';else delete document.documentElement.dataset.simple}
 function avatarHtml(){const ph=Store.get('pic_avatar');return ph&&ph.data?`<img src="${ph.data}" alt="">`:esc(profile().avatar)}
 function bannerStyle(){const ph=Store.get('pic_banner');const pf=profile();if(pf.banner==='photo'&&ph&&ph.data)return `background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35)),url(${ph.data}) center/cover`;const b=BANNERS.find(x=>x[0]===pf.banner)||BANNERS[0];return 'background:'+b[1]}
-function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}const c=$('#codeChip');if(c){const v=STANDALONE&&typeof Code!=='undefined'?Code.value:null;c.style.display=v?'':'none';if(v){const f=v.split('-')[0];c.textContent='🔑 '+(f.length>7?f.slice(0,6)+'…':f)}}}
+function updateAvatar(){const b=$('#avatarBtn');if(b){b.innerHTML=avatarHtml();b.classList.toggle('on',S.tab==='account')}const c=$('#codeChip');if(c){const v=STANDALONE&&typeof Code!=='undefined'?Code.value:null;c.style.display=v?'':'none';if(v){const f=v.split('-')[0];c.innerHTML='🔑<span class="cct"> '+esc(f.length>7?f.slice(0,6)+'…':f)+'</span>'}}}
 async function fileToJpeg(file,w,h,maxLen){const url=URL.createObjectURL(file);try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('That file isn\u2019t a picture I can open.'));i.src=url});
   const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');const sr=Math.max(w/img.naturalWidth,h/img.naturalHeight);const sw=w/sr,sh=h/sr;
   x.drawImage(img,(img.naturalWidth-sw)/2,(img.naturalHeight-sh)/2,sw,sh,0,0,w,h);let q=.86,d;do{d=c.toDataURL('image/jpeg',q);q-=.08}while(d.length>maxLen&&q>.3);return d}finally{URL.revokeObjectURL(url)}}
@@ -2308,6 +2313,7 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
   const cont=open?`<div class="tcard"><div class="th"><span>🖍</span><b class="grow">Keep loading</b><span class="small muted">${open.pp.dn}/${open.pp.total} steps</span></div><b style="font-family:var(--serif);font-size:18px">${esc(planTitle(open.pl))}</b><div class="prog" style="margin:6px 0 8px"><i style="width:${open.pp.pct}%"></i></div><button class="btn sm pri" data-act="tContinue" data-k="${open.pl.key}">Continue →</button></div>`:'';
   const codeNag=STANDALONE&&Code.value&&!settings().codeOk?`<div class="tcard warn"><div class="th"><span>🔑</span><b class="grow">Save your Bible code!</b></div><p class="small" style="margin:4px 0 8px">It’s the only way to get your progress back on another phone. Screenshot it or write it in the back of your Bible.</p><div class="bigcode small-code" style="margin:0 0 8px">${esc(Code.value)}</div><div class="row"><button class="btn sm pri grow" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm grow" data-act="codeOk">✓ I saved it</button></div></div>`:'';
   v.innerHTML=`<div class="todayhead"><div class="grow"><div class="small muted">${new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div><h2>${hi}${nm?', '+esc(nm):''}!</h2></div><div class="tstreak"><b>🔥 ${st.streak}</b><span>day streak</span></div></div>
+   <button class="todaysearch" data-act="search"><span>🔍</span>Search your notes, prayers, studies…</button>
    <div class="tgoal"><span class="small"><b>Today:</b> ${Math.min(st.today,goal)}/${goal} things done</span><div class="prog grow"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div></div>
    ${codeNag}
    <div class="tcard votdc"><div class="th"><span>☀️</span><b class="grow">Verse of the day</b><button class="iconbtn" data-act="sayVerse" data-r="${vref}" title="Listen">🔊</button><button class="iconbtn" data-act="votdNext" title="Another verse">🎲</button></div>
@@ -2315,7 +2321,7 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
      <div class="row" style="margin-top:6px"><button class="btn sm pri grow" data-act="votdLoad" data-r="${vref}">✨ Load it</button><button class="btn sm grow" data-act="shareVerse" data-r="${vref}">📤 Share</button></div></div>
    ${reading}${cont}${pray}${mem}
    <div class="tcard"><div class="th"><span>🙌</span><b class="grow">One thing I’m thankful for</b></div><div class="row" style="margin-top:6px"><input class="f grow" id="tGrat" placeholder="Today I’m thankful for…" style="margin:0"><button class="btn sm pri" data-act="tGratSave">Save</button></div></div>
-   <div class="tquick"><button data-act="tab" data-tab="load"><span>🖍</span>Load a chapter</button><button data-act="tab" data-tab="study"><span>🔎</span>Study</button><button data-act="jOpen" data-s="write"><span>✍️</span>Write</button><button data-act="search"><span>🔍</span>Search</button></div>
+   <div class="tquick"><button data-act="tab" data-tab="load"><span>🖍</span>Load a chapter</button><button data-act="tab" data-tab="study"><span>🔎</span>Study</button><button data-act="jOpen" data-s="write"><span>✍️</span>Write</button><button data-act="tab" data-tab="online"><span>📖</span>Read</button></div>
    <button class="tcard maplink" data-act="goKit" data-s="map"><span style="font-size:26px">🗺️</span><div class="grow" style="text-align:left"><b>My Bible map</b><div class="small muted">See how loaded your Bible is, book by book</div></div><span>›</span></button>
    <p class="small muted" style="text-align:center;margin:14px 0 4px"><a data-act="tourAgain" style="cursor:pointer;text-decoration:underline">Show me around the app</a></p>`;
   const gi=$('#tGrat',v);if(gi)gi.addEventListener('keydown',e=>{if(e.key==='Enter')A.tGratSave()})}
