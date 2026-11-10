@@ -513,18 +513,98 @@ details.more{margin-top:8px}details.more summary{cursor:pointer;color:var(--mute
 .notice{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13.5px;color:var(--muted);margin:10px 0}
 .spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite;display:inline-block}
 @keyframes rot{to{transform:rotate(360deg)}}
+header.top{flex-wrap:wrap;row-gap:6px}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.backbtn{display:none;flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:24px;line-height:1;padding:0 0 3px;cursor:pointer;align-items:center;justify-content:center}
+.backbtn.show{display:flex;animation:pop .25s ease-out}
+header.top:has(.backbtn.show) .brand svg{display:none}
+@media (max-width:440px){header.top:has(.backbtn.show) .searchpill{font-size:0;padding:0 9px}header.top:has(.backbtn.show) .searchpill span{font-size:16px}}
+@media (max-width:370px){header.top:has(.backbtn.show) .brand{font-size:15px!important}}
+.imini .ipen{animation:ipenL 2.6s ease-in-out infinite}@keyframes ipenL{0%{stroke-dashoffset:120}60%,100%{stroke-dashoffset:0}}
+.bpill{order:99;flex:1 1 100%;display:flex;align-items:center;gap:7px;min-width:0;height:30px;margin:0 auto;max-width:520px;padding:0 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.bpill .bpt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpill small{color:var(--muted);font-size:12px}.bpill .bpc{color:var(--muted);font-size:11px}
+.bpill.unset{border-style:dashed;border-color:var(--accent);color:var(--accent)}
+.bsrow{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:11px 12px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.bsrow.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent)}
+.readerbar{top:var(--hdr,53px)!important}
+.mucard{padding:14px}.munow{display:flex;align-items:center;gap:12px;margin:12px 0 6px}
+.muart{width:56px;height:56px;flex:none;border-radius:16px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,var(--card)),var(--paper));border:1px solid var(--line)}
+.muart.spin{animation:mufloat 3s ease-in-out infinite}
+.muname{font-family:var(--serif);font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mubtns{display:flex;justify-content:center;align-items:center;gap:12px;margin:8px 0 10px}
+.mubtns button{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;cursor:pointer}
+.mubtns .mubig{width:62px;height:62px;font-size:24px;background:var(--accent);color:#fff;border-color:var(--accent)}
+.mubtns button.on{background:color-mix(in srgb,var(--accent) 18%,var(--card));border-color:var(--accent)}
+.muvol{display:flex;align-items:center;gap:8px;margin:10px 0}.muvol input{flex:1;accent-color:var(--accent)}
+#mupill{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:26;display:flex;align-items:center;gap:2px;max-width:560px;margin:0 auto;padding:5px 6px 5px 8px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:0 8px 26px rgba(0,0,0,.16);animation:pop .3s ease-out}
+#mupill button{border:0;background:none;color:var(--ink);font:inherit;font-size:17px;width:36px;height:36px;border-radius:50%;cursor:pointer;flex:none}
+#mupill .mupname{flex:1;width:auto;display:flex;align-items:center;gap:8px;text-align:left;min-width:0;border-radius:12px;padding:0 4px}
+#mupill .mupname b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#mupill .mupname small{display:block;font-size:11.5px;color:var(--muted)}
+#mupill .mupname .grow{min-width:0}
+.mueq{display:inline-block;animation:mufloat 1.6s ease-in-out infinite}
+@keyframes mufloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(4deg)}}
+body.introon{overflow:hidden}
+#intro{position:fixed;inset:0;z-index:70;overflow-y:auto;-webkit-overflow-scrolling:touch;background:radial-gradient(120% 70% at 50% -10%,color-mix(in srgb,var(--accent) 22%,var(--paper)) 0%,var(--paper) 60%);color:var(--ink);padding:calc(10px + env(safe-area-inset-top)) 18px calc(26px + env(safe-area-inset-bottom));transition:opacity .35s,transform .35s}
+#intro.out{opacity:0;transform:scale(1.03)}
+.ihead{display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto 6px}
+.iback{width:38px;height:38px;flex:none;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:24px;padding:0 0 3px;cursor:pointer}span.iback{border:0;background:none}
+.iskip{border:0;background:none;color:var(--muted);font:inherit;font-weight:600;cursor:pointer;padding:8px}
+.idots{flex:1;display:flex;gap:6px;justify-content:center}.idots i{width:8px;height:8px;border-radius:99px;background:var(--line);transition:all .3s}.idots i.done{background:color-mix(in srgb,var(--accent) 50%,var(--line))}.idots i.on{width:24px;background:var(--accent)}
+.islide{max-width:520px;margin:0 auto;text-align:center;animation:islide .45s cubic-bezier(.2,.8,.2,1) both}.islide.rev{animation-name:islideR}
+@keyframes islide{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}@keyframes islideR{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
+.islide h1{font-family:var(--serif);font-size:32px;line-height:1.15;margin:8px 0 10px}.islide h2{font-family:var(--serif);font-size:25px;line-height:1.2;margin:10px 0 8px}
+.ilead{color:var(--muted);font-size:16px;line-height:1.5;margin:0 auto 16px;max-width:400px}
+.ibig{width:100%;height:54px;font-size:17px;margin-top:14px;border-radius:16px}
+.islide .btn.ghost{margin-top:6px;width:100%}
+.ibigin{font-size:19px!important;height:56px;text-align:center;border-radius:16px!important}
+.igreet{min-height:24px;margin:12px 0 0;font-size:17px;animation:islide .4s}
+.ivis{display:flex;justify-content:center;align-items:flex-end;min-height:120px;margin:10px 0 4px}
+.ibook{width:min(300px,80vw);height:auto;animation:ibookin .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ibookin{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:none}}
+.ihl{transform-box:fill-box;transform-origin:left center;animation:ihl 1.1s .7s ease-out both}.ihl2{animation-delay:1.5s}
+@keyframes ihl{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.ipen{stroke-dasharray:120;stroke-dashoffset:120;animation:ipen 1.6s 1.1s ease-in-out forwards}.ipen2{animation-delay:2.2s}
+@keyframes ipen{to{stroke-dashoffset:0}}
+.isp{transform-box:fill-box;transform-origin:center;animation:isp 2.4s 1.6s ease-in-out infinite both}.isp2{animation-delay:2.4s}
+@keyframes isp{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.1)}}
+.iwave{font-size:84px;transform-origin:70% 80%;animation:iwave 1.6s .3s ease-in-out 2}
+@keyframes iwave{0%,100%{transform:rotate(0)}15%,45%{transform:rotate(16deg)}30%,60%{transform:rotate(-8deg)}}
+.ishelf{gap:8px;min-height:130px}.ispine{display:block;width:30px;border-radius:5px 5px 3px 3px;box-shadow:inset -5px 0 0 rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12);position:relative;animation:ispine .7s cubic-bezier(.2,.8,.2,1) both}
+.ispine i{position:absolute;left:6px;right:9px;top:16px;height:3px;background:#f2c14e;opacity:.85;box-shadow:0 8px 0 #f2c14e}
+.ispine:nth-child(3){transform:translateY(-14px);animation-name:ispineUp}
+@keyframes ispine{from{opacity:0;transform:translateY(30px)}to{opacity:1}}@keyframes ispineUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(-14px)}}
+.igoals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.igoal{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:18px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600;font-size:14.5px;cursor:pointer;transition:all .2s}
+.igoal .ige{font-size:32px;transition:transform .25s}.igoal .igc{position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;display:grid;place-items:center;opacity:0;transform:scale(.4);transition:all .2s}
+.igoal.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--card))}.igoal.on .ige{transform:scale(1.15) rotate(-6deg)}.igoal.on .igc{opacity:1;transform:none}
+.icards{display:flex;flex-direction:column;gap:10px;text-align:left;margin-top:6px}
+.icard{display:flex;gap:12px;align-items:center;padding:12px;border-radius:18px;background:var(--card);border:1.5px solid var(--line);animation:islide .5s both}
+.icard.for{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
+.icard p{margin:3px 0 0;font-size:13.5px;color:var(--muted);line-height:1.4}.icard b{font-size:16px}
+.iforyou{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:99px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;vertical-align:2px}
+.imini{width:96px;flex:none;border-radius:12px;background:var(--paper);padding:4px}.imini svg{width:100%;height:auto;display:block}
+.imag{animation:imag 2.6s ease-in-out infinite}@keyframes imag{0%,100%{transform:translateX(0)}50%{transform:translateX(54px)}}
+.idot{transform-box:fill-box;transform-origin:center;animation:idot 2s ease-in-out infinite both}@keyframes idot{0%,100%{transform:scale(.55)}40%{transform:scale(1.05)}}
+.idone{width:88px;height:88px;border-radius:50%;background:var(--accent);color:#fff;font-size:46px;display:grid;place-items:center;animation:idone .6s cubic-bezier(.3,1.6,.5,1) both;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 40%,transparent)}
+@keyframes idone{from{transform:scale(0) rotate(-40deg)}to{transform:none}}
+.inext{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+.inextb{display:flex;justify-content:space-between;align-items:center;width:100%;padding:15px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600;font-size:16px;cursor:pointer;text-align:left}
+.inextb span{color:var(--accent);font-size:22px}
+@media (prefers-reduced-motion:reduce){#intro *,.backbtn,#mupill{animation:none!important;transition:none!important}.ihl{transform:none}.ipen{stroke-dashoffset:0}}
 .switchrow input[type=checkbox]{flex:0 0 22px;width:22px;height:22px}
 .bsinfo{margin-top:10px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--card)}.bsinfo summary{cursor:pointer;list-style:none}.bsinfo summary::-webkit-details-marker{display:none}.bsinfo[open] summary{margin-bottom:4px}
 </style>
 </head>
 <body>
 <header class="top">
+  <button class="backbtn" id="backBtn" data-act="goBack" aria-label="Go back">‹</button>
   <div class="brand"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M12 6v8M9 9h6"/></svg>Loaded Bible</div>
   <div class="sync" id="sync" title="Saved on this device"><i></i><span>On this device</span></div>
   <button class="codechip" id="codeChip" data-act="tab" data-tab="account" style="display:none" aria-label="My Bible code"></button>
   <button class="searchpill" data-act="search" aria-label="Search"><span>🔍</span>Search</button>
   <button class="hbtn" data-act="donate" aria-label="Donate">❤️</button>
   <button class="avatar" id="avatarBtn" data-act="tab" data-tab="account" aria-label="My account">🙂</button>
+  <button class="bpill" id="biblePill" data-act="bpill" aria-label="Which Bible you are using"></button>
 </header>
 <main id="view"></main>
 <div id="selbar"></div>
@@ -805,11 +885,11 @@ function setTab(t){if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='pjEmoC'){const v=e.target.value.trim();const g=window.Intl&&Intl.Segmenter?[...new Intl.Segmenter().segment(v)].map(x=>x.segment):[...v];const em=g[0]||'';if(em){S._pjEmo=em;const pv=$('#pjEmoPrev');if(pv)pv.textContent=em;$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.remove('on'))}}});
 window.addEventListener('online',()=>{offlineBar();try{Store.flush()}catch(e){}toast('Back online ✓ Saving your changes')});window.addEventListener('offline',()=>offlineBar());
 window.addEventListener('scroll',()=>{const t=document.getElementById('totop');if(t)t.classList.toggle('show',window.scrollY>1400)},{passive:true});
-window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
+window.addEventListener('hashchange',()=>{if(Date.now()-NAV.pop<600)return;const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
 
 function renderView(){const v=$('#view');
   ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,online:viewOnline,account:viewAccount})[S.tab](v);
-  renderSelbar();if(S.coach!=null)setTimeout(coachHL,60)}
+  renderSelbar();if(S.coach!=null)setTimeout(coachHL,60);try{navRecord();biblePill()}catch(e){}}
 
 /* ---------- ONLINE BIBLE ---------- */
 function viewOnline(v){v.innerHTML=`<div class="chips" style="padding-top:2px">${[['read','📖 Read'],['notes','🔖 My notes & highlights']].map(([k,l])=>`<button class="chip ${S.onlineSub===k?'on':''}" data-act="onlineSub" data-s="${k}">${l}</button>`).join('')}</div><div class="howto" style="margin:0 2px 8px">ℹ️ ${S.onlineSub==='notes'?'All your notes, highlights and saved studies in one place. Tap a reference to jump to the verse.':'Read the Bible here. Tap a verse to highlight it, write a note or add it to a topic tab.'}</div><div id="onlineBody"></div>`;
@@ -1749,6 +1829,21 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   bibleSetup:el=>bibleSheet(el.dataset.p||''),
   bibOpen:el=>{S.bibOpen=S.bibOpen===el.dataset.p?null:el.dataset.p;renderView()},
   bsEx:el=>{const i=$('#bsQ');if(i)i.value=el.dataset.v},
+  goBack:()=>{goBack()},
+  bpill:()=>bibleSwitchSheet(),
+  bpUse:el=>{const id=el.dataset.p||'';saveSettings({proj:id});closeSheet();renderView();const pj=curProjObj();toast('Now using '+(pj?pj.name:'My main Bible')+' ✓')},
+  bpNew:()=>{closeSheet();S.loadedSub='projects';setTab('tabs')},
+  muOnOff:()=>{if(MU.on)muOff();else muToggle()},
+  muToggle:()=>muToggle(),muPrev:()=>muPrev(),muNext:()=>muNext(),muOff:()=>muOff(),
+  muShuffle:()=>{muSave({sh:!muS().sh});muUI()},
+  muMood:el=>{muSave({mood:el.dataset.m});const L=muList();if(MU.on&&!L.some(t=>t.id===MU.cur))muPlay(L[0].id);else muUI()},
+  muTracks:()=>{const L=muList();openSheet(`<h3>📃 Study music</h3><p class="small muted">${L.length} tracks. Tap one to play it.</p>${L.map(t=>{const T=muTitle(t);return `<button class="bsrow ${MU.cur===t.id&&MU.on?'on':''}" data-act="muPlayId" data-i="${t.id}"><span style="font-size:20px">${T.hymn?'🎼':'🕊️'}</span><span class="grow"><b>${esc(T.name)}</b><br><small class="muted">${esc(T.mood)}</small></span>${MU.cur===t.id&&MU.on?'<span class="tag">♪ Playing</span>':''}</button>`}).join('')}`)},
+  muPlayId:el=>{muPlay(+el.dataset.i);$$('#sheet .bsrow').forEach(b=>{const on=b.dataset.i===el.dataset.i;b.classList.toggle('on',on);const tg=b.querySelector('.tag');if(tg&&!on)tg.remove();if(on&&!tg)b.insertAdjacentHTML('beforeend','<span class="tag">♪ Playing</span>')})},
+  muSheet:()=>{openSheet(muCard())},
+  introNav:el=>{introRead();const I=S.intro;if(el.dataset.nob)I.bible='';I.dir=+el.dataset.d;showIntro(Math.max(0,Math.min(5,I.i+(+el.dataset.d))))},
+  introBib:el=>{const i=$('#inBible');if(i)i.value=el.dataset.v;$$('#intro [data-act=introBib]').forEach(b=>b.classList.toggle('on',b===el))},
+  introGoal:el=>{const I=S.intro,g=el.dataset.g;I.goals=I.goals.includes(g)?I.goals.filter(x=>x!==g):I.goals.concat(g);el.classList.toggle('on');const nb=$('#intro .ibig');if(nb)nb.textContent=I.goals.length?'Next →':'Skip for now →'},
+  introDone:el=>introFinish(el.dataset.go||'today'),
   bsMore:()=>{S._bsInfoOpen=true;bibleSheet(S._bsP,null,(S._bsRes||{}).query)},
   bsBack:()=>bibleSheet(S._bsP,null,(S._bsRes||{}).query),
   bsClear:()=>{const pid=S._bsP;if(pid){Store.set('projects',{list:projList().map(x=>x.id===pid?Object.assign({},x,{bible:null}):x)})}else Store.del('mybible');closeSheet();renderView()},
@@ -1810,9 +1905,9 @@ Return JSON: {"name":"full edition name","publisher":"...","translation":"short 
   backupRestore:()=>{openSheet(`<h3>⬆️ Restore a backup</h3><p class="small muted">Choose your backup file, or paste the backup text.</p><input type="file" id="bkFile" accept=".json,application/json,text/plain" class="f"><textarea class="f" id="bkText" placeholder="…or paste the backup text here" style="min-height:90px"></textarea><button class="btn pri wide" data-act="backupRestoreGo" style="margin-top:8px">Restore</button>`);
     $('#bkFile').onchange=async e=>{const f=e.target.files[0];if(f)restoreFrom(await f.text())}},
   backupRestoreGo:()=>{const t=$('#bkText').value.trim();if(!t){toast('Choose a file or paste the backup text');return}restoreFrom(t)},
-  tourEnd:()=>{const n=$('#twName');if(n&&n.value.trim())saveProfile({name:n.value.trim()});saveSettings({toured:true});closeSheet();coachEnd();if(S.tab!=='today')setTab('today')},
-  tourAgain:()=>{coachEnd();showTour()},
-  twSimple:()=>{const on=!settings().simple;saveSettings({simple:on});applyTheme();const sw=$('.switchrow .switch');if(sw)sw.classList.toggle('on',on)},
+  tourEnd:()=>{const pb=S._pendBible;S._pendBible='';if(pb)setTimeout(()=>A.bsFind(null,pb,''),500);const n=$('#twName');if(n&&n.value.trim())saveProfile({name:n.value.trim()});saveSettings({toured:true});closeSheet();coachEnd();if(S.tab!=='today')setTab('today')},
+  tourAgain:()=>{coachEnd();S.intro=null;showIntro(0)},
+  twSimple:el=>{const on=!settings().simple;saveSettings({simple:on});applyTheme();const sw=(el&&el.querySelector('.switch'))||$('.switchrow .switch');if(sw)sw.classList.toggle('on',on)},
   coachStart:()=>{const n=$('#twName');if(n&&n.value.trim())saveProfile({name:n.value.trim()});coachShow(0)},
   coachGo:el=>coachShow(+el.dataset.i),
   coachMem:el=>{const vi=VOTD[(dayIdx(VOTD.length)+(S.votdOff||0)+VOTD.length*10)%VOTD.length];const L=memList().slice();if(!L.some(v=>v.ref===vi)){L.push({ref:vi,learned:false,added:Date.now()});Store.set('memory',{verses:L})}el.outerHTML='<div class="small" style="margin-top:6px">✓ Added to your memory verses!</div>'},
@@ -2388,6 +2483,7 @@ const XREFS={none:'No cross-references','center column':'Cross-references in the
 function defNoteSize(){const b=curBible()||{};return b.interleaved?'half':b.margins==='none'?'sticky':'margin'}
 function bibleCtx(){const b=curBible();if(!b)return '';return `ABOUT THEIR PAPER BIBLE: ${b.name||b.query} (${b.translation||'unknown translation'}), ${b.format||''} format, ${MARGINS[b.margins]||b.margins||''}, ${PAPERS[b.paper]||b.paper||''}, ${b.studyNotes?'it HAS study notes':'no study notes'}, ${XREFS[b.crossRefs]||'no cross-references'}${b.intros?', has book introductions':''}${b.interleaved?', INTERLEAVED (a blank page after every printed page)':''}. Adapt every tip to this exact Bible: ${b.interleaved?'it is interleaved, so longer notes, outlines and small drawings can go on the blank page right next to the passage (prefer that over sticky notes or inserts); ':''}${b.margins==='none'||b.margins==='narrow'?'the margins are small, so keep handwritten notes very short and suggest sticky notes, tabs or insert cards for anything longer; ':''}${b.margins==='journaling'||b.margins==='wide'?'there is room in the margins, so notes and small drawings can go right next to the verse; ':''}${/thin/.test(b.paper||'')?'the paper is thin, so recommend dry highlighters or colored pencils and a fine pen; ':''}${b.studyNotes?'when useful, point them to the study note on a verse in their Bible; ':''}${b.crossRefs&&b.crossRefs!=='none'?'their Bible already prints cross-references ('+b.crossRefs+'), so suggest circling a useful one instead of rewriting it; ':''}refer to verses using ${b.translation||'their translation'} wording when you mention them (quote at most a few words).`}
 function bibleBar(){const b=curBible();const pj=curProjObj();
+  if(b)return '';
   if(!b)return `<button class="biblebar unset" data-act="bibleSetup" data-p="${pj?pj.id:''}"><span>📖</span><span class="grow"><b>Which Bible do you have?</b><br><small>Tell us, and every tip fits your Bible</small></span><span>›</span></button>`;
   return `<div class="biblebar"><span style="font-size:22px">${esc(pj?pj.emoji||'📗':'📖')}</span><span class="grow"><b>${esc(b.name||b.query)}</b><br><small>${esc([b.translation,MARGINS[b.margins],b.studyNotes?'study notes':''].filter(Boolean).join(' · '))}</small></span><button class="btn sm" data-act="goKit" data-s="projects">${pj?'Switch':'Change'}</button></div>`}
 const BSINFO=[['pub','Publisher','e.g. Crossway, Zondervan, Thomas Nelson'],['isbn','ISBN','On the back cover or the copyright page'],['cover','Cover','e.g. brown leather soft, blue hardcover, cloth'],['size','Size','e.g. fits in a pocket, about 13×19 cm, big'],['pages','Number of pages','Look at the last page number'],['spine','Words on the cover or spine','e.g. "Holy Bible · Study Edition"'],['inside','What you see inside','e.g. 2 columns, notes at the bottom, wide margins, red letters'],['more','Anything else','Year, where you bought it, a series name…']];
@@ -2626,7 +2722,203 @@ function coachShow(i){S.coach=i;const c=COACH[i];closeSheet();if(c.pre)try{c.pre
   b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(coachHL,120)}
 function coachHL(){$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));if(S.coach==null)return;const c=COACH[S.coach];if(!c||!c.sel)return;const t=c.sel.split(',').map(x=>$(x.trim())).find(Boolean);if(t){t.classList.add('coachhl');t.scrollIntoView({behavior:'smooth',block:'center'})}}
 function coachEnd(){S.coach=null;$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));const b=$('#coach');if(b)b.remove()}
-function maybeTour(){if(settings().toured)return;const au=document.querySelector('#auth');if(au&&au.innerHTML.trim()&&getComputedStyle(au).display!=='none')return;saveSettings({toured:true});showTour()}
+function maybeTour(){if(settings().toured)return;const au=document.querySelector('#auth');if(au&&au.innerHTML.trim()&&getComputedStyle(au).display!=='none')return;saveSettings({toured:true});showIntro(0)}
+/* ===== ‹ BACK + 📖 BIBLE PILL ===== */
+const NAV={st:[],pop:0};
+function navSig(){return [S.tab,S.tab==='tabs'?S.loadedSub:'',S.tab==='journal'?S.jSub:'',S.tab==='online'?S.onlineSub:'',S.tab==='tabs'&&S.loadedSub==='inserts'?S.insKind:'',S.tab==='tabs'&&S.loadedSub==='cover'?S.pmView:'',S.tab==='study'?S.studyPick:''].join('|')}
+function navRecord(){const sig=navSig(),top=NAV.st[NAV.st.length-1];if(!top||top.sig!==sig){NAV.st.push({sig,s:{tab:S.tab,loadedSub:S.loadedSub,jSub:S.jSub,onlineSub:S.onlineSub,insKind:S.insKind,pmView:S.pmView,studyPick:S.studyPick},y:0});if(NAV.st.length>60)NAV.st.shift()}navBtn()}
+function navBtn(){const b=$('#backBtn');if(b)b.classList.toggle('show',NAV.st.length>1)}
+function sheetOpen(){const w=$('#sheetWrap');return !!(w&&w.classList.contains('show'))}
+function goBack(){if(sheetOpen()){closeSheet();return true}
+  if(NAV.st.length<2)return false;NAV.st.pop();const e=NAV.st[NAV.st.length-1];Object.assign(S,e.s);const y=e.y;setTab(e.s.tab);setTimeout(()=>window.scrollTo(0,y),40);setTimeout(()=>window.scrollTo(0,y),220);navBtn();return true}
+window.addEventListener('scroll',()=>{const t=NAV.st[NAV.st.length-1];if(t)t.y=window.scrollY},{passive:true});
+if(STANDALONE){try{history.pushState({lbg:1},'')}catch(e){}
+  window.addEventListener('popstate',()=>{NAV.pop=Date.now();if(goBack()){try{history.pushState({lbg:1},'')}catch(e){}}else{try{history.back()}catch(e){}}})}
+function biblePill(){const p=$('#biblePill');if(!p)return;const b=curBible(),pj=curProjObj();
+  const em=pj?(pj.emoji||'📗'):'📖';let main,sub='';
+  if(b){main=b.name||b.query;sub=[pj?pj.name:'',b.translation,b.interleaved?'📄 Interleaved':''].filter(Boolean).join(' · ')}
+  else if(pj){main=pj.name;sub='Which Bible? Tap to set it'}else{main='Which Bible do you have?';sub='Tap to set it'}
+  p.innerHTML=`<span class="bpe">${esc(em)}</span><span class="bpt"><b>${esc(main)}</b>${sub?`<small> · ${esc(sub)}</small>`:''}</span><span class="bpc">▾</span>`;
+  p.classList.toggle('unset',!b);hdrVar()}
+function hdrVar(){const h=$('header.top');if(h)document.documentElement.style.setProperty('--hdr',h.offsetHeight+'px')}
+window.addEventListener('resize',hdrVar);
+function bibleSwitchSheet(){const cur=settings().proj||'';const pl=projList();
+  const row=(id,em,name,b)=>`<button class="bsrow ${cur===id?'on':''}" data-act="bpUse" data-p="${esc(id)}"><span class="bpe" style="font-size:24px">${esc(em)}</span><span class="grow"><b>${esc(name)}</b><br><small class="muted">${b?esc([b.name||b.query,b.translation,b.interleaved?'Interleaved':''].filter(Boolean).join(' · ')):'No Bible set yet'}</small></span>${cur===id?'<span class="tag">✓ Using</span>':''}</button>`;
+  openSheet(`<h3>📖 Which Bible are you using?</h3><p class="small muted">Tips, keys and loadings follow the Bible you pick here.</p>
+   ${row('','📖','My main Bible',Store.get('mybible'))}${pl.map(p=>row(p.id,p.emoji||'📗',p.name,p.bible)).join('')}
+   <div class="row" style="margin-top:12px"><button class="btn grow" data-act="bibleSetup" data-p="${esc(cur)}">✏️ ${curBible()?'Change this Bible':'Set this Bible'}</button><button class="btn grow" data-act="bpNew">＋ New Bible</button></div>`)}
+
+/* ===== 🎵 STUDY MUSIC ===== */
+const MU_MOODS=[['piano','🎹','Piano'],['ambient','🌫️','Ambient'],['strings','🎻','Strings'],['box','🎐','Music box'],['organ','⛪','Organ']];
+const MOOD_SET={piano:{tm:1,wet:.28},ambient:{tm:.82,wet:.6},strings:{tm:.92,wet:.42},box:{tm:.95,wet:.36},organ:{tm:.88,wet:.46}};
+const HYMNS=[
+ ['Amazing Grace',7,3,1,72,'D4 G4:2 B4:.5 G4:.5 B4:2 A4 G4:2 E4 D4:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 D5:3 r:2 B4 D5:1.5 B4:.5 D5:.5 B4:.5 G4:2 D4 E4:1.5 G4:.5 G4:.5 E4:.5 D4:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 G4:3'],
+ ['Doxology (Old Hundredth)',7,4,0,72,'G4:2 G4 F#4 E4 D4 G4 A4 B4:4 B4:2 B4 B4 A4 G4 C5 B4 A4:4 G4:2 A4 B4 A4 G4 E4 F#4 G4:4 D5:2 B4 G4 A4 C5 B4 A4 G4:4'],
+ ['Joyful, Joyful (Ode to Joy)',2,4,0,88,'F#4 F#4 G4 A4 A4 G4 F#4 E4 D4 D4 E4 F#4 F#4:1.5 E4:.5 E4:2 F#4 F#4 G4 A4 A4 G4 F#4 E4 D4 D4 E4 F#4 E4:1.5 D4:.5 D4:2 E4 E4 F#4 D4 E4 F#4:.5 G4:.5 F#4 D4 E4 F#4:.5 G4:.5 F#4 E4 D4 E4 A3:2 F#4 F#4 G4 A4 A4 G4 F#4 E4 D4 D4 E4 F#4 E4:1.5 D4:.5 D4:2'],
+ ['Silent Night',0,3,0,76,'G4:1.5 A4:.5 G4 E4:3 G4:1.5 A4:.5 G4 E4:3 D5:2 D5 B4:3 C5:2 C5 G4:3 A4:2 A4 C5:1.5 B4:.5 A4 G4:1.5 A4:.5 G4 E4:3 A4:2 A4 C5:1.5 B4:.5 A4 G4:1.5 A4:.5 G4 E4:3 D5:2 D5 F5:1.5 D5:.5 B4 C5:3 E5:3 C5 G4 E4 G4:1.5 F4:.5 D4 C4:6'],
+ ['Jesus Loves Me',0,4,0,80,'G4 E4 E4 D4 E4 G4 G4:2 A4 A4 C5 A4 A4 G4 G4:2 G4 E4 E4 D4 E4 G4 G4:2 A4 A4 G4 C4 E4 D4 C4:2 G4:2 E4 G4 A4 C5:3 G4:2 E4 C4 E4 D4:3 G4:2 E4 G4 A4 C5:2 A4 G4 C4 E4 D4 C4:4'],
+ ['Abide With Me',0,4,0,60,'E4:2 E4 D4 C4:2 G4:2 A4 G4 G4 F4 E4:4 E4:2 F4 G4 A4:2 G4:2 F4 D4 E4 F#4 G4:4 E4:2 E4 D4 C4:2 G4:2 G4 F4 F4 E4 D4:4 D4:2 E4 F4 E4 D4 C4 F4 E4:2 D4:2 C4:4'],
+ ['Kumbaya',0,4,0,66,'C4 E4 G4 G4 A4 A4 G4:2 C4 E4 G4 G4 F4 E4 D4:2 C4 E4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2'],
+ ['Jesu, Joy of Man’s Desiring',7,3,0,72,'G4:.5 A4:.5 B4:.5 D5:.5 C5:.5 C5:.5 E5:.5 D5:.5 D5:.5 G5:.5 F#5:.5 G5:.5 D5:.5 B4:.5 G4:.5 A4:.5 B4:.5 C5:.5 D5:.5 E5:.5 D5:.5 C5:.5 B4:.5 A4:.5 B4:1.5 A4:1.5 G4:3'],
+ ['Canon in D',2,4,0,60,'F#5:2 E5:2 D5:2 C#5:2 B4:2 A4:2 B4:2 C#5:2 D5:2 C#5:2 B4:2 A4:2 G4:2 F#4:2 G4:2 E4:2 D4:.5 F#4:.5 A4:.5 G4:.5 F#4:.5 D4:.5 F#4:.5 E4:.5 D4:.5 B3:.5 D4:.5 A4:.5 G4:.5 B4:.5 A4:.5 G4:.5',[0,7,9,4,5,0,5,7]],
+ ['Goin’ Home',0,4,0,58,'E4 G4 G4:2 E4 D4 C4:2 D4 E4 G4 E4 D4:4 E4 G4 G4:2 E4 D4 C4:2 D4 E4 D4 C4 C4:4']];
+const ORIG=['Still Waters','Green Pastures','Selah','Morning Mercies','Quiet Time','Lamp to My Feet','Be Still','Grace Upon Grace','Mustard Seed','Living Water','The Narrow Road','Olive Grove','Sabbath Rest','Galilee Shore','Upper Room','Emmaus Road','Mercy Seat','Daily Bread','Cedars of Lebanon','Psalm of Ascent'];
+const PIECES=HYMNS.map(h=>({name:h[0],hymn:1,d:h})).concat(ORIG.map((n,i)=>({name:n,orig:i})));
+const TRACKS=MU_MOODS.flatMap((m,mi)=>PIECES.map((p,pi)=>({id:mi*PIECES.length+pi,p:pi,mood:m[0]})));
+const MU={ctx:null,on:false,playing:false,cur:null,q:[],qi:0,t0:0,spb:.8,endB:0,tg:null,wet:null,timer:null,startAt:0};
+function muS(){return Object.assign({i:0,mood:'all',sh:false,vol:.7},settings().mu||{})}
+function muSave(p){saveSettings({mu:Object.assign(muS(),p)})}
+function muList(){const m=muS().mood;return TRACKS.filter(t=>m==='all'||t.mood===m)}
+function muTitle(t){const P=PIECES[t.p],M=MU_MOODS.find(x=>x[0]===t.mood);return {name:P.name,mood:M[1]+' '+M[2],hymn:!!P.hymn}}
+const mf=m=>440*Math.pow(2,(m-69)/12);
+function parseNotes(str){const out=[];let t=0;str.trim().split(/\s+/).forEach(tok=>{const [p,dd]=tok.split(':');const d=dd?parseFloat(dd):1;
+  if(p!=='r'){const mm=p.match(/^([A-G])([#b]?)(\d)$/);if(mm){const m={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[mm[1]]+(mm[2]==='#'?1:mm[2]==='b'?-1:0)+(+mm[3]+1)*12;out.push({t,d,m})}}t+=d});return {notes:out,len:t}}
+const DEG=[[0,'M'],[7,'M'],[5,'M'],[9,'m'],[2,'m'],[4,'m']];
+const chordPcs=(key,deg,q)=>[0,q==='M'?4:3,7].map(x=>(key+deg+x)%12);
+function harmonize(notes,len,key,seg,prog){const n=Math.ceil(len/seg-1e-6),out=[];let prev=null;
+  for(let k=0;k<n;k++){const a=k*seg,b=a+seg;let dg;
+    if(prog){dg=DEG.find(x=>x[0]===prog[k%prog.length])||DEG[0]}
+    else{const w=new Array(12).fill(0);let any=0;notes.forEach(x=>{const ov=Math.min(b,x.t+x.d)-Math.max(a,x.t);if(ov>0){any=1;w[x.m%12]+=ov+(Math.abs(x.t-a)<1e-6?.6:0)}});
+      if(k===n-1)dg=DEG[0];else if(!any&&prev)dg=prev;else{let best=-1;DEG.forEach((c,i)=>{const sc=chordPcs(key,c[0],c[1]).reduce((s,p)=>s+w[p],0)-i*.12+(k===0&&i===0?.8:0);if(sc>best){best=sc;dg=c}});
+        if(k===n-2){const v=DEG[1],sv=chordPcs(key,v[0],v[1]).reduce((s,p)=>s+w[p],0);const sb=chordPcs(key,dg[0],dg[1]).reduce((s,p)=>s+w[p],0);if(sv>=sb*.6)dg=v}}}
+    prev=dg;out.push({t:a,d:seg,pcs:chordPcs(key,dg[0],dg[1]),root:(key+dg[0])%12})}return out}
+function rng(seed){let s=seed*9301+49297;return()=>{s=(s*9301+49297)%233280;return s/233280}}
+const PROGS=[[0,7,9,5],[0,5,9,7],[9,5,0,7],[0,9,5,7],[5,0,7,9],[0,5,0,7],[0,4,5,7],[9,7,5,7]];
+function genPiece(i){const r=rng(i*7+3);const key=[0,2,3,5,7,9,10][Math.floor(r()*7)],tempo=54+Math.floor(r()*14),prog=PROGS[Math.floor(r()*PROGS.length)];
+  const scale=[0,2,4,5,7,9,11].map(x=>(key+x)%12);const inScale=m=>scale.includes(((m%12)+12)%12);
+  const RH=[[4],[2,2],[3,1],[1,1,2],[2,1,1],[1.5,.5,2],[2,2],[1,1,1,1]];
+  const phrase=(base,bars)=>{const ns=[];let last=base;const pr=rng(i*31+base);for(let b=0;b<bars;b++){const ch=chordPcs(key,prog[b%4],(DEG.find(x=>x[0]===prog[b%4])||DEG[0])[1]);
+      const rh=b===bars-1?[4]:RH[Math.floor(pr()*RH.length)];let t=b*4;rh.forEach((d,j)=>{let m;
+        if(j===0){let bestM=last,bd=99;for(let c=base-5;c<=base+12;c++){if(ch.includes(((c%12)+12)%12)){const dd=Math.abs(c-last)+(pr()*2.5);if(dd<bd){bd=dd;bestM=c}}}m=bestM}
+        else{const dir=pr()<.5?-1:1;m=last+dir;let g=0;while(!inScale(m)&&g++<3)m+=dir;}
+        ns.push({t,d,m});last=m;t+=d})}return ns};
+  const base=60+key+(key>5?-12:0)+4;const A=phrase(base,8),B=phrase(base+5,8);
+  const notes=[];const put=(arr,off,rest)=>arr.forEach((x,j)=>{if(rest&&j%5===3)return;notes.push({t:x.t+off,d:x.d,m:x.m})});
+  put(A,0);put(A,32,true);put(B,64);put(A,96);
+  return {key,meter:4,tempo,notes,len:128,chords:harmonize([],128,key,4,prog),seg:4}}
+function buildPiece(pi){const P=PIECES[pi];if(P._b)return P._b;let b;
+  if(P.hymn){const [name,key,meter,pick,tempo,str,prog]=P.d;const pn=parseNotes(str);const off=pick?meter-pick:0;const notes=pn.notes.map(x=>({t:x.t+off,d:x.d,m:x.m}));
+    const seg=meter===3?3:2;let len=Math.ceil((pn.len+off)/meter-1e-6)*meter;b={key,meter,tempo,notes,len,seg,chords:harmonize(notes,len,key,seg,prog)}}
+  else b=genPiece(P.orig);return P._b=b}
+function muCtx(){if(MU.ctx)return MU.ctx;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const c=new AC();MU.ctx=c;
+  const comp=c.createDynamicsCompressor();comp.threshold.value=-20;comp.ratio.value=3;comp.connect(c.destination);
+  MU.master=c.createGain();MU.master.gain.value=muS().vol;MU.master.connect(comp);
+  const rev=c.createConvolver();const len=Math.floor(c.sampleRate*3.4),buf=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.8)}rev.buffer=buf;
+  MU.revIn=c.createGain();MU.revIn.connect(rev);rev.connect(MU.master);return c}
+function muUnlock(){try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+  if(!MU.el){try{const sr=8000,n=sr,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+    w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+    const a=new Audio(URL.createObjectURL(new Blob([buf],{type:'audio/wav'})));a.loop=true;a.setAttribute('playsinline','');MU.el=a}catch(e){}}
+  try{MU.el&&MU.el.play().catch(()=>{})}catch(e){}}
+function voice(kind,m,t,dur,vel){const c=MU.ctx,f=mf(m);const g=c.createGain();g.connect(MU.tg);g.gain.setValueAtTime(0,t);const os=[];
+  const osc=(type,fr,gain,det,dest)=>{const o=c.createOscillator();o.type=type;o.frequency.value=fr;if(det)o.detune.value=det;let n=o;if(gain!==1){const gg=c.createGain();gg.gain.value=gain;o.connect(gg);n=gg}n.connect(dest);os.push(o);return o};
+  const lp=fq=>{const l=c.createBiquadFilter();l.type='lowpass';l.frequency.value=fq;l.connect(g);return l};let end;
+  if(kind==='piano'){const l=lp(Math.min(4500,f*5));osc('triangle',f,1,0,l);osc('sine',f*2,.22,0,l);osc('sine',f*3,.05,0,l);
+    g.gain.linearRampToValueAtTime(vel,t+.008);g.gain.setTargetAtTime(vel*.4,t+.01,.25);const r=t+Math.max(.2,dur);g.gain.setTargetAtTime(0,r,.3);end=r+1.8}
+  else if(kind==='pad'){const l=lp(600+f*.8);osc('sawtooth',f,1,-9,l);osc('sawtooth',f,1,9,l);osc('sine',f/2,.6,0,l);
+    g.gain.linearRampToValueAtTime(vel,t+Math.min(1.1,dur*.5));const r=t+dur;g.gain.setValueAtTime(vel,r);g.gain.setTargetAtTime(0,r,.6);end=r+3.5}
+  else if(kind==='strings'){const l=lp(1500);const a=osc('sawtooth',f,1,-5,l),b=osc('sawtooth',f,1,6,l);const lfo=c.createOscillator();lfo.frequency.value=5.2;const lg=c.createGain();lg.gain.value=7;lfo.connect(lg);lg.connect(a.detune);lg.connect(b.detune);os.push(lfo);
+    g.gain.linearRampToValueAtTime(vel,t+Math.min(.35,dur*.4));const r=t+dur;g.gain.setValueAtTime(vel,r);g.gain.setTargetAtTime(0,r,.25);end=r+1.6}
+  else if(kind==='bell'){osc('sine',f,1,0,g);osc('sine',f*2.76,.14,0,g);osc('sine',f*5.4,.04,0,g);g.gain.linearRampToValueAtTime(vel,t+.004);g.gain.setTargetAtTime(0,t+.01,.45+Math.min(.6,dur*.2));end=t+3.2}
+  else if(kind==='organ'){const l=lp(2800);osc('sine',f,1,0,l);osc('sine',f*2,.45,0,l);osc('sine',f*3,.2,0,l);osc('sine',f*4,.1,0,l);
+    g.gain.linearRampToValueAtTime(vel,t+.07);const r=t+dur;g.gain.setValueAtTime(vel,r);g.gain.setTargetAtTime(0,r,.12);end=r+.9}
+  else{osc('sine',f,1,0,g);osc('triangle',f,.3,0,g);g.gain.linearRampToValueAtTime(vel,t+.03);g.gain.setTargetAtTime(vel*.6,t+.05,.4);const r=t+dur;g.gain.setTargetAtTime(0,r,.25);end=r+1.5}
+  os.forEach(o=>{o.start(t);o.stop(end)})}
+function voicing(pcs,lo){return pcs.map(p=>{let m=lo+((p-lo)%12+12)%12;return m}).sort((a,b)=>a-b)}
+function arrange(b,mood){const ev=[];const add=(t,fn)=>ev.push({b:t,fn});const passes=Math.max(2,Math.ceil(95/(b.len*60/(b.tempo*MOOD_SET[mood].tm))));
+  for(let p=0;p<passes;p++){const o=1+p*b.len,last=p===passes-1;
+    b.notes.forEach(x=>{const m=x.m+(mood==='box'?12:0)+(mood==='piano'&&p===1&&b.notes.length<60?12:0);
+      const k=mood==='piano'?'piano':mood==='ambient'?(p%2?'bell':'piano'):mood==='strings'?'strings':mood==='box'?'bell':'organ';
+      const v=k==='piano'?.24:k==='bell'?.15:k==='strings'?.12:.1;add(o+x.t,(w,s)=>voice(k,m,w,x.d*s*(k==='strings'||k==='organ'?.96:1),v))});
+    b.chords.forEach((c,ci)=>{const d=c.d+(last&&ci===b.chords.length-1?3:0);const bass=36+((c.root-36)%12+12)%12;const vo=voicing(c.pcs,mood==='box'?60:52);
+      if(mood==='piano'){add(o+c.t,(w,s)=>voice('piano',bass,w,d*s,.16));for(let j=0;j<c.d;j++){const nt=vo[(j+1)%vo.length]+(j%2?0:12*(j===2?1:0));add(o+c.t+j+(b.meter===3?0:.0),(w,s)=>voice('piano',nt,w,1.4*s,.075))}}
+      else if(mood==='ambient'){add(o+c.t,(w,s)=>{vo.forEach(n=>voice('pad',n,w,d*s,.045));voice('bass',bass+12,w,d*s,.07)})}
+      else if(mood==='strings'){add(o+c.t,(w,s)=>{vo.forEach(n=>voice('strings',n,w,d*s*.98,.035));voice('strings',bass,w,d*s*.98,.05)})}
+      else if(mood==='box'){for(let j=0;j<c.d;j++){const nt=vo[j%vo.length];add(o+c.t+j+.5,(w,s)=>voice('bell',nt,w,.5*s,.05))}}
+      else{add(o+c.t,(w,s)=>{vo.forEach(n=>voice('organ',n,w,d*s*.98,.035));voice('organ',bass,w,d*s*.98,.05)})}})}
+  ev.sort((a,c)=>a.b-c.b);return {ev,endB:1+passes*b.len+4}}
+function muStopTrack(){const tg=MU.tg;if(tg&&MU.ctx){try{tg.gain.setTargetAtTime(0,MU.ctx.currentTime,.12);setTimeout(()=>{try{tg.disconnect()}catch(e){}},700)}catch(e){}}MU.tg=null;MU.q=[];MU.qi=0}
+function muPlay(id){const c=muCtx();if(!c){toast('Music doesn’t work in this browser');return}muUnlock();if(c.state!=='running')c.resume();muStopTrack();
+  const t=TRACKS[id]||TRACKS[0];MU.cur=t.id;muSave({i:t.id});const b=buildPiece(t.p),ms=MOOD_SET[t.mood];
+  MU.tg=c.createGain();MU.tg.connect(MU.master);const wet=c.createGain();wet.gain.value=ms.wet;MU.tg.connect(wet);wet.connect(MU.revIn);
+  const ar=arrange(b,t.mood);MU.q=ar.ev;MU.qi=0;MU.endB=ar.endB;MU.spb=60/(b.tempo*ms.tm);MU.t0=c.currentTime+.15;MU.startAt=Date.now();MU.on=true;MU.playing=true;
+  if(!MU.timer)MU.timer=setInterval(muTick,200);muTick();muUI();muMedia()}
+function muTick(){if(!MU.on||!MU.ctx||!MU.tg)return;const now=MU.ctx.currentTime;
+  while(MU.qi<MU.q.length&&MU.t0+MU.q[MU.qi].b*MU.spb<now+1.2){const e=MU.q[MU.qi++];try{e.fn(Math.max(now,MU.t0+e.b*MU.spb),MU.spb)}catch(err){}}
+  if(MU.playing&&now>MU.t0+MU.endB*MU.spb)muNext()}
+function muNext(){const L=muList();if(!L.length)return;const s=muS();let i=L.findIndex(t=>t.id===MU.cur);
+  if(s.sh&&L.length>1){let j;do j=Math.floor(Math.random()*L.length);while(j===i);i=j}else i=(i+1)%L.length;muPlay(L[i].id)}
+function muPrev(){const L=muList();if(!L.length)return;if(MU.on&&Date.now()-MU.startAt>4000){muPlay(MU.cur);return}let i=L.findIndex(t=>t.id===MU.cur);i=(i-1+L.length)%L.length;muPlay(L[i].id)}
+function muToggle(){if(!MU.on||MU.cur==null){const L=muList();const s=muS();muPlay((L.find(t=>t.id===s.i)||L[0]).id);return}
+  if(MU.playing){MU.ctx.suspend();MU.playing=false;try{MU.el&&MU.el.pause()}catch(e){}}else{muUnlock();MU.ctx.resume();MU.playing=true}muUI();muMedia()}
+function muOff(){muStopTrack();MU.on=false;MU.playing=false;try{MU.el&&MU.el.pause()}catch(e){}muUI();muMedia()}
+function muMedia(){const ms=navigator.mediaSession;if(!ms)return;try{if(MU.cur!=null){const T=muTitle(TRACKS[MU.cur]);ms.metadata=new MediaMetadata({title:T.name,artist:'Loaded Bible · '+T.mood,album:'Study music'})}
+  ms.playbackState=MU.on?(MU.playing?'playing':'paused'):'none';
+  if(!MU._mh){MU._mh=1;ms.setActionHandler('play',()=>{if(!MU.playing)muToggle()});ms.setActionHandler('pause',()=>{if(MU.playing)muToggle()});ms.setActionHandler('nexttrack',muNext);ms.setActionHandler('previoustrack',muPrev)}}catch(e){}}
+function muCard(){const s=muS(),L=muList();const t=TRACKS[MU.cur!=null?MU.cur:s.i]||L[0];const T=muTitle(t);const pos=L.findIndex(x=>x.id===t.id)+1;
+  return `<div class="card mucard"><button class="switchrow" data-act="muOnOff" style="margin-top:0"><span class="switch ${MU.on?'on':''}"><i></i></span><span style="text-align:left" class="grow"><b>🎵 Study music</b><br><small class="muted">Calm music while you read, study and pray</small></span></button>
+   <div class="munow"><div class="muart ${MU.playing?'spin':''}">${T.hymn?'🎼':'🕊️'}</div><div class="grow" style="min-width:0"><small class="muted">Track ${pos||1} of ${L.length}${T.hymn?' · hymn':''}</small><div class="muname">${esc(T.name)}</div><small>${esc(T.mood)}</small></div></div>
+   <div class="mubtns"><button data-act="muPrev" aria-label="Previous track">⏮</button><button class="mubig" data-act="muToggle" aria-label="Play or pause">${MU.playing?'⏸':'▶'}</button><button data-act="muNext" aria-label="Next track">⏭</button><button class="${s.sh?'on':''}" data-act="muShuffle" aria-label="Shuffle">🔀</button></div>
+   <div class="chips" style="justify-content:center">${[['all','✨','All']].concat(MU_MOODS).map(([k,e,l])=>`<button class="chip ${s.mood===k?'on':''}" data-act="muMood" data-m="${k}">${e} ${l}</button>`).join('')}</div>
+   <label class="muvol"><span>🔈</span><input type="range" id="muVol" min="0" max="1" step="0.05" value="${s.vol}"><span>🔊</span></label>
+   <button class="btn wide" data-act="muTracks">📃 All ${L.length} tracks</button>
+   <p class="small muted" style="margin:8px 0 0">Made live on your phone: old hymns that are free to use, plus calm original pieces. On iPhone it may stop when the screen locks.</p></div>`}
+function muUI(){$$('.mucard').forEach(x=>{x.outerHTML=muCard()});let p=$('#mupill');
+  if(!MU.on){if(p)p.remove();return}
+  if(!p){p=document.createElement('div');p.id='mupill';document.body.appendChild(p)}const T=muTitle(TRACKS[MU.cur]);
+  p.innerHTML=`<button class="mupname" data-act="muSheet"><span class="${MU.playing?'mueq':''}">🎵</span><span class="grow"><b>${esc(T.name)}</b><small>${esc(T.mood)}</small></span></button><button data-act="muPrev" aria-label="Previous">⏮</button><button data-act="muToggle" aria-label="Play or pause">${MU.playing?'⏸':'▶'}</button><button data-act="muNext" aria-label="Next">⏭</button><button data-act="muOff" aria-label="Turn music off">✕</button>`}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='muVol'){const v=+e.target.value;muSave({vol:v});if(MU.master)MU.master.gain.value=v}
+  if(e.target&&e.target.id==='inName'){const g=$('.igreet');const n=e.target.value.trim();if(g)g.innerHTML=n?`Nice to meet you, <b>${esc(n)}</b>! 😊`:'&nbsp;'}});
+
+/* ===== ✨ INTRO ===== */
+const GOALS=[['read','📖','Read the Bible more'],['pray','🙏','Pray more'],['understand','💡','Understand it better'],['remember','🧠','Remember verses'],['beautiful','🎨','Make my Bible beautiful'],['write','✍️','Write down what God shows me']];
+const GOAL_NEXT={read:['📅 Pick a reading plan','kit:plans'],pray:['🙏 Write your first prayer','j:pray'],understand:['🔎 Study a passage','study'],remember:['🧠 Learn today’s verse','today'],beautiful:['🖍 Load your first chapter','load'],write:['✍️ Write in your Journal','j:write']};
+const GOAL_CARD={read:'kit',pray:'journal',understand:'study',remember:'kit',beautiful:'load',write:'journal'};
+function introSvgBook(){return `<svg viewBox="0 0 240 160" class="ibook" aria-hidden="true">
+ <ellipse cx="120" cy="150" rx="96" ry="7" fill="var(--ink)" opacity=".08"/>
+ <path d="M120 32 C88 20 46 20 16 28 V136 C46 128 88 128 120 140Z" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+ <path d="M120 32 C152 20 194 20 224 28 V136 C194 128 152 128 120 140Z" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+ <rect class="ihl" x="28" y="55" width="76" height="10" rx="4" fill="#f2c14e" opacity=".75"/>
+ <rect class="ihl ihl2" x="28" y="87" width="56" height="10" rx="4" fill="#9fd3a8" opacity=".8"/>
+ <g stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" opacity=".55"><path d="M30 46H104M30 60H104M30 74H98M30 92H104M30 106H92M30 120H100"/><path d="M136 46H210M136 60H204"/></g>
+ <path class="ipen" d="M138 82 C150 70 158 96 170 82 S190 72 204 88" fill="none" stroke="#8b2e24" stroke-width="2.4" stroke-linecap="round"/>
+ <path class="ipen ipen2" d="M138 106 C148 98 160 116 174 104" fill="none" stroke="#2a8aa8" stroke-width="2.4" stroke-linecap="round"/>
+ <text class="isp" x="196" y="22" font-size="20">✨</text><text class="isp isp2" x="8" y="20" font-size="16">✨</text></svg>`}
+function introMini(k){const M={load:`<svg viewBox="0 0 120 50"><g stroke="var(--muted)" stroke-width="3" stroke-linecap="round" opacity=".5"><path d="M10 16H110M10 30H100M10 44H80"/></g><rect class="ihl" x="8" y="24" width="94" height="12" rx="4" fill="#f2c14e" opacity=".7"/></svg>`,
+  study:`<svg viewBox="0 0 120 50"><g stroke="var(--muted)" stroke-width="3" stroke-linecap="round" opacity=".5"><path d="M10 14H110M10 28H110M10 42H90"/></g><g class="imag"><circle cx="30" cy="26" r="13" fill="color-mix(in srgb,var(--card) 60%,transparent)" stroke="var(--ink)" stroke-width="3"/><path d="M40 36L50 46" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/></g></svg>`,
+  journal:`<svg viewBox="0 0 120 50"><path class="ipen" d="M10 32 C24 14 34 44 48 28 S70 18 82 34 S100 30 110 22" fill="none" stroke="#8b2e24" stroke-width="3" stroke-linecap="round"/></svg>`,
+  kit:`<svg viewBox="0 0 120 50">${['#e57d5a','#f2c14e','#5f8a65','#2a8aa8','#a07ce0','#d45d7f'].map((c,i)=>`<circle class="idot" style="animation-delay:${.15*i}s" cx="${14+i*18.5}" cy="25" r="8" fill="${c}"/>`).join('')}</svg>`};return M[k]}
+function showIntro(i){S.intro=S.intro||{i:0,name:profile().name||'',bible:(Store.get('mybible')||{}).query||'',goals:(profile().goals||[]).slice()};if(i!=null)S.intro.i=i;const I=S.intro;
+  let o=$('#intro');if(!o){o=document.createElement('div');o.id='intro';document.body.appendChild(o);document.body.classList.add('introon')}
+  const nm=esc(I.name||'friend'),N=6;
+  const steps=[
+   ()=>`<div class="ivis">${introSvgBook()}</div><h1>Welcome to<br>Loaded Bible</h1><p class="ilead">Fill your paper Bible with what God teaches you: one verse, one note, one prayer at a time.</p><button class="btn pri ibig" data-act="introNav" data-d="1">Let’s begin →</button>`,
+   ()=>`<div class="ivis"><div class="iwave">👋</div></div><h2>First, what should we call you?</h2><input class="f ibigin" id="inName" maxlength="30" value="${esc(I.name)}" placeholder="Your name" autocomplete="given-name"><p class="igreet">${I.name?`Nice to meet you, <b>${nm}</b>! 😊`:'&nbsp;'}</p><button class="btn pri ibig" data-act="introNav" data-d="1">Next →</button>`,
+   ()=>`<div class="ivis ishelf">${['#8b2e24','#2a5a8a','#5f8a65','#3a2a20','#a07ce0'].map((c,j)=>`<span class="ispine" style="background:${c};height:${92+((j*23)%30)}px;animation-delay:${j*.12}s"><i></i></span>`).join('')}</div>
+     <h2>Hi ${nm}! Which Bible do you hold in your hands?</h2><p class="ilead">We look it up, so every tip fits your Bible: its margins, its paper, its study notes.</p>
+     <input class="f ibigin" id="inBible" value="${esc(I.bible)}" placeholder="e.g. ESV Pocket Bible"><div class="chips" style="justify-content:center;margin-top:8px">${BIBLE_EXAMPLES.slice(0,6).map(x=>`<button class="chip" data-act="introBib" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+     <button class="btn pri ibig" data-act="introNav" data-d="1">Next →</button><button class="btn ghost" data-act="introNav" data-d="1" data-nob="1">I’ll do this later</button>`,
+   ()=>`<h2>What do you want to grow in, ${nm}?</h2><p class="ilead">Pick as many as you like. We’ll show you where to start.</p>
+     <div class="igoals">${GOALS.map(([k,e,l])=>`<button class="igoal ${I.goals.includes(k)?'on':''}" data-act="introGoal" data-g="${k}"><span class="ige">${e}</span><span>${l}</span><span class="igc">✓</span></button>`).join('')}</div>
+     <button class="btn pri ibig" data-act="introNav" data-d="1">${I.goals.length?'Next →':'Skip for now →'}</button>`,
+   ()=>{const want=new Set(I.goals.map(g=>GOAL_CARD[g]));return `<h2>Here’s how it helps you</h2><div class="icards">${[['load','🖍','Load','Step by step: what to highlight, write and mark in your paper Bible'],['study','🔎','Study','Understand a passage with simple study methods'],['journal','🙏','Journal','Prayers, thanks and what God shows you, all in one place'],['kit','🧰','Bible Kit','Your color key, reading plans, pages and inserts']].map(([k,e,t,p],j)=>`<div class="icard ${want.has(k)?'for':''}" style="animation-delay:${j*.12}s"><div class="imini">${introMini(k)}</div><div><b>${e} ${t}</b>${want.has(k)?'<span class="iforyou">For you</span>':''}<p>${p}</p></div></div>`).join('')}</div>
+     <button class="btn pri ibig" data-act="introNav" data-d="1">Next →</button>`},
+   ()=>{const g=(I.goals.length?I.goals:['read','understand','pray']).slice(0,3);return `<div class="ivis"><div class="idone">✓</div></div><h1>You’re all set, ${nm}! 🎉</h1>
+     ${I.bible?`<p class="ilead">📖 Next we look up your <b>${esc(I.bible)}</b> so every tip fits it.</p>`:'<p class="ilead">Here’s a good first step for you:</p>'}
+     <div class="inext">${g.map(k=>`<button class="inextb" data-act="introDone" data-go="${GOAL_NEXT[k][1]}">${GOAL_NEXT[k][0]}<span>›</span></button>`).join('')}</div>
+     <button class="switchrow" data-act="twSimple"><span class="switch ${settings().simple?'on':''}"><i></i></span><span style="text-align:left"><b>Simple mode</b><br><small class="muted">Bigger text and easier words</small></span></button>
+     <div class="row" style="margin-top:12px"><button class="btn grow" data-act="introDone" data-go="coach">🧭 Show me around</button><button class="btn pri grow" data-act="introDone" data-go="today">Start →</button></div>`}];
+  o.innerHTML=`<div class="ihead">${I.i?`<button class="iback" data-act="introNav" data-d="-1" aria-label="Back">‹</button>`:'<span class="iback"></span>'}<div class="idots">${Array.from({length:N},(_,j)=>`<i class="${j===I.i?'on':j<I.i?'done':''}"></i>`).join('')}</div><button class="iskip" data-act="introDone" data-go="today">Skip</button></div>
+   <div class="islide ${I.dir<0?'rev':''}">${steps[I.i]()}</div>`;o.scrollTop=0;
+  if(I.i===1)setTimeout(()=>{const x=$('#inName');if(x&&!x.value)x.focus()},350)}
+function introRead(){const I=S.intro;if(!I)return;const n=$('#inName');if(n)I.name=n.value.trim();const b=$('#inBible');if(b)I.bible=b.value.trim()}
+function introFinish(go){introRead();const I=S.intro||{};if(I.name)saveProfile({name:I.name});saveProfile({goals:I.goals||[]});saveSettings({toured:true});
+  const o=$('#intro');if(o){o.classList.add('out');setTimeout(()=>o.remove(),350)}document.body.classList.remove('introon');updateAvatar();
+  const bq=I.bible&&!(Store.get('mybible')&&Store.get('mybible').query===I.bible)?I.bible:'';S.intro=null;
+  if(go==='coach'){S._pendBible=bq;coachShow(0);return}
+  if(go&&go.startsWith('kit:')){S.loadedSub=go.slice(4);setTab('tabs')}else if(go&&go.startsWith('j:')){S.jSub=go.slice(2);setTab('journal')}else setTab(['study','load','today'].includes(go)?go:'today');
+  if(bq)setTimeout(()=>A.bsFind(null,bq,''),400);else if(go!=='today'&&I.name)toast('Welcome, '+I.name+'! 🎉');if(typeof confetti==='function'&&go==='today')confetti('Welcome'+(I.name?', '+I.name:'')+'! 🎉')}
+
 /* ===== 🔍 SEARCH ===== */
 function searchSheet(){openSheet(`<h3>🔍 Search everything</h3><input class="f" id="srchIn" placeholder="Search notes, prayers, studies, pages…" value="${esc(S.srchQ||'')}" autocomplete="off"><div id="srchOut" class="small muted" style="margin-top:8px">Type at least 2 letters.</div>`);
   const i=$('#srchIn');i.focus();i.addEventListener('input',()=>{S.srchQ=i.value;runSearch(i.value)});if(S.srchQ)runSearch(S.srchQ)}
@@ -2654,7 +2946,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
   const goal=pf.goal||5;const vi=(Math.floor(Date.now()/864e5)+(S.votdOff||0))%VOTD.length;const vref=VOTD[(vi+VOTD.length)%VOTD.length];const vp=parseRef(vref);
   const vtxt=KJV&&vp?vrange(vp).map(n=>plainV((KJV[vp.b]&&KJV[vp.b][vp.c]||[])[n-1]||'')).join(' '):'';
   const prov=!STANDALONE?'Claude account':Auth.guest?'Guest (this device only)':!Auth.user?'':Auth.user.uid.startsWith('tiktok:')?'TikTok':(Auth.user.providerData[0]||{}).providerId==='google.com'?'Google':'Email & password';
-  v.innerHTML=`<div class="profilecard"><div class="banner" style="${bannerStyle()}"><button class="bannerbtn" data-act="pickBanner">🖼 Change banner</button></div>
+  v.innerHTML=muCard()+`<div class="profilecard"><div class="banner" style="${bannerStyle()}"><button class="bannerbtn" data-act="pickBanner">🖼 Change banner</button></div>
      <div class="pc-body"><div class="avwrap"><button class="bigavatar" data-act="pickAvatar" aria-label="Change profile picture">${avatarHtml()}</button><button class="camdot" data-act="pickAvatar" aria-label="Change profile picture">📷</button></div>
      <div class="pc-info"><h2>${esc(displayName())}</h2><p class="small muted" style="margin:0">Level ${lv.n} · ${lv.title} · ${st.xp} XP</p><div class="prog" style="margin-top:8px"><i style="width:${lv.pct}%"></i></div><p class="small muted" style="margin:4px 0 0">${lv.toNext} XP to level ${lv.n+1}</p></div></div></div>
    <div class="tiles">
