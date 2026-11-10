@@ -373,6 +373,7 @@ details.grp[open]>summary::after{content:"▴"}
 .pp-ded{font-style:italic;font-size:15.5px;line-height:1.55;color:var(--ink)}
 .pp-write{height:22px;border-bottom:1px solid var(--line);margin:4px 10px}
 .lifesugg{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.lifesugg b{display:block;font-size:14px}.lifesugg span{font-size:12.5px;color:var(--muted)}
+.sizechips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 8px}
 .paperlist{margin-top:12px;padding:12px;border-radius:14px;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 5%,var(--card))}
 .plh{font-weight:700;font-size:15px}.paperlist .item{margin:6px 0 0}
 .savecard{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-top:8px;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.savecard span{font-size:26px}.savecard b{display:block;font-size:15.5px}.savecard small{color:var(--muted);font-size:12.5px}
@@ -988,33 +989,41 @@ function insKindOf(x){return x.kind==='study'?'study':x.kind&&INS_TYPES.some(t=>
 const recPaper=k=>{const r=Store.get(k);return r?(r.paper||(r.fields&&r.fields.paper)||null):null};
 function setPaper(k,paper){const r=JSON.parse(JSON.stringify(Store.get(k)));if(k.startsWith('j_')){r.fields=r.fields||{};if(paper)r.fields.paper=paper;else delete r.fields.paper}else{if(paper)r.paper=paper;else delete r.paper}Store.set(k,r)}
 function colorFor(name){const m=mainSet();const n=String(name||'').toLowerCase().trim();const t=m&&m.topics.find(t=>t.name.toLowerCase()===n||n.includes(t.name.toLowerCase()));if(t)return t.color;const pc=PALETTE.find(x=>x[1]===n||n.includes(x[1]));return pc?pc[0]:'y'}
+const NSIZES=[['margin','✎ Margin'],['sticky','🗒️ Sticky note'],['half','📄 Half page']];
+const NSPEC={margin:'margin note, max 15 words, handwritable',sticky:'sticky-note note, 25 to 40 words, handwritable',half:'half-page note, 80 to 120 words, for an insert page'};
+const NWHERE={margin:['✎ Write in the margin','Next to','write'],sticky:['🗒️ Write on a sticky note','Stick it next to','write on it'],half:['📄 Write a half-page insert','Tuck it in at','write on it']};
+const sizeChips=(act,k,cur)=>`<div class="sizechips"><span class="small muted">Write notes as:</span>${NSIZES.map(([z,l])=>`<button class="chip ${cur===z?'on':''}" data-act="${act}" data-k="${k}" data-z="${z}">${l}</button>`).join('')}</div>`;
 const PICON={heading:'✍️',highlight:'🖍',margin:'✎',link:'🔗',card:'🗂️',date:'📅'};
 function paperBlock(k){if(!k)return '';const P=recPaper(k);const busy=S.paperBusy&&S.paperBusy[k];
   if(busy)return `<div class="paperlist"><div class="plh">🖊️ Making your checklist…</div><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div>`;
   if(!P)return '';const st=P.steps||[];const d=P.done||{};const n=st.filter((_,i)=>d[i]).length;
   return `<div class="paperlist" id="pl-${k}"><div class="row"><div class="plh grow">🖊️ In your physical Bible <span class="small muted">· ${n}/${st.length} done</span></div><button class="iconbtn" data-act="paperRedo" data-k="${k}" title="Make a new list">↻</button><button class="iconbtn" data-act="paperDel" data-k="${k}" title="Remove list">🗑</button></div>
    <div class="prog" style="margin:6px 0 8px"><i style="width:${st.length?n/st.length*100:0}%"></i></div>
-   ${st.map((x,i)=>`<div class="item step ${d[i]?'done':''}"><button class="tick" data-act="paperTick" data-k="${k}" data-i="${i}" aria-label="Mark done">${d[i]?'✓':''}</button><div class="grow"><div class="stxt">${PICON[x.type]||'•'} ${x.verse?`<a class="ref" data-act="openRef" data-ref="${esc(x.verse)}">${esc(codeToLabel(x.verse))}</a> `:''}${x.color?`<span class="swatch sw-${ck(x.color)}"></span> `:''}${x.html}</div></div></div>`).join('')}
+   ${sizeChips('paperSize',k,P.size||'margin')}
+   ${st.map((x,i)=>{const pk=k+'|'+i;const pm=(S.ppPanel||{})[pk];const ex=((P.extra||{})[i])||{};const busy=m=>S.ppBusy===pk+'|'+m;const content=pm?((S.ppStream||{})[pk+'|'+pm]!=null?S.ppStream[pk+'|'+pm]:ex[pm]):'';const tools=['highlight','margin','link','heading'].includes(x.type);
+     return `<div class="item step ${d[i]?'done':''}"><button class="tick" data-act="paperTick" data-k="${k}" data-i="${i}" aria-label="Mark done">${d[i]?'✓':''}</button><div class="grow"><div class="stxt">${PICON[x.type]||'•'} ${x.verse?`<a class="ref" data-act="openRef" data-ref="${esc(x.verse)}">${esc(codeToLabel(x.verse))}</a> `:''}${x.color?`<span class="swatch sw-${ck(x.color)}"></span> `:''}${x.html}</div>
+     ${tools?`<div class="stepacts"><button class="mini ${pm==='explain'?'on':''}" data-act="ppAI" data-k="${k}" data-i="${i}" data-m="explain" ${busy('explain')?'disabled':''}>${busy('explain')?'<span class="spin"></span>':'💡'} Context</button><button class="mini ${pm==='deep'?'on':''}" data-act="ppAI" data-k="${k}" data-i="${i}" data-m="deep" ${busy('deep')?'disabled':''}>${busy('deep')?'<span class="spin"></span>':'📖'} In depth</button><button class="mini" data-act="ppRegen" data-k="${k}" data-i="${i}" ${S.ppBusy===pk+'|regen'?'disabled':''}>${S.ppBusy===pk+'|regen'?'<span class="spin"></span> New…':'🔄 New one'}</button></div>`:''}
+     ${pm?`<div class="subpanel"><div class="row" style="gap:6px"><b class="small grow">${pm==='explain'?'💡 Context':'📖 In depth'}</b>${content&&!busy(pm)?`<button class="mini" data-act="ppAI" data-k="${k}" data-i="${i}" data-m="${pm}" data-f="1">↻</button>`:''}<button class="mini" data-act="ppClose" data-k="${k}" data-i="${i}">✕</button></div><div class="out" id="ppx-${cssId(pk)}">${content?md(content):'<div class="loadingline"></div>'}</div></div>`:''}</div></div>`}).join('')}
    ${P.online?'<div class="small muted" style="margin-top:6px">✓ Also added to your 📖 Online Bible</div>':''}</div>`}
 function paperBtns(k,kind){return `<div class="row" style="margin-top:10px"><button class="btn sm pri grow" data-act="paperGo" data-k="${k||''}" data-kind="${kind}">🖊️ Put in physical Bible</button><button class="btn sm grow" data-act="onlineGo" data-k="${k||''}" data-kind="${kind}">📖 Put in online Bible</button></div>`}
-async function makePaper(k,kind){S.paperBusy=S.paperBusy||{};S.paperBusy[k]=true;renderView();const r0=Store.get(k);const m=mainSet();
+async function makePaper(k,kind,size){size=size||(recPaper(k)||{}).size||'margin';const W=NWHERE[size];S.paperBusy=S.paperBusy||{};S.paperBusy[k]=true;renderView();const r0=Store.get(k);const m=mainSet();
   const colors=m&&m.topics.length?'Their highlighter colors mean: '+m.topics.map(t=>{const pc=PALETTE.find(x=>x[0]===t.color);return (pc?pc[1]:t.color)+' = '+t.name}).join(', ')+'. For "color" use one of these topic names.':'For "color" use a simple color name (yellow, green, blue, pink, orange, purple).';
   let prompt;
-  if(kind==='prayer'){const f=r0.fields||{};prompt=JSYS+`Help someone put this prayer into their PAPER Bible. ${f.ref?'It is based on '+codeToLabel(f.ref)+'.':'Pick one verse it fits best.'} Return JSON: {"verse":"Book chapter:verse","margin":"the prayer shortened to max 25 words, first person","color":"..."}. ${colors}\nThe prayer:\n${(f.body||'').slice(0,3000)}`}
+  if(kind==='prayer'){const f=r0.fields||{};prompt=JSYS+`Help someone put this prayer into their PAPER Bible. ${f.ref?'It is based on '+codeToLabel(f.ref)+'.':'Pick one verse it fits best.'} Return JSON: {"verse":"Book chapter:verse","margin":"the prayer shortened for ${size==='margin'?'a Bible margin: max 25 words':size==='sticky'?'a sticky note: 30 to 50 words':'a half-page insert: 80 to 120 words'}, first person","color":"..."}. ${colors}\nThe prayer:\n${(f.body||'').slice(0,3000)}`}
   else prompt=JSYS+`Turn this Bible study into a short checklist for marking a PAPER Bible. Passage: ${r0.refLabel}. ${colors}
-Return JSON: {"heading":"a short heading for the top of the page, max 6 words","steps":[{"type":"highlight","verse":"Book chapter:verse","color":"...","why":"max 8 words"},{"type":"margin","verse":"Book chapter:verse","note":"max 12 words"},{"type":"link","verse":"Book chapter:verse","to":"Book chapter:verse","why":"max 6 words"}]}. Give 2-4 highlights, 2-3 margin notes and 1-3 links. Easy words. Only use what the study says.
+Return JSON: {"heading":"a short heading for the top of the page, max 6 words","steps":[{"type":"highlight","verse":"Book chapter:verse","color":"...","why":"max 8 words"},{"type":"margin","verse":"Book chapter:verse","note":"${NSPEC[size]}"},{"type":"link","verse":"Book chapter:verse","to":"Book chapter:verse","why":"max 6 words"}]}. Give 2-4 highlights, 2-3 margin notes and 1-3 links. Easy words. Only use what the study says.
 The study:\n${(r0.text||'').slice(0,5000)}`;
   try{const r=await ai(prompt,null,null,'default');const j=parseJSON(r.text);const steps=[];const vc=x=>{const p=parseRef(String(x||''));return p?rc(p):''};
     if(kind==='prayer'){const v=vc(j.verse);const f=r0.fields||{};
-      steps.push({type:'margin',verse:v,color:colorFor(j.color),html:`Write next to it: <i>“${esc(j.margin||'')}”</i>`,note:j.margin||''});
+      steps.push({type:'margin',verse:v,color:colorFor(j.color),html:`${W[0].replace(/^\S+\s/,'')}: <i>\u201c${esc(j.margin||'')}\u201d</i>`,note:j.margin||''});
       steps.push({type:'card',html:'Write the full prayer on a card and tuck it in the back of your Bible (your prayer pages).'});
       steps.push({type:'date',html:`Write today’s date (${new Date().toLocaleDateString()}) next to it. When God answers, add ✓ and the date.`});
       if(!f.ref&&v){const r2=JSON.parse(JSON.stringify(Store.get(k)));r2.fields.ref=v;Store.set(k,r2)}}
     else{if(j.heading)steps.push({type:'heading',verse:'',html:`At the top of the page write: <b>${esc(j.heading)}</b>`,note:j.heading});
       (j.steps||[]).forEach(x=>{const v=vc(x.verse);if(x.type==='highlight')steps.push({type:'highlight',verse:v,color:colorFor(x.color),html:`Highlight it${x.why?' — '+esc(x.why):''}`});
-        else if(x.type==='margin')steps.push({type:'margin',verse:v,html:`Write in the margin: <i>${esc(x.note||'')}</i>`,note:x.note||''});
+        else if(x.type==='margin')steps.push({type:'margin',verse:v,html:`${W[0].replace(/^\S+\s/,'')}: <i>${esc(x.note||'')}</i>`,note:x.note||''});
         else if(x.type==='link'){const t=vc(x.to);steps.push({type:'link',verse:v,to:t,html:`Write in the margin: <b>→ ${esc(t?codeToLabel(t):x.to||'')}</b>${x.why?' ('+esc(x.why)+')':''}`,note:x.why||''})}})}
-    setPaper(k,{steps,done:{},at:Date.now()})}catch(e){toast(aiErr(e))}
+    setPaper(k,{steps,done:{},size,at:Date.now()})}catch(e){toast(aiErr(e))}
   S.paperBusy[k]=false;renderView();setTimeout(()=>{const el=document.getElementById('pl-'+k);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},80)}
 function paperSheet(title,sub,prompt,pre=''){openSheet(`<h3>${title}</h3><p class="small muted">${esc(sub||'')}</p>${pre}<div class="howto">✨ Made for your paper Bible:</div><div id="paperOut" class="out"><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div><div class="row" style="margin-top:10px"><button class="btn sm grow" data-act="paperCopy">⧉ Copy</button><button class="btn sm pri grow" data-act="closeSheet">✓ Done</button></div>`);
   ai(prompt,t=>{const o=$('#paperOut');if(o)o.innerHTML=md(t)},null,'default').then(r=>{const o=$('#paperOut');if(o){o.innerHTML=md(r.text);o.dataset.t=r.text}}).catch(e=>{const o=$('#paperOut');if(o)o.innerHTML=`<p class="muted">${esc(aiErr(e))}</p>`})}
@@ -1359,6 +1368,29 @@ const A={
   study:el=>runStudy(el.dataset.tool,$('#studyRef').value),
   paperGo:async el=>{let k=el.dataset.k;if(!k&&S.study)k=S.study.key;if(!k){toast('Wait until the study is finished');return}if(recPaper(k)){const e2=document.getElementById('pl-'+k);if(e2)e2.scrollIntoView({behavior:'smooth',block:'center'});return}
     if(el.dataset.kind==='prayer'){S.prOpen=k}else if(S.tab==='study'&&(!S.study||S.study.key!==k))S.openStudy=k;await makePaper(k,el.dataset.kind)},
+  paperSize:el=>{const k=el.dataset.k,z=el.dataset.z;const P=recPaper(k);if(P&&(P.size||'margin')===z)return;makePaper(k,k.startsWith('j_')?'prayer':'study',z)},
+  ppClose:el=>{S.ppPanel=S.ppPanel||{};delete S.ppPanel[el.dataset.k+'|'+el.dataset.i];renderView()},
+  ppAI:async el=>{const k=el.dataset.k,i=el.dataset.i,mode=el.dataset.m;const pk=k+'|'+i;S.ppPanel=S.ppPanel||{};S.ppStream=S.ppStream||{};S.ppPanel[pk]=mode;const P=recPaper(k);const x=P.steps[i];
+    if(((P.extra||{})[i]||{})[mode]&&!el.dataset.f){renderView();return}
+    S.ppStream[pk+'|'+mode]='';S.ppBusy=pk+'|'+mode;renderView();
+    const what=`"${plain(x.html)}"${x.verse?' ('+codeToLabel(x.verse)+')':''}`;
+    const prompt=mode==='explain'?SYS.replace('450','140')+`In 60 to 120 easy words, explain the context: what is going on around this verse and why this step matters. No headings. ${what}`
+      :SYS+`Give an in-depth study of this: ${what}. Use ## headings: Context, What it means, Key words, Connections in Scripture, Living it out. About 300 to 400 words.`;
+    try{const r=await ai(prompt,t=>{S.ppStream[pk+'|'+mode]=t;const o=document.getElementById('ppx-'+cssId(pk));if(o)o.innerHTML=md(t)},null,mode==='explain'?'quick':'default');
+      const P2=JSON.parse(JSON.stringify(recPaper(k)));P2.extra=P2.extra||{};P2.extra[i]=Object.assign({},P2.extra[i],{[mode]:r.text});delete S.ppStream[pk+'|'+mode];S.ppBusy=null;setPaper(k,P2)}
+    catch(e){toast(aiErr(e));S.ppBusy=null;delete S.ppPanel[pk];renderView()}},
+  ppRegen:async el=>{const k=el.dataset.k,i=+el.dataset.i;const pk=k+'|'+i;const P=recPaper(k);const x=P.steps[i];const size=P.size||'margin';const W=NWHERE[size];const r0=Store.get(k);
+    S.ppBusy=pk+'|regen';renderView();
+    const others=P.steps.map(y=>plain(y.html)+(y.verse?' '+y.verse:'')).join(' | ');
+    const spec={highlight:'{"type":"highlight","verse":"Book chapter:verse","color":"topic name or color","why":"max 8 words"}',margin:`{"type":"margin","verse":"Book chapter:verse","note":"${NSPEC[size]}"}`,link:'{"type":"link","verse":"Book chapter:verse","to":"Book chapter:verse","why":"max 6 words"}',heading:'{"type":"heading","heading":"max 6 words"}'}[x.type];
+    try{const r=await ai(JSYS+`I’m marking my paper Bible for ${r0.refLabel||((r0.fields||{}).title)||'this passage'}. Give ONE new step that is different from all of these: ${others}. Return JSON: ${spec}.${r0.text?'\nBased on this study:\n'+r0.text.slice(0,3000):''}${r0.fields&&r0.fields.body?'\nThe prayer:\n'+r0.fields.body.slice(0,2000):''}`,null,null,'default');
+      const j=parseJSON(r.text);const vc=y=>{const p=parseRef(String(y||''));return p?rc(p):''};const v=vc(j.verse);let ns;
+      if(x.type==='highlight')ns={type:'highlight',verse:v,color:colorFor(j.color),html:`Highlight it${j.why?' — '+esc(j.why):''}`};
+      else if(x.type==='margin')ns={type:'margin',verse:v||x.verse,color:x.color,html:`${W[0].replace(/^\S+\s/,'')}: <i>${esc(j.note||'')}</i>`,note:j.note||''};
+      else if(x.type==='link'){const t=vc(j.to);ns={type:'link',verse:v,to:t,html:`Write in the margin: <b>→ ${esc(t?codeToLabel(t):j.to||'')}</b>${j.why?' ('+esc(j.why)+')':''}`,note:j.why||''}}
+      else ns={type:'heading',verse:'',html:`At the top of the page write: <b>${esc(j.heading||'')}</b>`,note:j.heading||''};
+      const P2=JSON.parse(JSON.stringify(recPaper(k)));P2.steps[i]=ns;if(P2.done)delete P2.done[i];if(P2.extra)delete P2.extra[i];S.ppBusy=null;setPaper(k,P2);toast('New one 🔄')}
+    catch(e){S.ppBusy=null;toast(aiErr(e));renderView()}},
   paperRedo:el=>makePaper(el.dataset.k,el.dataset.k.startsWith('j_')?'prayer':'study'),
   paperDel:el=>confirmSheet('Remove this checklist?','🗑 Remove',()=>{setPaper(el.dataset.k,null);closeSheet();renderView()}),
   paperTick:el=>{const k=el.dataset.k,i=el.dataset.i;const P=JSON.parse(JSON.stringify(recPaper(k)));P.done=P.done||{};if(P.done[i])delete P.done[i];else{P.done[i]=true;touch()}setPaper(k,P);if(P.steps.length&&Object.keys(P.done).length===P.steps.length)toast('All done! Your Bible is loaded 🎉')},
@@ -1630,7 +1662,7 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
       add(pl.v1?'✍️ Above the verses':'✍️ Top of the chapter','top',`Write above ${pl.v1?'verse '+pl.v1:'chapter '+c}: <b>“${esc(x.heading||'')}”</b>${x.summary?`<div class="small muted">Optional one-liner: ${esc(x.summary)}</div>`:''}`,`Top of ${nm}: "${x.heading}"`);
       add(pl.v1?'✍️ Above the verses':'✍️ Top of the chapter','ctx',`Write a small context box by verse ${pl.v1||1}: <b>${[x.author&&'By '+x.author,x.audience&&'to '+x.audience].filter(Boolean).map(esc).join(' ')}</b>${x.setting?` · ${esc(x.setting)}`:''}${(x.background||[]).length?`<ul class="small" style="margin:6px 0 0">${x.background.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}`,`Context box by v.1: ${[x.author&&'By '+x.author,x.audience&&'to '+x.audience,x.setting].filter(Boolean).join(' · ')}`)}
     (d.highlights||[]).forEach((x,i)=>add('🖍 Highlight','hl'+i,`${sw(x.color)} Highlight ${vr(x.v)} in <b>${colorWord(x.color)}</b> <span class="small muted">(${esc(colorLabel(okColor(x.color)))})</span>${x.quote?`<div style="font-family:var(--serif);font-size:16.5px">“${esc(x.quote)}”</div>`:''}<div class="small">${esc(x.why||'')}</div>`,`Highlight v.${x.v} ${colorWord(x.color)} — ${x.why||''}`));
-    (d.margin||[]).forEach((x,i)=>add('✎ Write in the margin','mg'+i,`Next to ${vr(x.v)} write:<div class="hand">${esc(x.note||'')}</div>`,`Margin v.${x.v}: ${x.note}`));
+    {const W=NWHERE[pl.size||'margin'];(d.margin||[]).forEach((x,i)=>add(W[0],'mg'+i,`${W[1]} ${vr(x.v)} ${W[2]}:<div class="hand">${esc(x.note||'')}</div>`,`Note v.${x.v}: ${x.note}`))}
     (d.xrefs||[]).forEach((x,i)=>add('🔗 Cross-references','xr'+i,`Next to ${vr(x.v)} write: <span class="hand" style="display:inline">${(x.refs||[]).map(y=>esc(y.ref)).join('; ')}</span><div class="small muted">${(x.refs||[]).map(y=>{const p=parseRef(y.ref);return (p?refA(rc(p),y.ref):esc(y.ref))+' — '+esc(y.why||'')}).join('<br>')}</div>`,`v.${x.v} → ${(x.refs||[]).map(y=>y.ref).join('; ')}`));
     (d.words||[]).forEach((x,i)=>add('🔤 Word meanings','wd'+i,`Above <b>“${esc(x.word)}”</b> in ${vr(x.v)} write: <span class="hand" style="display:inline">${esc(x.original||'')} = ${esc(x.meaning||'')}</span>`,`v.${x.v} "${x.word}": ${x.original} = ${x.meaning}`));
     if(d.soap){const x=d.soap;add('📖 S.O.A.P. for your journal','soap',`Copy this into your paper journal (or save it to the app Journal):<p style="margin:6px 0"><b>S</b> ${vr(x.v)} — <span style="font-family:var(--serif)">${esc(x.scripture||'')}</span></p><p style="margin:6px 0"><b>O</b> ${esc(x.observation||'')}</p><p style="margin:6px 0"><b>A</b> ${esc(x.application||'')}</p><p style="margin:6px 0"><b>P</b> <i>${esc(x.prayer||'')}</i></p><button class="btn sm" data-act="bSoap">Save to app Journal</button>`,`S.O.A.P. on v.${x.v}\nS: ${x.scripture}\nO: ${x.observation}\nA: ${x.application}\nP: ${x.prayer}`)}
@@ -1767,12 +1799,12 @@ function stepHtml(pl,it,ch){const sk=pl.key+'|'+it.id;const pm=S.panel[sk];const
      ${content&&!busy(pm)?`<button class="mini" data-act="itemAI" data-k="${pl.key}" data-i="${esc(it.id)}" data-m="${pm}" data-f="1">↻</button>`:''}<button class="mini" data-act="panelClose" data-k="${pl.key}" data-i="${esc(it.id)}">✕</button></div>
      <div class="out" id="px-${cssId(sk)}">${content?md(content):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>'}</div></div>`:''}</div></div>`}
 function grpActs(pl,g){const sec=idSec(g.items[0].id);if(!sec)return '';const arr=Array.isArray(pl.data[sec]);const bk=S.secBusy===pl.key+'|'+sec;
-  return `<div class="row grpacts">${arr&&sec!=='chapters'?`<button class="btn sm" data-act="secPart" data-k="${pl.key}" data-s="${sec}" data-m="more" ${bk?'disabled':''}>${bk&&S.secMode==='more'?'<span class="spin"></span> Loading…':'＋ Load more'}</button>`:''}
+  return `${sec==='margin'?sizeChips('planSize',pl.key,pl.size||'margin'):''}<div class="row grpacts">${arr&&sec!=='chapters'?`<button class="btn sm" data-act="secPart" data-k="${pl.key}" data-s="${sec}" data-m="more" ${bk?'disabled':''}>${bk&&S.secMode==='more'?'<span class="spin"></span> Loading…':'＋ Load more'}</button>`:''}
     <button class="btn sm ghost" data-act="secPart" data-k="${pl.key}" data-s="${sec}" data-m="section" ${bk?'disabled':''}>${bk&&S.secMode==='section'?'<span class="spin"></span> Regenerating…':'🔄 Regenerate this section'}</button></div>`}
 function planPassage(pl){return pl.kind==='topic'?`a topic tab for "${pl.topic}"`:pl.kind==='book'?`the book of ${BM[pl.b].name}`:planTitle(pl)}
 function secSchema(pl,sec){const s=settings();const t=pl.topic||'';return ({
   highlights:'[{"v": "verse number or range", "color": "one color code from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}]',
-  margin:'[{"v": "verse number or range", "note": "margin note, max 15 words, handwritable"}]',
+  margin:`[{"v": "verse number or range", "note": "${NSPEC[pl.size||'margin']}"}]`,
   xrefs:'[{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}]',
   words:'[{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}]',
   verses:`[{"ref": "Book chapter:verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}]`,
@@ -1933,6 +1965,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   bGo:()=>runBuild(),
   openPlan:el=>{S.build.planKey=el.dataset.k;renderView();scrollToPlan(el.dataset.k)},
   itemAI:el=>itemAI(el.dataset.k,el.dataset.i,el.dataset.m,!!el.dataset.f),
+  planSize:el=>{const k=el.dataset.k,z=el.dataset.z;const pl=Store.get(k);if((pl.size||'margin')===z)return;updatePlan(k,p=>{p.size=z});regenPart(k,'margin','section')},
   itemRegen:el=>regenPart(el.dataset.k,idSec(el.dataset.i),'item',el.dataset.i),
   panelTab:el=>{S.panel[el.dataset.k+'|'+el.dataset.i]=el.dataset.m;renderView()},
   panelClose:el=>{delete S.panel[el.dataset.k+'|'+el.dataset.i];renderView()},
