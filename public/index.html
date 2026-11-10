@@ -418,10 +418,31 @@ details.grp[open]>summary::after{content:"▴"}
 .tourwave{font-size:64px;display:inline-block;animation:wave 1.6s ease-in-out 2;transform-origin:70% 70%}@keyframes wave{0%,100%{transform:rotate(0)}20%{transform:rotate(18deg)}40%{transform:rotate(-10deg)}60%{transform:rotate(14deg)}80%{transform:rotate(-4deg)}}
 #coach{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:70;background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:14px 16px;box-shadow:0 12px 34px rgba(0,0,0,.25)}
 #coach.pop{animation:coachpop .35s cubic-bezier(.2,1.4,.4,1)}@keyframes coachpop{from{transform:translateY(30px) scale(.96);opacity:0}to{transform:none;opacity:1}}
-#coach h3{margin:6px 0 4px;font-size:20px}#coach p{margin:0;font-size:15px;line-height:1.45}#coach .tourdots{justify-content:flex-start}.coachact{margin-top:10px;width:100%;justify-content:center;background:color-mix(in srgb,var(--accent) 12%,var(--card))}
+#coach h3{margin:6px 0 4px;font-size:20px}#coach .tourdots i{width:6px;height:6px}#coach .tourdots i.on{width:16px}#coach .stepn{font-size:12px;color:var(--muted);font-weight:700}#coach p{margin:0;font-size:15px;line-height:1.45}#coach .tourdots{justify-content:flex-start}.coachact{margin-top:10px;width:100%;justify-content:center;background:color-mix(in srgb,var(--accent) 12%,var(--card))}
 .coachhl{position:relative;z-index:5;border-radius:16px;animation:coachhl 1.6s ease-in-out infinite}@keyframes coachhl{0%,100%{box-shadow:0 0 0 3px var(--accent)}50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--accent) 30%,transparent)}}
 html[data-simple] #view{zoom:1.1}html[data-simple] .mini[data-m=deep],html[data-simple] .partcard[data-p=words],html[data-simple] .studytabs button[data-p=methods],html[data-simple] .nszrow{display:none}
-.todayhead{display:flex;align-items:flex-end;gap:10px;margin:10px 2px 8px}.todayhead h2{margin:2px 0 0;font-size:27px}
+.todayhead{display:flex;align-items:flex-end;gap:10px;margin:10px 0 10px;padding:16px;border-radius:20px;color:var(--ink)}
+.tod-morning{background:linear-gradient(135deg,color-mix(in srgb,#ffcf8a 45%,var(--card)),color-mix(in srgb,#ffb3a7 35%,var(--card)))}
+.tod-day{background:linear-gradient(135deg,color-mix(in srgb,#9fd3f0 40%,var(--card)),color-mix(in srgb,#fff1b8 35%,var(--card)))}
+.tod-evening{background:linear-gradient(135deg,color-mix(in srgb,#f5a97f 40%,var(--card)),color-mix(in srgb,#b79ce0 40%,var(--card)))}
+.tod-night{background:linear-gradient(135deg,color-mix(in srgb,#2c3e6b 45%,var(--card)),color-mix(in srgb,#5b4a8a 35%,var(--card)))}
+.todayhead .tstreak{background:color-mix(in srgb,var(--card) 70%,transparent)}
+.plan.bk{border-left:5px solid var(--gc)!important}
+.fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:26;width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-size:30px;line-height:1;box-shadow:0 8px 20px rgba(0,0,0,.25);cursor:pointer}
+#totop{bottom:calc(150px + env(safe-area-inset-bottom))!important}
+#offbar{position:sticky;top:0;z-index:45;background:var(--ink);color:var(--paper);font-size:13px;font-weight:600;padding:8px 14px;text-align:center}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}.confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:conf 1.6s ease-in forwards}
+@keyframes conf{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+.sharestyles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sharestyles button{display:flex;flex-direction:column;gap:6px;align-items:center;padding:8px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.ssprev{display:block;width:100%;height:110px;border-radius:10px;position:relative}.ssprev i{position:absolute;left:14%;right:14%;top:14%;bottom:14%;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}.ssprev b{display:block;width:60%;height:6px;border-radius:3px}.ssprev u{display:block;width:70%;height:4px;border-radius:2px;opacity:.5}
+.guidei{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;background:var(--paper)}.guidei summary{font-weight:700;cursor:pointer}.guidei p{margin:8px 0;font-size:14.5px;line-height:1.5}
+.simplebar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding:8px 12px;border-radius:14px;background:color-mix(in srgb,#5f8a65 15%,var(--card));font-weight:600;font-size:14px}
+html[data-simple] #nav [data-tab=tabs],html[data-simple] .tmem,html[data-simple] .tmap{display:none}
+html[data-simple] .modecard[data-m=book],html[data-simple] .modecard[data-m=snote],html[data-simple] .modecard[data-m=inserts]{display:none}
+html[data-simple] .jseg button[data-g=grow],html[data-simple] .subtabs button[data-s=cal],html[data-simple] .subtabs button[data-s=writings]{display:none}
+html[data-simple] .jseg{grid-template-columns:1fr 1fr}html[data-simple] .stepacts .mini[data-act=itemRegen],html[data-simple] .grpacts,html[data-simple] .sizechips{display:none}
+html[data-simple] .btn{min-height:42px}
+html[data-simple] .studytabs,html[data-simple] .planfoot2 [data-act=friendShare],html[data-simple] .planfoot2 [data-act=copyPlan],html[data-simple] .planfoot2 [data-act=redoPlan]{display:none}.todayhead h2{margin:2px 0 0;font-size:27px}
 .tstreak{text-align:center;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:6px 12px}.tstreak b{display:block;font-size:20px}.tstreak span{font-size:11px;color:var(--muted)}
 .tgoal{display:flex;align-items:center;gap:10px;margin:0 2px 10px}.tgoal .prog{margin:0}
 .tcard{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;margin:10px 0}.tcard.warn{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,var(--card))}
@@ -673,8 +694,13 @@ const Store={
   set(k,v){if(/^(k|i|p)_/.test(k)&&v&&typeof v==='object'&&!Array.isArray(v)&&!this.items.has(k)&&!('proj' in v)){const pj=curProj();if(pj)v=Object.assign({},v,{proj:pj})}this.items.set(k,v);this.persist(k,v);if(/^(n|h|b|j|t|i)_/.test(k)||k==='progress')touch();changed()},
   del(k){this.items.delete(k);this.persist(k,null);changed()},
   persist(k,v){try{v==null?localStorage.removeItem(this.LS+k):localStorage.setItem(this.LS+k,JSON.stringify(v))}catch(e){}
-    if(!this.col)return;clearTimeout(this.timers.get(k));
-    this.timers.set(k,setTimeout(()=>{this.timers.delete(k);const cur=this.items.get(k);this.enqueue(k,()=>cur==null?this.col.doc(k).delete():this.col.doc(k).set(JSON.parse(JSON.stringify(cur))))},350))},
+    this.markDirty(k,true);if(!this.col)return;clearTimeout(this.timers.get(k));
+    this.timers.set(k,setTimeout(()=>{this.timers.delete(k);this.send(k)},350))},
+  send(k){const cur=this.items.get(k);const col=this.col;if(!col)return;this.enqueue(k,async()=>{await (cur==null?col.doc(k).delete():col.doc(k).set(JSON.parse(JSON.stringify(cur))));if(this.items.get(k)===cur)this.markDirty(k,false)})},
+  dkey(){return 'lb1:dirty:'+this.LS},
+  loadDirty(){try{this.dirty=new Set(JSON.parse(localStorage.getItem(this.dkey())||'[]'))}catch(e){this.dirty=new Set()}this.dirtyNs=this.LS},
+  markDirty(k,on){if(!this.dirty||this.dirtyNs!==this.LS)this.loadDirty();if(on)this.dirty.add(k);else this.dirty.delete(k);try{localStorage.setItem(this.dkey(),JSON.stringify([...this.dirty]))}catch(e){}},
+  flush(){if(!this.col)return;if(!this.dirty||this.dirtyNs!==this.LS)this.loadDirty();[...this.dirty].forEach(k=>this.send(k))},
   enqueue(k,fn){const p=(this.queues.get(k)||Promise.resolve()).then(fn).catch(e=>{console.warn('save failed',k,e);if(e&&e.code==='quota_exceeded')toast('Storage is full — delete a few old notes');});this.queues.set(k,p)},
   unsub:null,
   useNamespace(ns,mergeGuest){this.disconnect();this.lastRemote=new Set();this.items.clear();this.LS='lb1:'+ns+':d:';this.loadLocal();let moved=0;
@@ -686,11 +712,13 @@ const Store={
     this.unsub=col.onSnapshot(snap=>{
       const remote=new Map();
       snap.docs.forEach(d=>{if(d.exists&&isItemKey(d.id))remote.set(d.id,JSON.parse(JSON.stringify(d.data())))});
+      if(!this.dirty||this.dirtyNs!==this.LS)this.loadDirty();const D=this.dirty;
       if(!snap.metadata.fromCache){clearTimeout(timer);
         if(first){first=false;this.col=col;for(const [k,v] of this.items)if(!remote.has(k))this.enqueue(k,()=>col.doc(k).set(JSON.parse(JSON.stringify(v))));}
         setSync('Synced to your account',true)}
-      for(const k of this.lastRemote)if(!remote.has(k)&&!this.timers.has(k))this.items.delete(k);
-      for(const [k,v] of remote)if(!this.timers.has(k)||!this.col)this.items.set(k,v);
+      for(const k of this.lastRemote)if(!remote.has(k)&&!this.timers.has(k)&&!D.has(k))this.items.delete(k);
+      for(const [k,v] of remote)if((!this.timers.has(k)||!this.col)&&!D.has(k))this.items.set(k,v);
+      if(this.col&&D.size)setTimeout(()=>this.flush(),50);
       this.lastRemote=new Set(remote.keys());changed();if(S.tab==='account'||S.tab==='load')applyTheme();
     },e=>{clearTimeout(timer);console.warn(e);setSync('Saved on this device')})},
   async connect(){
@@ -758,6 +786,7 @@ function setTab(t){if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='
   try{if(location.hash!=='#'+t)history.replaceState(null,'','#'+t)}catch(e){}
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderView();window.scrollTo(0,0)}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='pjEmoC'){const v=e.target.value.trim();const g=window.Intl&&Intl.Segmenter?[...new Intl.Segmenter().segment(v)].map(x=>x.segment):[...v];const em=g[0]||'';if(em){S._pjEmo=em;const pv=$('#pjEmoPrev');if(pv)pv.textContent=em;$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.remove('on'))}}});
+window.addEventListener('online',()=>{offlineBar();try{Store.flush()}catch(e){}toast('Back online ✓ Saving your changes')});window.addEventListener('offline',()=>offlineBar());
 window.addEventListener('scroll',()=>{const t=document.getElementById('totop');if(t)t.classList.toggle('show',window.scrollY>1400)},{passive:true});
 window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
 
@@ -889,7 +918,7 @@ function viewStudy(v){const s=settings();if(!S.studyRef)S.studyRef=refLabel(s.bo
   $('#studyRef').oninput=e=>S.studyRef=e.target.value;wireStudyList();
   if(st&&st.loading)$('#studyOut').scrollIntoView({block:'start'});
 }
-function studyPanel(pick){const grid=obj=>`<div class="toolgrid">${Object.entries(obj).map(([k,t])=>`<button class="tool ${obj===METHODS?'method':''}" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>`;
+function studyPanel(pick){if(isSimple()){const T=['context','meaning','apply','questions'].filter(k=>TOOLS[k]);return `<div class="howto">🌱 Tap what you want to know about this passage.</div><div class="toolgrid">${T.map(k=>{const t=TOOLS[k];return `<button class="tool" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`}).join('')}</div><label class="l">Or ask a question</label><textarea class="f" id="askQ" style="min-height:60px" placeholder="e.g. What does this mean for me?"></textarea><div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>`}const grid=obj=>`<div class="toolgrid">${Object.entries(obj).map(([k,t])=>`<button class="tool ${obj===METHODS?'method':''}" data-act="study" data-tool="${k}"><span class="e">${t[0]}</span><div><b>${t[1]}</b><span>${t[2]}</span></div></button>`).join('')}</div>`;
   return `<div class="howto">ℹ️ ${pick==='tools'?'One quick explanation, like the background or what a verse means. Tap one to start.':pick==='methods'?'A full Bible study done for you, step by step, using a well-known method. S.O.A.P. is the easiest to start with.':'Ask anything about this passage and get a clear answer.'}</div>
    ${pick==='tools'?grid(TOOLS):pick==='methods'?grid(METHODS)+'<details class="guide" style="margin-top:8px"><summary>📖 How do these methods work?</summary><div class="body">'+GUIDES.map(g=>`<b>${g[0]}</b><br>${g[1]}`).join('<br><br>')+'</div></details>':`<textarea class="f" id="askQ" placeholder="e.g. Why did Jesus speak in parables here? What does 'born again' mean?" style="min-height:70px"></textarea><div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn pri" data-act="ask">Ask</button></div>`}`}
 const studyActions=(k,pri)=>`${paperBtns(k,'study')}<div class="row studyacts"><button class="btn sm grow" data-act="studySaveTo" data-k="${k||''}">💾 Save to…</button><button class="iconbtn" data-act="copyStudy" data-k="${k||''}" title="Copy">⧉</button>${pri?'<button class="iconbtn" data-act="redoStudy" title="Do it again">↻</button>':''}<button class="iconbtn" data-act="studyDel" data-k="${k||''}" title="Delete">🗑</button></div>${paperBlock(k)}`;
@@ -1572,7 +1601,7 @@ Return JSON: {"subtitle":"small label above the title","title":"page title, max 
   pmDiscard:()=>{S.pm.cur=null;renderView()},
   pmView:el=>{S.pmView=el.dataset.v;renderView();window.scrollTo(0,0)},
   pmFilter:el=>{S.pmFilter=el.dataset.f;renderView()},
-  pmDone:el=>{const pg=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));pg.inBible=!pg.inBible;Store.set(el.dataset.k,pg);if(pg.inBible){touch();toast('Written in your Bible ✓')}},
+  pmDone:el=>{const pg=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));pg.inBible=!pg.inBible;Store.set(el.dataset.k,pg);if(pg.inBible){touch();confetti('Written in your Bible ✓')}},
   pmToggle:el=>{S.pmOpen=S.pmOpen===el.dataset.k?null:el.dataset.k;renderView()},
   pmHow:el=>{const pg=Store.get(el.dataset.k);if(!pg)return;const T=PAGE_TYPES.find(x=>x[0]===pg.type)||PAGE_TYPES[9];const where={first:'the first blank page or the inside cover',book:`the blank space before ${esc((pg.page.title||'the book'))} starts, or on an insert page there`,prayer:'the blank pages at the back of your Bible',answered:'the blank pages at the back, next to your prayer page',memory:'the inside back cover'}[pg.type]||'a blank page near the passage it’s about, or on an insert page';
     openSheet(`<h3>🖊️ Put this page in your physical Bible</h3><p class="small muted">${esc(pg.page.title||T[2])}</p>
@@ -1596,7 +1625,7 @@ Return JSON: {"subtitle":"small label above the title","title":"page title, max 
     const prev=of.steps||[];const steps=$('#gSteps').value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>({t:x,d:!!(prev.find(p=>p.t===x)||{}).d}));const pr=parseRef($('#gRef').value.trim());
     Store.set(k||('j_'+newId()),Object.assign({type:'goal',date:Date.now()},old||{},{fields:Object.assign({},of,{title:t,why:$('#gWhy').value.trim(),ref:pr?rc(pr):'',steps}),updated:Date.now()}));closeSheet();toast('Goal saved 🎯')},
   goalStep:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));const st=e.fields.steps[+el.dataset.i];st.d=!st.d;Store.set(el.dataset.k,e);if(st.d)touch()},
-  goalDone:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.done=!e.fields.done;e.fields.doneAt=e.fields.done?Date.now():null;Store.set(el.dataset.k,e);if(e.fields.done)toast('Goal reached! 🏆 Praise God!')},
+  goalDone:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.done=!e.fields.done;e.fields.doneAt=e.fields.done?Date.now():null;Store.set(el.dataset.k,e);if(e.fields.done)confetti('Goal reached! 🏆 Praise God!')},
   goalAI:async()=>{const t=$('#gTitle').value.trim();const btn=$('[data-act="goalAI"]');btn.disabled=true;btn.innerHTML='<span class="spin"></span> Thinking…';
     try{const r=await ai(JSYS+`Help a Christian set a faith goal.${t?` Their goal: "${t}".`:' Suggest one simple, meaningful faith goal for the next month.'} Return JSON: {"title": "the goal, max 8 words", "why": "1 to 2 sentences, first person, why it matters", "verse": "one fitting Bible reference", "steps": ["4 to 6 small concrete steps, each under 10 words"]}`,null,null,'default');const d=parseJSON(r.text);
       const set=(id,v)=>{const i=$(id);if(i&&v&&!i.value.trim())i.value=v};set('#gTitle',d.title);set('#gWhy',d.why);set('#gRef',d.verse);set('#gSteps',(d.steps||[]).join('\n'));toast('Filled in. Make it your own ✏️')}catch(e){toast(aiErr(e))}btn.disabled=false;btn.innerHTML='✨ Fill in for me'},
@@ -1693,6 +1722,17 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   projEditGo:el=>{const L=projList().map(x=>x.id===el.dataset.p?Object.assign({},x,{name:$('#pjName').value.trim()||x.name,emoji:S._pjEmo||x.emoji,note:$('#pjNote').value.trim()}):x);S._pjEmo=null;Store.set('projects',{list:L});closeSheet();renderView()},
   projDel:el=>{const id=el.dataset.p;const p=projList().find(x=>x.id===id);confirmSheet(`Delete “${p.name}” and its loadings, inserts, pages and key? Your journal, prayers and studies stay.`,'🗑 Delete project',()=>{
     ['k_','i_','p_'].forEach(pre=>Store.list(pre).filter(x=>x.proj===id).forEach(x=>Store.del(x.key)));Store.del('s_main_'+id);Store.set('projects',{list:projList().filter(x=>x.id!==id)});if(curProj()===id)saveSettings({proj:''});closeSheet();renderView();toast('Project deleted')})},
+  qadd:()=>quickSheet(),
+  qPick:el=>quickSheet(el.dataset.k),
+  guide:()=>guideSheet(),
+  qSave:el=>{const k=el.dataset.k;const t=(($('#qTxt')||{}).value||'').trim();const rv=(($('#qRef')||{}).value||'').trim();const pr=rv&&parseRef(rv);
+    if(['vnote','mem'].includes(k)&&!pr){toast('Type a verse like Psalm 46:10');return}if(k!=='mem'&&!t){toast('Write something first');return}
+    if(k==='req'){Store.set('j_'+newId(),{type:'prayer',date:Date.now(),fields:{title:t.slice(0,60),body:t.length>60?t:'',who:'',ref:'',answer:'',answered:false}});closeSheet();toast('Saved in Journal › Requests 🙏')}
+    else if(k==='thx'){const gk='j_grat_'+todayStr();const old=Store.get(gk);const items=old?(old.fields.body||'').split('\n').filter(Boolean):[];items.push(t);Store.set(gk,Object.assign({type:'grat',date:Date.now()},old||{},{fields:{body:items.join('\n')},updated:Date.now()}));closeSheet();toast('Saved in Journal › Thanks 🙌')}
+    else if(k==='note'){Store.set('j_'+newId(),{type:'reflect',date:Date.now(),fields:{title:'',ref:'',body:t}});closeSheet();toast('Saved in Journal › Writings ✍️')}
+    else if(k==='vnote'){const vs=pr.v1?vrange(pr):[];addNote(pr.b,pr.c,vs,'📌 Note',t);closeSheet();toast('Saved next to '+codeToLabel(rc(pr))+' in the Online Bible 📌')}
+    else if(k==='mem'){const L=memList().slice();const r=rc(pr);if(!L.some(v=>v.ref===r))L.push({ref:r,learned:false,added:Date.now()});Store.set('memory',{verses:L});closeSheet();toast('Added to your memory verses 🧠')}
+    touch()},
   goKit:el=>{S.loadedSub=el.dataset.s;setTab('tabs')},
   tMem:()=>{S.tMemShow=true;renderView()},
   tContinue:el=>{S.build.planKey=el.dataset.k;setTab('load');setTimeout(()=>scrollToPlan(el.dataset.k),100)},
@@ -1703,6 +1743,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   sharePage:el=>{const pg=Store.get(el.dataset.k);const C=pg.page;shareImage({kicker:C.subtitle||'',title:C.title,text:(C.verse&&C.verse.text?'“'+C.verse.text+'”  ':'')+(C.sections||[]).map(x=>x.heading+': '+(x.lines||[]).filter(l=>!/^_+$/.test(l)).join(' · ')).join('   '),ref:C.verse&&C.verse.ref})},
   sharePrayer:el=>{const e=Store.get(el.dataset.k);shareImage({kicker:'A prayer',title:e.fields.title||'',text:e.fields.body||'',ref:e.fields.ref?codeToLabel(e.fields.ref):''})},
   shareJournal:el=>{const e=Store.get(el.dataset.k);const f=e.fields||{};const T=JTYPES[e.type]||JTYPES.reflect;shareImage({kicker:T.name,title:f.title||'',text:[f.before,f.god,f.now,f.body].filter(Boolean).join('  '),ref:f.ref?codeToLabel(f.ref):''})},
+  shareStyle:el=>{const o=S._shareO;closeSheet();if(o)setTimeout(()=>renderShare(o,el.dataset.s),60)},
   shareDl:async()=>{if(S._shareBlob&&await downloadFile('loaded-bible.png',S._shareBlob,'image/png'))toast('Picture saved ✓')},
   doPrint:el=>{const P=S._print;closeSheet();if(P)printDoc(P.title,P.html,el.dataset.z)},
   printPage:el=>{const C=el.dataset.k?Store.get(el.dataset.k).page:S.pm.cur;printSheet(C.title,pagePrintHtml(C),'full')},
@@ -1748,7 +1789,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     Store.set('j_'+newId(),{type:'prayer',date:Date.now(),fields:{title:(P.words.trim().slice(0,60)||tl||'Prayer request'),who:P.who.trim(),ref:pr?rc(pr):'',body:P.out.replace(/\*\*/g,''),answer:'',answered:false}});jSaved('prayer',(P.words.trim().slice(0,60)||tl||'Prayer request'))},
   prAnswered:el=>{const e=Store.get(el.dataset.k);openSheet(`<h3>🎉 Prayer answered!</h3><p><b>${esc((e.fields||{}).title||'')}</b></p><label class="l">How did God answer? (optional)</label><textarea class="f" id="ansTxt" placeholder="Write it down so you can remember it."></textarea>
     <button class="btn pri wide" data-act="prAnsSave" data-k="${el.dataset.k}" style="margin-top:12px">Mark as answered</button>`)},
-  prAnsSave:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields=Object.assign({},e.fields,{answered:true,answeredAt:Date.now(),answer:$('#ansTxt').value.trim()||(e.fields||{}).answer||''});Store.set(el.dataset.k,e);closeSheet();toast('Praise God! 🎉')},
+  prAnsSave:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields=Object.assign({},e.fields,{answered:true,answeredAt:Date.now(),answer:$('#ansTxt').value.trim()||(e.fields||{}).answer||''});Store.set(el.dataset.k,e);closeSheet();confetti('Praise God! 🎉 Prayer answered')},
   genTakeaway:async()=>{const sh=$('#sheet');const g=k=>($(`[data-f="${k}"]`,sh)||{}).value||'';if(!g('points').trim()&&!g('ref').trim()){toast('Add the passage or main points first');return}
     const btn=$('[data-act="genTakeaway"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Thinking…';
     try{const r=await ai(`From these sermon notes, write one personal takeaway and one concrete action step for this week, in 2 to 3 short sentences, first person. Output only those sentences.\nTitle: ${g('title')}\nPassage: ${g('ref')}\nPoints: ${g('points')}\nQuotes: ${g('quotes')}`,null,null,'quick');
@@ -1786,7 +1827,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();
 const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depression','Doubt','Shame & guilt','Temptation','Joy','Gratitude','Hope','Patience','Rejection','Stress','Forgiving others','Waiting on God','Courage','Purpose','Marriage','Parenting','Friendship','Money','Sickness','Peace','Salvation','Prayer'];
 const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['soap','📖 S.O.A.P.']];
 const PART_INFO={context:['✍️','Heading & context','A title + short background for the top of the page'],hl:['🖍','What to highlight','Which verses to color, and why'],margin:['✎','Margin notes','Short notes to write next to verses'],xrefs:['🔗','Cross-references','Other verses to link in the margin'],words:['🔤','Word meanings','Key Hebrew & Greek words, explained'],soap:['📖','S.O.A.P.','A short devotion, saved to your Journal']};
-const partsHtml=B=>`<div class="stepl"><span>3</span> What do you want to add? <small>Tap to choose, tap again to remove</small></div><div class="partgrid">${PARTS.map(([k])=>{const i=PART_INFO[k];return `<button class="partcard ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}"><span class="pc">${B.parts[k]?'✓':''}</span><span class="pe">${i[0]}</span><span class="pt"><b>${i[1]}</b><small>${i[2]}</small></span></button>`}).join('')}</div>`;
+const partsHtml=B=>isSimple()?`<div class="howto">🌱 You’ll get a heading, what to highlight and short notes to write. (Turn off Simple mode for more options.)</div>`:`<div class="stepl"><span>3</span> What do you want to add? <small>Tap to choose, tap again to remove</small></div><div class="partgrid">${PARTS.map(([k])=>{const i=PART_INFO[k];return `<button class="partcard ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}"><span class="pc">${B.parts[k]?'✓':''}</span><span class="pe">${i[0]}</span><span class="pt"><b>${i[1]}</b><small>${i[2]}</small></span></button>`}).join('')}</div>`;
 S.panel={};S.streams={};S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
 function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
 function colorKeyText(){const m=mainSet().topics;return m.map(t=>`${okColor(t.color)} (${colorWord(t.color)}) = ${t.name}${t.meaning?' — '+t.meaning:''}`).join('; ')+'. In "color" fields use only these color codes, exactly as written.'}
@@ -2035,7 +2076,7 @@ Start with one "# " title line (max 6 words). Then use short lines, bullet point
   d.loading=false;if(d.text&&!d.err){const k='g_'+newId();Store.set(k,{type:src.type,size:src.size,subject:src.subject,text:d.text,at:Date.now(),saved:false});I.drafts.splice(I.drafts.indexOf(d),1);S.openIns=k}renderBuildOut();if(S.openIns)setTimeout(()=>document.getElementById('gi-'+S.openIns)?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
 function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
   const rows=plans.map(pl=>({pl,pp:planProg(pl)}));const act=rows.filter(r=>!r.pp.done),fin=rows.filter(r=>r.pp.done);
-  const card=r=>{const open=B.planKey===r.pl.key;return `<div class="plan ${open?'open':''} ${r.pp.done?'isdone':''}" id="plan-${esc(r.pl.key)}">${planHead(r.pl,r.pp,open)}${open?`<div class="planbody">${planBody(r.pl,r.pp)}</div>`:''}</div>`};
+  const card=r=>{const open=B.planKey===r.pl.key;const gc=r.pl.b&&BM[r.pl.b]?GENRES[BM[r.pl.b].genre][1]:'var(--gold)';return `<div class="plan bk ${open?'open':''} ${r.pp.done?'isdone':''}" style="--gc:${gc}" id="plan-${esc(r.pl.key)}">${planHead(r.pl,r.pp,open)}${open?`<div class="planbody">${planBody(r.pl,r.pp)}</div>`:''}</div>`};
   return `<div class="row" style="margin:18px 2px 4px;align-items:baseline"><h2 class="sec grow" style="margin:0">My loading list</h2><span class="small muted">${act.length} in progress · ${fin.length} done</span></div>
    <p class="small muted" style="margin:0 2px 8px">Tap a loading to open or close it.</p>
    ${act.length?act.map(card).join(''):'<div class="notice">Nothing in progress — pick a chapter or feeling above to start loading.</div>'}
@@ -2048,7 +2089,7 @@ function archivePlan(pl){const pp=planProg(pl);const st=Object.assign({},Store.g
   ar.steps+=pp.dn;if(pp.done){if(pl.kind==='chapter'){ar.loaded++;if(pl.b==='PSA')ar.psalms++}else if(pl.kind==='topic')ar.topics++;else ar.books++}st.arch=ar;Store.set('stats',st)}
 function removePlan(k){const pl=Store.get(k);if(!pl)return;archivePlan(pl);Store.del(k);if(S.build.planKey===k)S.build.planKey=null}
 async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert();const s=settings();let prompt,meta,key;
-  if(B.mode==='chapter'||B.mode==='verses'){const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
+  if(B.mode==='chapter'||B.mode==='verses'){if(isSimple())B.parts={context:true,hl:true,margin:true,xrefs:false,words:false,soap:false};const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
     const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;const keys=[];
     if(B.parts.context)keys.push('"context": {"heading": "short title to write above the chapter (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "who it was first written to (few words)", "setting": "when/where and what is happening (max 15 words)", "background": ["2-4 short historical or cultural facts a modern reader would miss (max 15 words each)"]}');
     if(B.parts.hl)keys.push(`"highlights": [{"v": "verse number or range like 3-5", "color": "one color code from the color key", "quote": "opening words of the verse (max 10 words)", "why": "one sentence: why highlight it and why that color"}] — the 5-10 most important verses`);
@@ -2171,7 +2212,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   clearDone:()=>{const fin=loadPlans().filter(pl=>planProg(pl).done);confirmSheet(`Remove ${fin.length} finished loading${fin.length===1?'':'s'} from your list? Your badges and stats are kept.`,'Remove',()=>{fin.forEach(pl=>removePlan(pl.key));toast('Finished loadings removed');renderView()})},
   tick:el=>{const k=el.dataset.k||S.build.planKey;const pl=Store.get(k);if(!pl)return;const ch=Object.assign({},pl.checks);ch[el.dataset.i]=!ch[el.dataset.i];if(ch[el.dataset.i])touch();
     if(pl.kind==='chapter'&&!pl.v1){const it=planItems(pl);if(it.every(x=>ch[x.id])&&!isRead(pl.b,pl.c))toggleRead(pl.b,pl.c)}
-    Store.set(k,Object.assign({},pl,{checks:ch}))},
+    Store.set(k,Object.assign({},pl,{checks:ch}));if(ch[el.dataset.i]){const it=planItems(pl);if(it.length&&it.every(x=>ch[x.id]))confetti(`🎉 ${planTitle(pl)} is fully loaded!`)}},
   copyPlan:el=>{const pl=Store.get(el.dataset.k||S.build.planKey);const it=planItems(pl);let g=null;
     copyText(`Load my Bible — ${planTitle(pl).replace(/^\S+\s/,m=>/\p{Emoji}/u.test(m)?'':m)}\n`+it.map(x=>{let s='';if(x.group!==g){g=x.group;s+=`\n${g.replace(/^\S+\s/,'')}\n`}return s+`${(pl.checks||{})[x.id]?'[x]':'[ ]'} ${x.text}`}).join('\n'))},
   planOnline:el=>planOnline(Store.get(el.dataset.k||S.build.planKey)),
@@ -2313,6 +2354,38 @@ function showIncomingShare(){const raw=S.pendingShare;if(!raw)return;S.pendingSh
 /* ===== ↩️ UNDO ===== */
 function undoToast(msg,fn){let u=$('#undobar');if(!u){u=document.createElement('div');u.id='undobar';document.body.appendChild(u)}u.innerHTML=`<span class="grow">${esc(msg)}</span><button>Undo</button>`;u.classList.add('show');
   u.querySelector('button').onclick=()=>{fn();u.classList.remove('show');toast('Restored ↩️')};clearTimeout(S._undoT);S._undoT=setTimeout(()=>u.classList.remove('show'),5000)}
+/* ===== 📴 OFFLINE BAR ===== */
+function offlineBar(){let b=$('#offbar');if(navigator.onLine!==false){if(b)b.remove();return}if(!b){b=document.createElement('div');b.id='offbar';document.body.appendChild(b)}b.textContent='📴 You’re offline. Reading, notes and checklists still work. AI needs internet. Everything saves when you’re back online.'}
+/* ===== 🎉 CONFETTI ===== */
+function confetti(msg){const box=document.createElement('div');box.className='confetti';const cols=['#e57d5a','#f2c14e','#5f8a65','#2a8aa8','#a07ce0','#d45d7f','#8b2e24'];
+  for(let i=0;i<46;i++){const c=document.createElement('i');c.style.left=Math.random()*100+'%';c.style.background=cols[i%cols.length];c.style.animationDelay=(Math.random()*.4)+'s';c.style.animationDuration=(1.2+Math.random()*.9)+'s';c.style.transform=`rotate(${Math.random()*360}deg)`;box.appendChild(c)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),2600);if(msg)toast(msg)}
+/* ===== 🌱 SIMPLE ===== */
+const isSimple=()=>!!settings().simple;
+/* ===== ＋ QUICK ADD ===== */
+const QADD=[['req','🙏','Prayer request','What do you want to pray for?'],['thx','🙌','Thank-you','What are you thankful for?'],['note','✍️','Quick journal note','What’s on your heart?'],['vnote','📌','Note on a verse','Which verse, and what do you want to remember?'],['mem','🧠','Memory verse','Which verse do you want to learn?']];
+function quickSheet(k){const q=k&&QADD.find(x=>x[0]===k);
+  if(!q){openSheet(`<h3>＋ Quick add</h3><p class="small muted">Add something in a few seconds.</p>${QADD.map(([k,e,l,d])=>`<button class="savecard" data-act="qPick" data-k="${k}"><span>${e}</span><div><b>${l}</b><small>${d}</small></div></button>`).join('')}`);return}
+  const refIn=['vnote','mem'].includes(k)?`<input class="f" id="qRef" placeholder="e.g. Psalm 46:10">`:'';const txt=k==='mem'?'':`<textarea class="f" id="qTxt" style="min-height:90px" placeholder="${esc(q[3])}"></textarea>`;
+  openSheet(`<h3>${q[1]} ${q[2]}</h3>${refIn}${txt}<div class="row" style="margin-top:10px"><button class="btn grow" data-act="qPick" data-k="">← Back</button><button class="btn pri grow" data-act="qSave" data-k="${k}">💾 Save</button></div>`);setTimeout(()=>{const f=$('#qRef')||$('#qTxt');if(f)f.focus()},150)}
+/* ===== 📘 GUIDE ===== */
+function guideSheet(){openSheet(`<h3>📘 Guide</h3><p class="small muted">How everything works. Tap “Show me” and the app takes you there.</p>
+  ${COACH.map((c,i)=>c.sel===null?'':`<details class="guidei"><summary>${c.t}</summary><p>${c.p}</p><button class="btn sm" data-act="coachGo" data-i="${i}">Show me →</button></details>`).join('')}
+  <h3 style="font-size:19px;margin-top:16px">❓ Questions</h3>
+  ${[['Where is my stuff saved?',STANDALONE?'Online with your Bible code, and also on this phone. Use your code on any device to open the same Bible. Make a backup in My Account to be extra safe.':'In your Claude account. Make a backup in My Account to be extra safe.'],
+     ['Does it work without internet?','Yes. Reading the KJV, your notes, journal and checklists all work offline. AI buttons need internet. Changes are saved as soon as you’re back online.'],
+     ['How do I put the app on my home screen?','iPhone: open the website in Safari, tap the Share button, then “Add to Home Screen”. Android: tap ⋮ in Chrome, then “Add to Home screen”.'],
+     ['What is the main key?','Your color key: which highlighter color means what. Load, Study and the Online Bible all use it. Change it in Bible Kit › Tabs › Topics.'],
+     ['What is Simple mode?','A calmer version with bigger text, fewer buttons and easier words. Turn it on or off in My Account.'],
+     ['Can I use it for more than one Bible?','Yes. In Bible Kit › Projects you can make a project for each Bible. Each one has its own key, loadings, inserts and pages.']].map(([q,a])=>`<details class="guidei"><summary>${q}</summary><p>${a}</p></details>`).join('')}
+  <button class="btn pri wide" style="margin-top:12px" data-act="tourAgain">▶ Start the full tour</button>`)}
+/* ===== 🎨 SHARE STYLES ===== */
+const SHARE_STYLES=[['theme','🎨','My theme'],['soft','🌸','Soft'],['paper','📜','Paper'],['dark','🌙','Night']];
+function shareStyleColors(st){const cs=getComputedStyle(document.documentElement);const C=k=>cs.getPropertyValue(k).trim()||'#888';
+  return {theme:{bg:[C('--paper'),C('--paper')],card:C('--card'),accent:C('--accent'),ink:C('--ink'),muted:C('--muted')},
+    soft:{bg:['#ffd9c7','#d9c9f5'],card:'rgba(255,255,255,.82)',accent:'#c8577a',ink:'#3b2a3a',muted:'#8a7186'},
+    paper:{bg:['#e9dcc0','#d8c6a0'],card:'#fbf6ea',accent:'#8b2e24',ink:'#2a2018',muted:'#8a7558'},
+    dark:{bg:['#0f1626','#1d1430'],card:'#18213a',accent:'#d9b46a',ink:'#f2ead8',muted:'#a9a3b8'}}[st]}
 /* ===== 🏠 TODAY ===== */
 function dayIdx(n){return n?Math.floor(Date.now()/864e5)%n:0}
 function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().getHours();const hi=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
@@ -2327,10 +2400,10 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
   else reading=`<div class="tcard"><div class="th"><span>📅</span><b class="grow">Read every day</b></div><p class="small muted" style="margin:4px 0 8px">Pick a reading plan and it shows up here every day.</p><button class="btn sm pri" data-act="goKit" data-s="plans">Choose a reading plan →</button></div>`;
   // memory
   const ml=memList();const todo=ml.filter(x=>!x.learned);const mv=(todo.length?todo:ml)[dayIdx((todo.length?todo:ml).length)];
-  const mem=mv?`<div class="tcard"><div class="th"><span>🧠</span><b class="grow">Memory verse</b><span class="small muted">${ml.filter(x=>x.learned).length}/${ml.length} learned</span></div>
+  const mem=mv?`<div class="tcard tmem"><div class="th"><span>🧠</span><b class="grow">Memory verse</b><span class="small muted">${ml.filter(x=>x.learned).length}/${ml.length} learned</span></div>
     <h3 style="margin:6px 0 2px;font-size:21px">${esc(codeToLabel(mv.ref))}</h3>${S.tMemShow?`<p class="tverse">${esc(kjvText(mv.ref)||'…')}</p>`:`<p class="small muted" style="margin:2px 0 6px">Say it out loud, then check.</p>`}
     <div class="row">${S.tMemShow?'':`<button class="btn sm grow" data-act="tMem">👁 Show it</button>`}<button class="btn sm grow" data-act="goKit" data-s="memory">🧠 Practice all</button></div></div>`
-    :`<div class="tcard"><div class="th"><span>🧠</span><b class="grow">Memory verse</b></div><p class="small muted" style="margin:4px 0 8px">Save a verse to learn by heart. Today’s verse is a good start!</p><button class="btn sm" data-act="memAddRef" data-r="${vref}">＋ Learn ${esc(codeToLabel(vref))}</button></div>`;
+    :`<div class="tcard tmem"><div class="th"><span>🧠</span><b class="grow">Memory verse</b></div><p class="small muted" style="margin:4px 0 8px">Save a verse to learn by heart. Today’s verse is a good start!</p><button class="btn sm" data-act="memAddRef" data-r="${vref}">＋ Learn ${esc(codeToLabel(vref))}</button></div>`;
   // prayer
   const prs=Store.list('j_').filter(e=>e.type==='prayed');const fav=prs.filter(e=>e.fields.fav);const pr=(fav.length?fav:prs)[dayIdx((fav.length?fav:prs).length)];const reqs=Store.list('j_').filter(e=>e.type==='prayer'&&!(e.fields||{}).answered).length;
   const pray=`<div class="tcard"><div class="th"><span>🙏</span><b class="grow">Pray today</b>${reqs?`<a class="small" data-act="jOpen" data-s="list">${reqs} request${reqs===1?'':'s'} →</a>`:''}</div>
@@ -2340,7 +2413,9 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
   const open=loadPlans().map(pl=>({pl,pp:planProg(pl)})).filter(r=>!r.pp.done&&r.pp.total)[0];
   const cont=open?`<div class="tcard"><div class="th"><span>🖍</span><b class="grow">Keep loading</b><span class="small muted">${open.pp.dn}/${open.pp.total} steps</span></div><b style="font-family:var(--serif);font-size:18px">${esc(planTitle(open.pl))}</b><div class="prog" style="margin:6px 0 8px"><i style="width:${open.pp.pct}%"></i></div><button class="btn sm pri" data-act="tContinue" data-k="${open.pl.key}">Continue →</button></div>`:'';
   const codeNag=STANDALONE&&Code.value&&!settings().codeOk?`<div class="tcard warn"><div class="th"><span>🔑</span><b class="grow">Save your Bible code!</b></div><p class="small" style="margin:4px 0 8px">It’s the only way to get your progress back on another phone. Screenshot it or write it in the back of your Bible.</p><div class="bigcode small-code" style="margin:0 0 8px">${esc(Code.value)}</div><div class="row"><button class="btn sm pri grow" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm grow" data-act="codeOk">✓ I saved it</button></div></div>`:'';
-  v.innerHTML=`<div class="todayhead"><div class="grow"><div class="small muted">${new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div><h2>${hi}${nm?', '+esc(nm):''}!</h2></div><div class="tstreak"><b>🔥 ${st.streak}</b><span>day streak</span></div></div>
+  const tod=h<5||h>=21?'night':h<12?'morning':h<18?'day':'evening';const tico={night:'🌙',morning:'🌅',day:'☀️',evening:'🌇'}[tod];
+  v.innerHTML=`<div class="todayhead tod-${tod}"><div class="grow"><div class="small">${tico} ${new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div><h2>${hi}${nm?', '+esc(nm):''}!</h2><div class="small" style="opacity:.8">${esc(['A little time with God changes the whole day.','His mercies are new every morning.','Your Word is a lamp to my feet.','Be still, and know that I am God.','Grab your Bible, He has something for you today.'][dayIdx(5)])}</div></div><div class="tstreak"><b>🔥 ${st.streak}</b><span>day streak</span></div></div>
+   ${isSimple()?`<div class="simplebar">🌱 Simple mode is on <button class="btn sm" data-act="simpleToggle">Turn off</button></div>`:''}
    <button class="todaysearch" data-act="search"><span>🔍</span>Search your notes, prayers, studies…</button>
    <div class="tgoal"><span class="small"><b>Today:</b> ${Math.min(st.today,goal)}/${goal} things done</span><div class="prog grow"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div></div>
    ${codeNag}
@@ -2350,8 +2425,9 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
    ${reading}${cont}${pray}${mem}
    <div class="tcard"><div class="th"><span>🙌</span><b class="grow">One thing I’m thankful for</b></div><div class="row" style="margin-top:6px"><input class="f grow" id="tGrat" placeholder="Today I’m thankful for…" style="margin:0"><button class="btn sm pri" data-act="tGratSave">Save</button></div></div>
    <div class="tquick"><button data-act="tab" data-tab="load"><span>🖍</span>Load a chapter</button><button data-act="tab" data-tab="study"><span>🔎</span>Study</button><button data-act="jOpen" data-s="write"><span>✍️</span>Write</button><button data-act="tab" data-tab="online"><span>📖</span>Read</button></div>
-   <button class="tcard maplink" data-act="goKit" data-s="books"><span style="font-size:26px">🗺️</span><div class="grow" style="text-align:left"><b>My Bible map</b><div class="small muted">See how loaded your Bible is, book by book</div></div><span>›</span></button>
-   <p class="small muted" style="text-align:center;margin:14px 0 4px"><a data-act="tourAgain" style="cursor:pointer;text-decoration:underline">Show me around the app</a></p>`;
+   <button class="fab" id="qadd" data-act="qadd" aria-label="Quick add">＋</button>
+   <button class="tcard maplink tmap" data-act="goKit" data-s="books"><span style="font-size:26px">🗺️</span><div class="grow" style="text-align:left"><b>My Bible map</b><div class="small muted">See how loaded your Bible is, book by book</div></div><span>›</span></button>
+   <div class="row" style="justify-content:center;gap:8px;margin:14px 0 4px"><button class="btn sm" data-act="guide">📘 Guide</button><button class="btn sm" data-act="tourAgain">▶ Tour</button></div>`;
   const gi=$('#tGrat',v);if(gi)gi.addEventListener('keydown',e=>{if(e.key==='Enter')A.tGratSave()})}
 /* ===== 🖨️ PRINT ===== */
 const PSIZES=[['card','🗒️ Index card','3 × 5 in','76mm 127mm'],['bookmark','🔖 Bookmark','2 × 6 in','51mm 152mm'],['half','📃 Half page','A6','105mm 148mm'],['full','📄 Full page','A5','148mm 210mm']];
@@ -2376,9 +2452,10 @@ function pagePrintHtml(C){return `${C.subtitle?`<div class="small">${esc(C.subti
   ${(C.sections||[]).map(x=>`<h2>${esc(x.heading||'')}</h2>${(x.lines||[]).map(l=>/^_{3,}$/.test(String(l).trim())?'<div class="line"></div>':`<p style="text-align:center">${esc(String(l).replace(/\*\*/g,''))}</p>`).join('')}`).join('')}${C.footer?`<p class="verse">${esc(C.footer)}</p>`:''}`}
 const mdPrint=(title,ref,text)=>`<h1>${esc(title||'')}</h1>${ref?`<div class="small">${esc(ref)}</div>`:''}${md(text||'')}`;
 /* ===== 📤 SHARE AS IMAGE ===== */
-async function shareImage(o){const cs=getComputedStyle(document.documentElement);const C=k=>cs.getPropertyValue(k).trim()||'#888';
+function shareImage(o){S._shareO=o;openSheet(`<h3>📤 Share as a picture</h3><p class="small muted">Pick a look:</p><div class="sharestyles">${SHARE_STYLES.map(([k,e,l])=>{const c=shareStyleColors(k);return `<button data-act="shareStyle" data-s="${k}"><span class="ssprev" style="background:linear-gradient(160deg,${c.bg[0]},${c.bg[1]})"><i style="background:${c.card}"><b style="background:${c.accent}"></b><u style="background:${c.ink}"></u><u style="background:${c.ink};width:50%"></u></i></span>${e} ${l}</button>`}).join('')}</div>`)}
+async function renderShare(o,stl){const P=shareStyleColors(stl||'theme');const C=k=>({'--paper':P.bg[0],'--card':P.card,'--accent':P.accent,'--ink':P.ink,'--muted':P.muted})[k];
   const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
-  g.fillStyle=C('--paper');g.fillRect(0,0,W,H);g.fillStyle=C('--card');const r=40,x0=70,y0=90,w0=W-140,h0=H-200;g.beginPath();g.moveTo(x0+r,y0);g.arcTo(x0+w0,y0,x0+w0,y0+h0,r);g.arcTo(x0+w0,y0+h0,x0,y0+h0,r);g.arcTo(x0,y0+h0,x0,y0,r);g.arcTo(x0,y0,x0+w0,y0,r);g.closePath();g.fill();
+  const grd=g.createLinearGradient(0,0,W,H);grd.addColorStop(0,P.bg[0]);grd.addColorStop(1,P.bg[1]);g.fillStyle=grd;g.fillRect(0,0,W,H);g.fillStyle=C('--card');const r=40,x0=70,y0=90,w0=W-140,h0=H-200;g.beginPath();g.moveTo(x0+r,y0);g.arcTo(x0+w0,y0,x0+w0,y0+h0,r);g.arcTo(x0+w0,y0+h0,x0,y0+h0,r);g.arcTo(x0,y0+h0,x0,y0,r);g.arcTo(x0,y0,x0+w0,y0,r);g.closePath();g.fill();
   g.fillStyle=C('--accent');g.fillRect(x0,y0,w0,16);
   const serif='Georgia, "Times New Roman", serif';g.textAlign='center';let y=y0+130;
   if(o.kicker){g.fillStyle=C('--accent');g.font=`700 30px system-ui, sans-serif`;g.fillText(o.kicker.toUpperCase(),W/2,y);y+=70}
@@ -2396,23 +2473,37 @@ function restoreFrom(text){let d;try{d=JSON.parse(text)}catch(e){toast('That isn
   const keys=Object.keys(d.items).filter(isItemKey);confirmSheet(`Restore ${keys.length} items from ${d.at?new Date(d.at).toLocaleDateString():'this backup'}? Things with the same name are replaced; everything else stays.`,'⬆️ Restore',()=>{keys.forEach(k=>Store.set(k,d.items[k]));closeSheet();toast(`Restored ${keys.length} items ✓`);renderView()})}
 /* ===== 👋 TOUR ===== */
 const COACH=[
- {tab:'today',sel:'.votdc',t:'☀️ Start every day here',p:'This is <b>Today</b>. Your verse of the day, today’s reading, a prayer and your memory verse are waiting here every morning.',act:['🧠 Learn this verse by heart','coachMem']},
- {tab:'load',sel:'.modegrid',t:'🖍 Load your paper Bible',p:'Pick a chapter, verses, a feeling or a whole book. You get a to-do list of exactly what to <b>highlight</b>, <b>write</b> and <b>tab</b> in your paper Bible.',act:['✨ Set up John 3:16 for me','coachLoad']},
- {tab:'study',sel:'.studytabs',t:'🔎 Understand what you read',p:'Quick help, full study methods (like S.O.A.P.) or ask any question. Then put it in your physical or online Bible.'},
- {tab:'tabs',sel:'.kseg',t:'🧰 Your Bible Kit',p:'Topic tabs and colors, inserts, the page maker, reading plans, memory verses and your 🗺️ Bible map.',act:['📅 Pick a reading plan','coachPlan']},
- {tab:'journal',sel:'.jseg',t:'✏️ Pray & write',p:'Let a prayer be written with you in your own style, keep a prayer list, write freely and say thank you.',act:['🙌 Write one thank-you now','coachThanks']},
- {tab:'online',sel:'.readerbar',t:'📖 Read & listen',p:'Read the Bible here. Tap 🎧 to listen to the chapter. Everything you add shows up right next to the verse.'},
- {tab:'today',sel:null,t:'🎉 You’re ready!',p:'Grab your Bible, a fine pen and a highlighter. Tip: tap 🔎 at the top to search everything you made.'}];
+ {tab:'today',sel:'.todayhead',t:'☀️ Today',p:'Your daily start. Every day you get a verse, your reading, a prayer and a memory verse here. Your 🔥 streak grows every day you do something.'},
+ {tab:'today',sel:'.todaysearch',t:'🔍 Search everything',p:'Find any note, prayer, study, page or insert you ever made. The 🔍 Search button at the top works on every screen.'},
+ {tab:'today',sel:'#qadd',t:'＋ Quick add',p:'Add a prayer request, a thank-you, a note or a memory verse in a few seconds, without searching through tabs.'},
+ {tab:'today',sel:'.votdc',t:'📖 Verse of the day',p:'🔊 listen, 🎲 another verse, ✨ load it in your Bible or 📤 share it as a pretty picture.',act:['🧠 Learn this verse by heart','coachMem']},
+ {tab:'load',sel:'.modegrid',t:'🖍 Load: step 1',p:'Choose what to load: a chapter, a few verses, a feeling, a whole book, a study note, a life application or inserts.'},
+ {tab:'load',pre:()=>{S.build.mode='chapter'},sel:'.partgrid,.howto',t:'🖍 Load: steps 2 and 3',p:'Pick the passage and what you want to add (heading, highlights, notes, cross-references…). Then tap ✨ Show me how.',act:['✨ Set up John 3:16 for me','coachLoad']},
+ {tab:'load',sel:'#planList,.plan,[data-act=bGo]',t:'✅ Your to-do list',p:'You get a checklist for your paper Bible. Tick each step when you’ve done it. 💡 Explain and 📖 In depth teach you more, 🔄 gives a new idea, and notes can be margin, sticky note or half page size.'},
+ {tab:'study',sel:'.studytabs,.toolgrid',t:'🔎 Study',p:'Type a passage, then pick quick help, a full study method (like S.O.A.P.) or ask a question.'},
+ {tab:'study',sel:'.toolgrid',t:'🖊️ After a study',p:'Every study gets 🖊️ Put in physical Bible (a checklist to tick off), 📖 Put in online Bible and 💾 Save to… your notes, journal or an insert card.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='key';S.keySet='main'},sel:'.keyhead',t:'⭐ Your main key',p:'Your color key: which highlighter color means what. Load, Study and the Online Bible all use it. Generate new key sets and make any of them your main key.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='books'},sel:'.mgrid',t:'📚 Books',p:'Every book of the Bible, filling up with color as you load. Tap a book to tick off chapters you’ve already done.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='inserts'},sel:'#loadedBody',t:'🗂️ Inserts',p:'Cards and pages to tuck into your Bible, sorted in folders. Print them, send them to a friend, or follow 🖊️ Physical Bible to glue them in.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='cover';S.pmView='make'},sel:'.modegrid',t:'📄 Page maker',p:'Make any page: your first page, a prayer page, a topic page, a timeline and more. Save it, print it, or copy it in by hand.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='plans'},sel:'#loadedBody',t:'📅 Reading plans',p:'Pick a plan and read a little every day. Today shows what to read.',act:['📅 Pick a reading plan','coachPlan']},
+ {tab:'tabs',pre:()=>{S.loadedSub='projects'},sel:'#loadedBody',t:'📚 Projects',p:'Loading more than one Bible? Make a project for each one, with its own key, loadings, inserts and pages.'},
+ {tab:'journal',pre:()=>{S.jSub='pray'},sel:'.jseg',t:'🙏 Pray',p:'Pick what’s on your heart and a style, and a prayer is written with you. Set ⭐ My style so it starts and ends the way you pray.'},
+ {tab:'journal',pre:()=>{S.jSub='list'},sel:'.jhead',t:'📋 Requests & answers',p:'Keep a prayer list. Tap ✓ Answered when God answers and write down how. Look back at all your answered prayers.'},
+ {tab:'journal',pre:()=>{S.jSub='grat'},sel:'.jseg',t:'✏️ More in Journal',p:'Thanks, free writing, a calendar, faith goals, testimonies and sermon notes. Everything also shows in your Timeline.',act:['🙌 Write one thank-you now','coachThanks']},
+ {tab:'online',pre:()=>{S.onlineSub='read'},sel:'.readerbar',t:'📖 Online Bible',p:'Read here. Tap a verse to highlight it, write a note, bookmark it or add it to a topic. 🎧 Listen reads the chapter out loud.'},
+ {tab:'account',sel:'#backupCard',t:'👤 My Account',p:'Your profile, looks (themes), badges, your Bible code, 💾 backups and 🌱 Simple mode live here.'},
+ {tab:'today',sel:null,t:'🎉 You’re ready!',p:'Grab your Bible, a fine pen and a highlighter. Lost? Tap 📘 Guide at the bottom of Today any time.'}];
 function showTour(){const pf=profile();openSheet(`<div class="tour"><div class="tourwave">👋</div><h3>Welcome to Loaded Bible</h3><p>Let’s fill your paper Bible with what God teaches you, one step at a time.</p>
   <label class="l" style="text-align:left">What should we call you?</label><input class="f" id="twName" maxlength="30" value="${esc(pf.name||'')}" placeholder="Your name">
   <button class="switchrow" data-act="twSimple"><span class="switch ${settings().simple?'on':''}"><i></i></span><span style="text-align:left"><b>Simple mode</b><br><small class="muted">Bigger text and easier words</small></span></button>
   <div class="row" style="margin-top:14px"><button class="btn grow" data-act="tourEnd">Skip</button><button class="btn pri grow" data-act="coachStart">Show me around →</button></div></div>`)}
-function coachShow(i){S.coach=i;const c=COACH[i];closeSheet();if(S.tab!==c.tab)setTab(c.tab);else renderView();
+function coachShow(i){S.coach=i;const c=COACH[i];closeSheet();if(c.pre)try{c.pre()}catch(e){}if(S.tab!==c.tab)setTab(c.tab);else renderView();
   let b=$('#coach');if(!b){b=document.createElement('div');b.id='coach';document.body.appendChild(b)}
-  b.innerHTML=`<div class="tourdots">${COACH.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><h3>${c.t}</h3><p>${c.p}</p>${c.act?`<button class="btn sm coachact" data-act="${c.act[1]}">${c.act[0]}</button>`:''}
+  b.innerHTML=`<div class="row" style="align-items:center"><div class="tourdots grow" style="margin:0">${COACH.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><span class="stepn">${i+1}/${COACH.length}</span></div><h3>${c.t}</h3><p>${c.p}</p>${c.act?`<button class="btn sm coachact" data-act="${c.act[1]}">${c.act[0]}</button>`:''}
    <div class="row" style="margin-top:10px">${i<COACH.length-1?`<button class="btn sm ghost" data-act="tourEnd">Skip tour</button><span class="grow"></span>${i?`<button class="btn sm" data-act="coachGo" data-i="${i-1}">←</button>`:''}<button class="btn sm pri" data-act="coachGo" data-i="${i+1}">Next →</button>`:`<button class="btn pri wide" data-act="tourEnd">Let’s go! 🎉</button>`}</div>`;
   b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(coachHL,120)}
-function coachHL(){$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));if(S.coach==null)return;const c=COACH[S.coach];if(!c||!c.sel)return;const t=$(c.sel);if(t){t.classList.add('coachhl');t.scrollIntoView({behavior:'smooth',block:'center'})}}
+function coachHL(){$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));if(S.coach==null)return;const c=COACH[S.coach];if(!c||!c.sel)return;const t=c.sel.split(',').map(x=>$(x.trim())).find(Boolean);if(t){t.classList.add('coachhl');t.scrollIntoView({behavior:'smooth',block:'center'})}}
 function coachEnd(){S.coach=null;$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));const b=$('#coach');if(b)b.remove()}
 function maybeTour(){if(settings().toured)return;const au=document.querySelector('#auth');if(au&&au.innerHTML.trim()&&getComputedStyle(au).display!=='none')return;saveSettings({toured:true});showTour()}
 /* ===== 🔍 SEARCH ===== */
@@ -2469,10 +2560,10 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
      <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">🚪 Log out</button></div></div>`:''}
 
-   <div class="card"><b>💾 Backup</b><p class="small muted" style="margin:4px 0 8px">Download everything you made into one file. If you ever lose your code or your phone, you can restore it.${settings().lastBackup?' Last backup: '+fmtDate(settings().lastBackup)+'.':''}</p>
+   <div class="card" id="backupCard"><b>💾 Backup</b><p class="small muted" style="margin:4px 0 8px">Download everything you made into one file. If you ever lose your code or your phone, you can restore it.${settings().lastBackup?' Last backup: '+fmtDate(settings().lastBackup)+'.':''}</p>
      <div class="row" style="flex-wrap:wrap"><button class="btn sm pri" data-act="backupDl">⬇️ Download my backup</button><button class="btn sm" data-act="backupCopy">⧉ Copy as text</button><button class="btn sm" data-act="backupRestore">⬆️ Restore</button></div></div>
    <div class="card"><div class="row"><div class="grow"><b>🌱 Simple mode</b><div class="small muted">Bigger text, fewer buttons and easier words. Great for kids or if you’re new to the Bible.</div></div><button class="switch ${settings().simple?'on':''}" data-act="simpleToggle" aria-label="Simple mode"><i></i></button></div></div>
-   <div class="card"><div class="row"><b class="grow">👋 App tour</b><button class="btn sm" data-act="tourAgain">Show me around</button></div></div>
+   <div class="card"><div class="row"><b class="grow">👋 Help</b><button class="btn sm" data-act="guide">📘 Guide</button><button class="btn sm" data-act="tourAgain">▶ Tour</button></div></div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
   const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
   const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
@@ -2820,7 +2911,7 @@ function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24
    <button class="linkbtn" data-act="codeBack">← Back</button>`);
   const i=$('#codeIn2');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
 function codeLost(){Code.clear();Store.disconnect();Store.items.clear();clearLocal();showWelcome('That Bible code wasn’t found. Start fresh or try your code again.')}
-function startCode(){setTimeout(()=>{if(S.pendingShare)showIncomingShare();else maybeTour()},1200);hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
+function startCode(){offlineBar();if(navigator.onLine!==false&&!(navigator.connection&&navigator.connection.saveData))setTimeout(()=>{if(!KJV)loadKJV().catch(()=>{})},9000);setTimeout(()=>{if(S.pendingShare)showIncomingShare();else maybeTour()},1200);hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
 Object.assign(A,{
   codeNew:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Making your code…';
     try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
