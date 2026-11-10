@@ -188,6 +188,10 @@ details.guide .body{padding-bottom:12px;line-height:1.5;font-size:15px}
 .grpacts{gap:6px;margin:4px 0 10px}
 .tick{flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);background:var(--card);color:var(--accent-ink);font-weight:800;font-size:16px;margin-top:1px}
 .step.done .tick{background:var(--accent)}
+.hand.sticky{font-size:20px;line-height:1.5;color:#3a3010;background:#fff2a8;border-radius:3px;padding:14px 14px 16px;box-shadow:0 4px 10px rgba(0,0,0,.12);transform:rotate(-.6deg);margin:8px 2px}
+.hand.half{font-size:19px;line-height:1.65;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:8px 0}
+.readall{border:0;background:none;color:var(--accent);font:inherit;font-weight:700;font-size:13.5px;padding:6px 0 0;cursor:pointer}
+.jfull{margin-top:6px}.jf{margin-top:8px}.jfl{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}.jfb{font-family:var(--serif);font-size:16.5px;line-height:1.55;white-space:normal}
 .hand{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--accent);background:var(--soft);border-radius:8px;padding:4px 9px;margin-top:4px}
 :root[data-theme=light]{
   --paper:#f6efe2; --card:#fffaf0; --ink:#2a2018; --muted:#857561; --line:#e4d8c3;
@@ -990,7 +994,8 @@ const recPaper=k=>{const r=Store.get(k);return r?(r.paper||(r.fields&&r.fields.p
 function setPaper(k,paper){const r=JSON.parse(JSON.stringify(Store.get(k)));if(k.startsWith('j_')){r.fields=r.fields||{};if(paper)r.fields.paper=paper;else delete r.fields.paper}else{if(paper)r.paper=paper;else delete r.paper}Store.set(k,r)}
 function colorFor(name){const m=mainSet();const n=String(name||'').toLowerCase().trim();const t=m&&m.topics.find(t=>t.name.toLowerCase()===n||n.includes(t.name.toLowerCase()));if(t)return t.color;const pc=PALETTE.find(x=>x[1]===n||n.includes(x[1]));return pc?pc[0]:'y'}
 const NSIZES=[['margin','✎ Margin'],['sticky','🗒️ Sticky note'],['half','📄 Half page']];
-const NSPEC={margin:'margin note, max 15 words, handwritable',sticky:'sticky-note note, 25 to 40 words, handwritable',half:'half-page note, 80 to 120 words, for an insert page'};
+const NSPEC={margin:'margin note, max 15 words, handwritable',sticky:'sticky-note note, 40 to 70 words: explain what the verse means and why it matters, in simple words',half:'half-page note, 150 to 220 words in 2 or 3 short paragraphs separated by \\n: what it says, the background and context, and what it means for today. Simple words'};
+const noteHtml=(t,z)=>`<div class="hand ${z&&z!=='margin'?z:''}">${esc(t||'').replace(/\n+/g,'<br><br>')}</div>`;
 const NWHERE={margin:['✎ Write in the margin','Next to','write'],sticky:['🗒️ Write on a sticky note','Stick it next to','write on it'],half:['📄 Write a half-page insert','Tuck it in at','write on it']};
 const sizeChips=(act,k,cur)=>`<div class="sizechips"><span class="small muted">Write notes as:</span>${NSIZES.map(([z,l])=>`<button class="chip ${cur===z?'on':''}" data-act="${act}" data-k="${k}" data-z="${z}">${l}</button>`).join('')}</div>`;
 const PICON={heading:'✍️',highlight:'🖍',margin:'✎',link:'🔗',card:'🗂️',date:'📅'};
@@ -1009,19 +1014,19 @@ function paperBtns(k,kind){return `<div class="row" style="margin-top:10px"><but
 async function makePaper(k,kind,size){size=size||(recPaper(k)||{}).size||'margin';const W=NWHERE[size];S.paperBusy=S.paperBusy||{};S.paperBusy[k]=true;renderView();const r0=Store.get(k);const m=mainSet();
   const colors=m&&m.topics.length?'Their highlighter colors mean: '+m.topics.map(t=>{const pc=PALETTE.find(x=>x[0]===t.color);return (pc?pc[1]:t.color)+' = '+t.name}).join(', ')+'. For "color" use one of these topic names.':'For "color" use a simple color name (yellow, green, blue, pink, orange, purple).';
   let prompt;
-  if(kind==='prayer'){const f=r0.fields||{};prompt=JSYS+`Help someone put this prayer into their PAPER Bible. ${f.ref?'It is based on '+codeToLabel(f.ref)+'.':'Pick one verse it fits best.'} Return JSON: {"verse":"Book chapter:verse","margin":"the prayer shortened for ${size==='margin'?'a Bible margin: max 25 words':size==='sticky'?'a sticky note: 30 to 50 words':'a half-page insert: 80 to 120 words'}, first person","color":"..."}. ${colors}\nThe prayer:\n${(f.body||'').slice(0,3000)}`}
+  if(kind==='prayer'){const f=r0.fields||{};prompt=JSYS+`Help someone put this prayer into their PAPER Bible. ${f.ref?'It is based on '+codeToLabel(f.ref)+'.':'Pick one verse it fits best.'} Return JSON: {"verse":"Book chapter:verse","margin":"the prayer shortened for ${size==='margin'?'a Bible margin: max 25 words':size==='sticky'?'a sticky note: 50 to 80 words':'a half-page insert: 150 to 220 words, 2 or 3 short paragraphs separated by \\n'}, first person","color":"..."}. ${colors}\nThe prayer:\n${(f.body||'').slice(0,3000)}`}
   else prompt=JSYS+`Turn this Bible study into a short checklist for marking a PAPER Bible. Passage: ${r0.refLabel}. ${colors}
 Return JSON: {"heading":"a short heading for the top of the page, max 6 words","steps":[{"type":"highlight","verse":"Book chapter:verse","color":"...","why":"max 8 words"},{"type":"margin","verse":"Book chapter:verse","note":"${NSPEC[size]}"},{"type":"link","verse":"Book chapter:verse","to":"Book chapter:verse","why":"max 6 words"}]}. Give 2-4 highlights, 2-3 margin notes and 1-3 links. Easy words. Only use what the study says.
 The study:\n${(r0.text||'').slice(0,5000)}`;
   try{const r=await ai(prompt,null,null,'default');const j=parseJSON(r.text);const steps=[];const vc=x=>{const p=parseRef(String(x||''));return p?rc(p):''};
     if(kind==='prayer'){const v=vc(j.verse);const f=r0.fields||{};
-      steps.push({type:'margin',verse:v,color:colorFor(j.color),html:`${W[0].replace(/^\S+\s/,'')}: <i>\u201c${esc(j.margin||'')}\u201d</i>`,note:j.margin||''});
+      steps.push({type:'margin',verse:v,color:colorFor(j.color),html:`${W[0].replace(/^\S+\s/,'')}:${noteHtml(j.margin,size)}`,note:j.margin||''});
       steps.push({type:'card',html:'Write the full prayer on a card and tuck it in the back of your Bible (your prayer pages).'});
       steps.push({type:'date',html:`Write today’s date (${new Date().toLocaleDateString()}) next to it. When God answers, add ✓ and the date.`});
       if(!f.ref&&v){const r2=JSON.parse(JSON.stringify(Store.get(k)));r2.fields.ref=v;Store.set(k,r2)}}
     else{if(j.heading)steps.push({type:'heading',verse:'',html:`At the top of the page write: <b>${esc(j.heading)}</b>`,note:j.heading});
       (j.steps||[]).forEach(x=>{const v=vc(x.verse);if(x.type==='highlight')steps.push({type:'highlight',verse:v,color:colorFor(x.color),html:`Highlight it${x.why?' — '+esc(x.why):''}`});
-        else if(x.type==='margin')steps.push({type:'margin',verse:v,html:`${W[0].replace(/^\S+\s/,'')}: <i>${esc(x.note||'')}</i>`,note:x.note||''});
+        else if(x.type==='margin')steps.push({type:'margin',verse:v,html:`${W[0].replace(/^\S+\s/,'')}:${noteHtml(x.note,size)}`,note:x.note||''});
         else if(x.type==='link'){const t=vc(x.to);steps.push({type:'link',verse:v,to:t,html:`Write in the margin: <b>→ ${esc(t?codeToLabel(t):x.to||'')}</b>${x.why?' ('+esc(x.why)+')':''}`,note:x.why||''})}})}
     setPaper(k,{steps,done:{},size,at:Date.now()})}catch(e){toast(aiErr(e))}
   S.paperBusy[k]=false;renderView();setTimeout(()=>{const el=document.getElementById('pl-'+k);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},80)}
@@ -1186,7 +1191,7 @@ function jPray(el){const P=S.pray||(S.pray={topics:[],words:'',ref:'',who:'',sty
   const bind=(id,k)=>{const i=$('#'+id,el);if(i)i.addEventListener('input',e=>{P[k]=e.target.value})};bind('prWords','words');bind('prWho','who');bind('prRef','ref');bind('prEdit','out')}
 function jList(el){const all=Store.list('j_').filter(e=>e.type==='prayer');const open=all.filter(e=>!(e.fields||{}).answered).sort((a,b)=>b.date-a.date);const done=all.filter(e=>(e.fields||{}).answered).sort((a,b)=>(b.fields.answeredAt||b.updated||0)-(a.fields.answeredAt||a.updated||0));
   const row=e=>{const f=e.fields||{};return `<div class="item"><div class="h"><span>${f.answered?'🎉':'🙏'}</span><span class="grow" data-act="editJournal" data-k="${e.key}" style="cursor:pointer">${esc(f.title||'Prayer request')}</span>${f.answered?'':`<button class="iconbtn" data-act="prAnswered" data-k="${e.key}" title="Mark answered">✓ Answered</button>`}<button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Edit">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
-    <div class="small muted">${f.who?'For '+esc(f.who)+' · ':''}since ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}</div>${f.body?`<div class="txt">${esc(f.body.slice(0,160))}</div>`:''}${f.answered&&f.answer?`<div class="txt"><b>How God answered:</b> ${esc(f.answer)}</div>`:''}</div>`};
+    <div class="small muted">${f.who?'For '+esc(f.who)+' · ':''}since ${fmtDate(e.date)}${f.ref?' · '+refA(f.ref,codeToLabel(f.ref)):''}</div>${f.body?(S.jRead===e.key?`<div class="jfull"><div class="jfb">${esc(f.body).replace(/\n/g,'<br>')}</div></div>`:`<div class="txt">${esc(f.body.slice(0,160))}${f.body.length>160?'…':''}</div>`):''}${f.body&&f.body.length>160?`<button class="readall" data-act="jRead" data-k="${e.key}">${S.jRead===e.key?'▴ Show less':'▾ Read all'}</button>`:''}${f.answered&&f.answer?`<div class="txt"><b>How God answered:</b> ${esc(f.answer)}</div>`:''}</div>`};
   el.innerHTML=`${jHead('📋','Prayer requests',`What you\u2019re praying for. Tap ✓ Answered when God answers. ${open.length} praying · ${done.length} answered`,newBtn('newJournal','data-t="prayer"'))}
    ${open.length?open.map(row).join(''):'<div class="empty">No open prayer requests. Tap ＋ New to add one.</div>'}
    ${done.length?`<h3 style="font-size:19px;margin:16px 2px 6px">🎉 Answered</h3>${done.map(row).join('')}`:''}`}
@@ -1237,7 +1242,12 @@ function jSermons(el){const es=Store.list('j_').filter(e=>e.type==='sermon').sor
 function journalItem(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const fb=(f.body||'').trim().split(/\s+/);const title=f.title||(f.ref?codeToLabel(f.ref):'')||(fb[0]?fb.slice(0,6).join(' ')+(fb.length>6?'…':''):'')||t.name;
   const snippet=t.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean).join(' · ').slice(0,180);
   return `<div class="item jitem" data-act="editJournal" data-k="${e.key}"><div class="h"><span>${f.mood||t.icon}</span><span class="grow">${esc(title)}</span><button class="iconbtn" data-act="editJournal" data-k="${e.key}" title="Open">✏️</button><button class="iconbtn" data-act="delItem" data-k="${e.key}" title="Delete">🗑</button></div>
-   <div class="small muted"><span class="tbadge">${esc(t.name)}</span> ${fmtDate(e.date)}${e.type==='prayer'?(f.answered?' · ✓ answered':' · praying'):''}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>${snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}</div>`}
+   <div class="small muted"><span class="tbadge">${esc(t.name)}</span> ${fmtDate(e.date)}${e.type==='prayer'?(f.answered?' · ✓ answered':' · praying'):''}${f.ref&&f.title?' · '+esc(codeToLabel(f.ref)):''}</div>
+   ${S.jRead===e.key?`<div class="jfull" data-act="jRead" data-k="${e.key}">${jFull(e)}</div>`:snippet?`<div class="txt">${esc(snippet)}${snippet.length>=180?'…':''}</div>`:''}
+   ${jHasMore(e)?`<button class="readall" data-act="jRead" data-k="${e.key}">${S.jRead===e.key?'▴ Show less':'▾ Read all'}</button>`:''}</div>`}
+function jFull(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};
+  return t.fields.filter(x=>x[2]!=='check'&&x[0]!=='title'&&f[x[0]]).map(([k,l])=>k==='ref'?`<div class="jf"><div class="jfl">${esc(l)}</div>${refA(f.ref,codeToLabel(f.ref))}</div>`:`<div class="jf"><div class="jfl">${esc(l)}</div><div class="jfb">${esc(String(f[k])).replace(/\n/g,'<br>')}</div></div>`).join('')+(e.type==='goal'&&f.steps&&f.steps.length?`<div class="jf"><div class="jfl">Steps</div>${f.steps.map(x=>`<div>${x.d?'✓':'○'} ${esc(x.t)}</div>`).join('')}</div>`:'')}
+function jHasMore(e){const t=JTYPES[e.type]||JTYPES.reflect;const f=e.fields||{};const all=t.fields.filter(x=>x[2]==='ta').map(x=>f[x[0]]).filter(Boolean);return all.join(' · ').length>=180||all.length>1||(e.type==='goal'&&(f.steps||[]).length)}
 function journalForm(type,key){const t=JTYPES[type];const e=key?Store.get(key):null;const f=(e&&e.fields)||{};
   if(!e&&type==='soap'&&S.sel.size){const s=settings();f.ref=refLabel(s.book,s.ch,selVerses());f.scripture=selText()}
   else if(!e&&(type==='soap'||type==='reflect')){const s=settings();f.ref=refLabel(s.book,s.ch,[])}
@@ -1386,7 +1396,7 @@ const A={
     try{const r=await ai(JSYS+`I’m marking my paper Bible for ${r0.refLabel||((r0.fields||{}).title)||'this passage'}. Give ONE new step that is different from all of these: ${others}. Return JSON: ${spec}.${r0.text?'\nBased on this study:\n'+r0.text.slice(0,3000):''}${r0.fields&&r0.fields.body?'\nThe prayer:\n'+r0.fields.body.slice(0,2000):''}`,null,null,'default');
       const j=parseJSON(r.text);const vc=y=>{const p=parseRef(String(y||''));return p?rc(p):''};const v=vc(j.verse);let ns;
       if(x.type==='highlight')ns={type:'highlight',verse:v,color:colorFor(j.color),html:`Highlight it${j.why?' — '+esc(j.why):''}`};
-      else if(x.type==='margin')ns={type:'margin',verse:v||x.verse,color:x.color,html:`${W[0].replace(/^\S+\s/,'')}: <i>${esc(j.note||'')}</i>`,note:j.note||''};
+      else if(x.type==='margin')ns={type:'margin',verse:v||x.verse,color:x.color,html:`${W[0].replace(/^\S+\s/,'')}:${noteHtml(j.note,size)}`,note:j.note||''};
       else if(x.type==='link'){const t=vc(j.to);ns={type:'link',verse:v,to:t,html:`Write in the margin: <b>→ ${esc(t?codeToLabel(t):j.to||'')}</b>${j.why?' ('+esc(j.why)+')':''}`,note:j.why||''}}
       else ns={type:'heading',verse:'',html:`At the top of the page write: <b>${esc(j.heading||'')}</b>`,note:j.heading||''};
       const P2=JSON.parse(JSON.stringify(recPaper(k)));P2.steps[i]=ns;if(P2.done)delete P2.done[i];if(P2.extra)delete P2.extra[i];S.ppBusy=null;setPaper(k,P2);toast('New one 🔄')}
@@ -1578,6 +1588,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   prEditT:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;P.edit=!P.edit;renderView()},
   prCopy:()=>copyText(S.pray.out.replace(/\*\*/g,'')),
   goNotes:()=>{closeSheet();S.onlineSub='notes';setTab('online');window.scrollTo(0,0)},
+  jRead:el=>{S.jRead=S.jRead===el.dataset.k?null:el.dataset.k;renderView()},
   jOpen:el=>{closeSheet();S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0)},
   jwFresh:()=>{S.jDraft=null;S.jSub='write';renderView()},
   prDiscard:()=>confirmSheet('Throw away this prayer? (It isn’t saved.)','🗑 Throw away',()=>{S.pray.out='';S.pray.edit=false;closeSheet();renderView()}),
@@ -1662,7 +1673,7 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
       add(pl.v1?'✍️ Above the verses':'✍️ Top of the chapter','top',`Write above ${pl.v1?'verse '+pl.v1:'chapter '+c}: <b>“${esc(x.heading||'')}”</b>${x.summary?`<div class="small muted">Optional one-liner: ${esc(x.summary)}</div>`:''}`,`Top of ${nm}: "${x.heading}"`);
       add(pl.v1?'✍️ Above the verses':'✍️ Top of the chapter','ctx',`Write a small context box by verse ${pl.v1||1}: <b>${[x.author&&'By '+x.author,x.audience&&'to '+x.audience].filter(Boolean).map(esc).join(' ')}</b>${x.setting?` · ${esc(x.setting)}`:''}${(x.background||[]).length?`<ul class="small" style="margin:6px 0 0">${x.background.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}`,`Context box by v.1: ${[x.author&&'By '+x.author,x.audience&&'to '+x.audience,x.setting].filter(Boolean).join(' · ')}`)}
     (d.highlights||[]).forEach((x,i)=>add('🖍 Highlight','hl'+i,`${sw(x.color)} Highlight ${vr(x.v)} in <b>${colorWord(x.color)}</b> <span class="small muted">(${esc(colorLabel(okColor(x.color)))})</span>${x.quote?`<div style="font-family:var(--serif);font-size:16.5px">“${esc(x.quote)}”</div>`:''}<div class="small">${esc(x.why||'')}</div>`,`Highlight v.${x.v} ${colorWord(x.color)} — ${x.why||''}`));
-    {const W=NWHERE[pl.size||'margin'];(d.margin||[]).forEach((x,i)=>add(W[0],'mg'+i,`${W[1]} ${vr(x.v)} ${W[2]}:<div class="hand">${esc(x.note||'')}</div>`,`Note v.${x.v}: ${x.note}`))}
+    {const z=pl.size||'margin',W=NWHERE[z];(d.margin||[]).forEach((x,i)=>add(W[0],'mg'+i,`${W[1]} ${vr(x.v)} ${W[2]}:${noteHtml(x.note,z)}`,`Note v.${x.v}: ${x.note}`))}
     (d.xrefs||[]).forEach((x,i)=>add('🔗 Cross-references','xr'+i,`Next to ${vr(x.v)} write: <span class="hand" style="display:inline">${(x.refs||[]).map(y=>esc(y.ref)).join('; ')}</span><div class="small muted">${(x.refs||[]).map(y=>{const p=parseRef(y.ref);return (p?refA(rc(p),y.ref):esc(y.ref))+' — '+esc(y.why||'')}).join('<br>')}</div>`,`v.${x.v} → ${(x.refs||[]).map(y=>y.ref).join('; ')}`));
     (d.words||[]).forEach((x,i)=>add('🔤 Word meanings','wd'+i,`Above <b>“${esc(x.word)}”</b> in ${vr(x.v)} write: <span class="hand" style="display:inline">${esc(x.original||'')} = ${esc(x.meaning||'')}</span>`,`v.${x.v} "${x.word}": ${x.original} = ${x.meaning}`));
     if(d.soap){const x=d.soap;add('📖 S.O.A.P. for your journal','soap',`Copy this into your paper journal (or save it to the app Journal):<p style="margin:6px 0"><b>S</b> ${vr(x.v)} — <span style="font-family:var(--serif)">${esc(x.scripture||'')}</span></p><p style="margin:6px 0"><b>O</b> ${esc(x.observation||'')}</p><p style="margin:6px 0"><b>A</b> ${esc(x.application||'')}</p><p style="margin:6px 0"><b>P</b> <i>${esc(x.prayer||'')}</i></p><button class="btn sm" data-act="bSoap">Save to app Journal</button>`,`S.O.A.P. on v.${x.v}\nS: ${x.scripture}\nO: ${x.observation}\nA: ${x.application}\nP: ${x.prayer}`)}
