@@ -347,7 +347,30 @@ details.grp[open]>summary::after{content:"▴"}
 .praytext{font-family:var(--serif);font-size:17px;line-height:1.55;margin-top:6px;max-height:4.8em;overflow:hidden;position:relative;cursor:pointer;-webkit-mask-image:linear-gradient(#000 55%,transparent)}
 .praytext.open{max-height:none;-webkit-mask-image:none}.praytext p{margin:0 0 .5em}
 .prayitem.fav{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-.howto{font-size:13.5px;line-height:1.45;color:var(--muted);background:var(--soft);border-radius:12px;padding:8px 10px;margin:8px 0}
+.stepl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;margin:14px 2px 8px}.stepl span{display:grid;place-items:center;min-width:24px;height:24px;padding:0 4px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-size:12.5px}.stepl small{font-weight:500;color:var(--muted);font-size:12px}
+.modegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.modecard{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;padding:9px 10px;border-radius:13px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}
+.modecard .me{grid-row:1/3;font-size:22px}.modecard b{font-size:14px;line-height:1.2}.modecard small{font-size:11.5px;color:var(--muted)}
+.modecard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--card));box-shadow:0 0 0 1px var(--accent) inset}
+.partgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.partcard{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:10px;border-radius:13px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}
+.partcard .pe{font-size:20px}.partcard b{font-size:13.5px;display:block}.partcard small{font-size:11.5px;color:var(--muted);line-height:1.3;display:block}
+.partcard .pc{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}
+.partcard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--card))}.partcard.on .pc{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.paperwrap{padding:6px;border-radius:18px;background:linear-gradient(135deg,#d8c7a3,#b99a63);box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.paperpage{background:#fbf6ea;color:#2a2018;border-radius:12px;padding:22px 20px;text-align:center;font-family:var(--serif);outline:1.5px solid #c9a96a;outline-offset:-9px}
+.pp-small{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a7558}
+.pp-name{font-size:30px;font-style:italic;margin:4px 0 6px;color:#2a2018}.pp-blank{color:#b8a888;font-style:italic}
+.pp-orn{color:#b0894a;letter-spacing:.4em;margin:12px 0 4px}
+.pp-h{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8b2e24;margin:16px 0 6px;font-weight:700;font-family:inherit}
+.pp-verse{font-size:17px;line-height:1.5;font-style:italic}.pp-ref{font-style:normal;font-size:13px;color:#8a7558;margin-top:4px}
+.pp-key{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 10px;text-align:left;font-size:14.5px}.pp-key div{display:flex;align-items:center;gap:7px}
+.pp-stroke{display:inline-block;width:26px;height:11px;border-radius:3px 7px 4px 8px;transform:skewX(-12deg);flex:none}
+.pp-line{display:flex;justify-content:space-between;gap:8px;font-size:14.5px;border-bottom:1px dotted #d6c6a4;padding:3px 0;text-align:left}
+.pp-mem{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-size:14px}
+.pp-ded{font-style:italic;font-size:15.5px;line-height:1.55}
+.lifesugg{display:block;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.lifesugg b{display:block;font-size:14px}.lifesugg span{font-size:12.5px;color:var(--muted)}
+.howto{font-size:13.5px;line-height:1.45;color:var(--ink);background:color-mix(in srgb,var(--accent) 8%,var(--card));border-left:4px solid var(--accent);border-radius:10px;padding:8px 11px;margin:8px 0}
 .coverpage{font-family:var(--serif);font-size:16px;line-height:1.6;background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-top:10px}
 .jhead{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:0 0 10px;border-radius:16px;background:var(--soft)}
 .jhead b{font-family:var(--serif);font-size:19px}.jhi{font-size:26px;line-height:1}
@@ -609,7 +632,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s)_/.test(k)||['settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -832,19 +855,50 @@ async function runStudy(tool,refText,question,force){
 }
 
 /* ---------- LOADED BIBLE ---------- */
-const KHELP={key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📖','First page','Copy this onto the first blank page or inside cover of your Bible, so you always know what your colors and symbols mean.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
-function loadedCover(el){const m=mainSet?mainSet():null;const pf=profile();const sy=symList();const ch=chainList();const mem=memList();
-  const lines=[];lines.push('MY LOADED BIBLE'+(pf.name?' — '+pf.name:''),'Started: '+new Date().toLocaleDateString());
-  if(pf.fav)lines.push('','My verse: '+codeToLabel(pf.fav));
-  if(m&&m.topics&&m.topics.length){lines.push('','COLOR KEY');m.topics.forEach(t=>{const pc=PALETTE.find(x=>x[0]===t.color);lines.push(`${pc?pc[1][0].toUpperCase()+pc[1].slice(1):t.color} = ${t.name}`)})}
-  if(sy.length){lines.push('','SYMBOLS');sy.forEach(x=>lines.push(`${x.s}  ${x.m}`))}
-  if(ch.length){lines.push('','VERSE CHAINS (start here)');ch.forEach(c=>lines.push(`${c.title}: start at ${codeToLabel(c.refs[0])}`))}
-  if(mem.length){lines.push('','MEMORY VERSES');mem.forEach(v=>lines.push(codeToLabel(v.ref)))}
-  el.innerHTML=`<div class="coverpage">${lines.map(l=>l===''?'<br>':/^[A-Z ()]+$/.test(l)&&l.length>3||l.startsWith('MY LOADED')?`<b>${esc(l)}</b><br>`:esc(l)+'<br>').join('')}</div>
-   <div class="row" style="margin-top:10px"><button class="btn pri grow" data-act="coverCopy">⧉ Copy it</button></div>
-   <p class="small muted">Want more on it? Add topics in 🏷️ Topics, symbols in ✒️ Symbols, chains in 🔗 Chains and verses in 🧠 Memory. Set your favorite verse in My Account.</p>`;S._cover=lines.join('\n')}
-const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✍️','Write-ins',[['symbols','✒️ Symbols'],['chains','🔗 Chains'],['cover','📖 First page']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
-function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
+const KHELP={key:['🏷️','Topic tabs & colors','Your color key: each topic gets a highlighter color and a tab. Add verses to a topic, then highlight them in that color in your paper Bible.'],books:['📑','Book tabs','Where to put a tab for each book. Tap a book for its theme, key verse and a guide to load it.'],inserts:['🗂️','Inserts','Cards and pages you tuck inside your Bible. Everything you save as an insert lands here, in its own folder.'],symbols:['✒️','Margin symbols','Small pen symbols you draw next to verses so you see at a glance what they’re about.'],chains:['🔗','Verse chains','Verses on one topic that you link together by writing the next reference in the margin.'],cover:['📖','First page','A designed first page for your paper Bible. Make it yours below, then copy it onto the first blank page or inside cover.'],plans:['📅','Reading plans','Read a little every day. Ticking a day marks those chapters as read.'],memory:['🧠','Memory verses','Verses you want to know by heart. Practice them with flip cards.'],progress:['📈','Progress','Which chapters you’ve read. Tap a chapter to mark it.']};
+const COVER_PARTS=[['owner','👤 Name'],['life','💛 Life verse'],['key','🖍 Color key'],['chains','🔗 Chains'],['memory','🧠 Memory verses'],['plan','📅 Reading plan'],['dedication','🙏 Dedication']];
+const coverDoc=()=>Object.assign({show:{owner:1,life:1,key:1,chains:1,memory:1,plan:1,dedication:1},owner:'',started:'',life:'',dedication:''},Store.get('cover')||{});
+function saveCover(p){const c=coverDoc();Store.set('cover',Object.assign(c,p))}
+function coverData(){const c=coverDoc();const pf=profile();const m=mainSet();const rp=Store.get('readplan');const P=rp&&rp.id?RPLANS.find(x=>x[0]===rp.id):null;
+  return {c,owner:c.owner||pf.name||'',started:c.started||todayStr(),life:c.life||pf.fav||'',topics:(m&&m.topics)||[],chains:chainList(),mem:memList(),plan:P?P[2]:''}}
+function coverText(){const d=coverData(),sh=d.c.show,L=[];
+  if(sh.owner)L.push('This Bible belongs to: '+(d.owner||'________'),'Started loading: '+new Date(d.started+'T12:00').toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'}),'');
+  if(sh.life&&d.life){L.push('MY LIFE VERSE',codeToLabel(d.life)+(kjvText(d.life)?' — '+kjvText(d.life):''),'')}
+  if(sh.key&&d.topics.length){L.push('MY COLOR KEY');d.topics.forEach(t=>{const pc=PALETTE.find(x=>x[0]===t.color);L.push(`${pc?pc[1]:t.color} — ${t.name}`)});L.push('')}
+  if(sh.chains&&d.chains.length){L.push('VERSE CHAINS (start here)');d.chains.forEach(ch=>L.push(`${ch.title}: ${codeToLabel(ch.refs[0])}`));L.push('')}
+  if(sh.memory&&d.mem.length){L.push('VERSES I KNOW BY HEART');d.mem.forEach(v=>L.push((v.learned?'✓ ':'○ ')+codeToLabel(v.ref)));L.push('')}
+  if(sh.plan&&d.plan)L.push('READING PLAN: '+d.plan,'');
+  if(sh.dedication&&d.c.dedication)L.push(d.c.dedication);
+  return L.join('\n').trim()}
+function loadedCover(el){const d=coverData(),c=d.c,sh=c.show;const lt=d.life?kjvText(d.life):'';if(d.life&&!lt&&!KJV&&!S.coverKjv){S.coverKjv=1;loadKJV().catch(()=>{}).then(()=>{if(S.loadedSub==='cover')renderView()})}
+  const sec=(k,html)=>sh[k]?html:'';
+  el.innerHTML=`<div class="paperwrap"><div class="paperpage">
+     ${sec('owner',`<div class="pp-small">This Bible belongs to</div><div class="pp-name">${esc(d.owner)||'<span class="pp-blank">your name</span>'}</div><div class="pp-small">Started loading ${new Date(d.started+'T12:00').toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})}</div><div class="pp-orn">✦ ✦ ✦</div>`)}
+     ${sec('life',d.life?`<div class="pp-h">My life verse</div><div class="pp-verse">${lt?'“'+esc(lt)+'”':''}<div class="pp-ref">${esc(codeToLabel(d.life))}</div></div>`:`<div class="pp-h">My life verse</div><div class="pp-blank">Pick one below ↓</div>`)}
+     ${sec('key',d.topics.length?`<div class="pp-h">My color key</div><div class="pp-key">${d.topics.map(t=>`<div><i class="pp-stroke sw-${ck(t.color)}"></i>${esc(t.name)}</div>`).join('')}</div>`:'')}
+     ${sec('chains',d.chains.length?`<div class="pp-h">Verse chains · start here</div>${d.chains.map(ch=>`<div class="pp-line"><span>${esc(ch.title)}</span><b>${esc(codeToLabel(ch.refs[0]))}</b></div>`).join('')}`:'')}
+     ${sec('memory',d.mem.length?`<div class="pp-h">Verses I know by heart</div><div class="pp-mem">${d.mem.map(v=>`<span>${v.learned?'✓':'○'} ${esc(codeToLabel(v.ref))}</span>`).join('')}</div>`:'')}
+     ${sec('plan',d.plan?`<div class="pp-h">Reading plan</div><div class="pp-line"><span>${esc(d.plan)}</span></div>`:'')}
+     ${sec('dedication',c.dedication?`<div class="pp-orn">✦</div><div class="pp-ded">${esc(c.dedication).replace(/\n/g,'<br>')}</div>`:'')}
+   </div></div>
+   <div class="row" style="margin:10px 0"><button class="btn pri grow" data-act="coverCopy">⧉ Copy the text</button></div>
+   <div class="card"><b style="font-family:var(--serif);font-size:18px">✏️ Make it yours</b>
+     <div class="small muted" style="margin:6px 0 4px">Show on the page (tap to turn on/off)</div>
+     <div class="chips">${COVER_PARTS.map(([k,l])=>`<button class="chip ${sh[k]?'on':''}" data-act="coverShow" data-k="${k}">${l}</button>`).join('')}</div>
+     <label class="l">Your name</label><input class="f" id="cvOwner" maxlength="40" value="${esc(c.owner||'')}" placeholder="${esc(profile().name||'Your name')}">
+     <label class="l">Started on</label><input class="f" id="cvStart" type="date" value="${esc(d.started)}">
+     <label class="l">Life verse</label><div class="row"><input class="f grow" id="cvLife" value="${esc(d.life?codeToLabel(d.life):'')}" placeholder="e.g. Jeremiah 29:11"><button class="btn sm" data-act="coverLifeAI">✨ Ideas</button></div>
+     <div id="cvLifeOut">${(S.coverLife||[]).map(x=>`<button class="lifesugg" data-act="coverLifePick" data-r="${esc(x.ref)}"><b>${esc(codeToLabel(x.ref))}</b><span>${esc(x.why||'')}</span></button>`).join('')}</div>
+     <label class="l">Dedication or prayer</label><textarea class="f" id="cvDed" style="min-height:80px" placeholder="e.g. Lord, let this Bible be full of what You teach me.">${esc(c.dedication||'')}</textarea>
+     <button class="btn sm" data-act="coverDedAI" style="margin-top:6px">✨ Fill in for me</button></div>
+   <div class="howto">✍️ <b>Writing it in:</b> sketch it lightly in pencil first, then go over it with a fine Bible-safe pen. Use your real highlighters for the color key strokes.</div>
+   <p class="small muted">The page fills itself from 🏷️ Topics, 🔗 Chains, 🧠 Memory and 📅 Plans, so it grows as you load your Bible.</p>`;
+  S._cover=coverText();
+  const on=(id,fn)=>{const i=$('#'+id,el);if(i)i.addEventListener('change',()=>fn(i.value))};
+  on('cvOwner',v=>saveCover({owner:v.trim()}));on('cvStart',v=>saveCover({started:v}));on('cvDed',v=>saveCover({dedication:v.trim()}));
+  on('cvLife',v=>{const p=parseRef(v);if(v.trim()&&!p){toast('Type a verse like John 3:16');return}saveCover({life:p?rc(p):''})})}
+const KGROUPS=[['tabs','🏷️','Tabs',[['key','🏷️ Topics'],['books','📑 Books'],['inserts','🗂️ Inserts']]],['mark','✍️','Write-ins',[['cover','📖 First page'],['chains','🔗 Chains']]],['habit','📅','Habits',[['plans','📅 Plans'],['memory','🧠 Memory'],['progress','📈 Progress']]]];
+function viewLoaded(v){const sub=['topics','colors'].includes(S.loadedSub)?'key':S.loadedSub==='symbols'?'cover':S.loadedSub;const KG=KGROUPS.find(g=>g[3].some(x=>x[0]===sub))||KGROUPS[0];
   v.innerHTML=`<div class="hero"><h2>🧰 My Bible Kit</h2><p>Set up and keep track of your paper Bible.</p></div>
   <div class="jseg kseg">${KGROUPS.map(([k,e,l])=>`<button class="${KG[0]===k?'on':''}" data-act="kGroup" data-g="${k}"><span>${e}</span> ${l}</button>`).join('')}</div>
   <div class="subtabs">${KG[3].map(([k,l])=>`<button class="${sub===k?'on':''}" data-act="loadedSub" data-s="${k}">${l}</button>`).join('')}</div>
@@ -1278,7 +1332,15 @@ const A={
   /* journal */
   newJournal:el=>journalForm(el.dataset.t),
   editJournal:el=>{const e=Store.get(el.dataset.k);if(!e)return;if(e.type==='goal'){goalSheet(el.dataset.k);return}if(e.type==='reflect'){const f=e.fields||{};S.jDraft={title:f.title||'',ref:f.ref?codeToLabel(f.ref):'',body:f.body||'',mood:f.mood||'',prompt:f.prompt||JPROMPTS[0],key:el.dataset.k};S.jSub='write';if(S.tab!=='journal')setTab('journal');else renderView();window.scrollTo(0,0);return}journalForm(e.type,el.dataset.k)},
-  coverCopy:()=>copyText(S._cover||''),
+  coverCopy:()=>copyText(coverText()),
+  coverShow:el=>{const c=coverDoc();c.show=Object.assign({},c.show,{[el.dataset.k]:!c.show[el.dataset.k]});saveCover({show:c.show})},
+  coverLifePick:el=>{saveCover({life:el.dataset.r});S.coverLife=null;toast('Life verse set 💛')},
+  coverLifeAI:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span>';const m=mainSet();
+    try{const r=await ai(JSYS+`Suggest 5 well-loved Bible verses that work well as a personal "life verse".${m&&m.topics.length?' The person cares about: '+m.topics.map(t=>t.name).join(', ')+'.':''} Return JSON: {"verses":[{"ref":"Book chapter:verse","why":"max 10 easy words"}]}`,null,null,'quick');
+      const d=parseJSON(r.text);S.coverLife=(d.verses||[]).filter(x=>parseRef(String(x.ref))).map(x=>({ref:rc(parseRef(String(x.ref))),why:x.why}));renderView()}catch(e){toast(aiErr(e));el.disabled=false;el.innerHTML='✨ Ideas'}},
+  coverDedAI:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Writing…';const ps=prayStyle();const d=coverData();
+    try{const r=await ai(`Write a short dedication prayer (2 to 3 sentences, first person, simple warm words) for the first page of someone’s Bible that they are filling with notes and highlights.${d.life?' Their life verse is '+codeToLabel(d.life)+'.':''}${ps.open?' Start with "'+ps.open+'".':''}${ps.close?' End with "'+ps.close+'".':''} Output only the prayer.`,null,null,'quick');
+      saveCover({dedication:r.text.trim()});toast('Written. Make it your own ✏️')}catch(e){toast(aiErr(e));el.disabled=false;el.innerHTML='✨ Fill in for me'}},
   kGroup:el=>{const G=KGROUPS.find(g=>g[0]===el.dataset.g);S.kLast=S.kLast||{};const cur=KGROUPS.find(g=>g[3].some(x=>x[0]===S.loadedSub))||KGROUPS[0];S.kLast[cur[0]]=S.loadedSub;S.loadedSub=S.kLast[G[0]]||G[3][0][0];renderView()},
   jGroup:el=>{const G=JGROUPS.find(g=>g[0]===el.dataset.g);S.jLast=S.jLast||{};const cur=jGroupOf(S.jSub||'all');S.jLast[cur[0]]=S.jSub||'all';S.jSub=S.jLast[G[0]]||G[3][0][0];renderView()},
   jSub:el=>{S.jSub=el.dataset.s;if(S.tab!=='journal')setTab('journal');else renderView()},
@@ -1403,6 +1465,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();
 /* ---------- LOAD: guide for marking up a physical Bible ---------- */
 const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depression','Doubt','Shame & guilt','Temptation','Joy','Gratitude','Hope','Patience','Rejection','Stress','Forgiving others','Waiting on God','Courage','Purpose','Marriage','Parenting','Friendship','Money','Sickness','Peace','Salvation','Prayer'];
 const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['soap','📖 S.O.A.P.']];
+const PART_INFO={context:['✍️','Heading & context','A title + short background for the top of the page'],hl:['🖍','What to highlight','Which verses to color, and why'],margin:['✎','Margin notes','Short notes to write next to verses'],xrefs:['🔗','Cross-references','Other verses to link in the margin'],words:['🔤','Word meanings','Key Hebrew & Greek words, explained'],soap:['📖','S.O.A.P.','A short devotion, saved to your Journal']};
+const partsHtml=B=>`<div class="stepl"><span>3</span> What do you want to add? <small>Tap to choose, tap again to remove</small></div><div class="partgrid">${PARTS.map(([k])=>{const i=PART_INFO[k];return `<button class="partcard ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}"><span class="pc">${B.parts[k]?'✓':''}</span><span class="pe">${i[0]}</span><span class="pt"><b>${i[1]}</b><small>${i[2]}</small></span></button>`}).join('')}</div>`;
 S.panel={};S.streams={};S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:true,words:true,soap:true},topic:'',planKey:null,loading:false,err:'',prog:0};
 function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
 function colorKeyText(){const m=mainSet().topics;return m.map(t=>`${okColor(t.color)} (${colorWord(t.color)}) = ${t.name}${t.meaning?' — '+t.meaning:''}`).join('; ')+'. In "color" fields use only these color codes, exactly as written.'}
@@ -1454,6 +1518,7 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
 function loadPlans(){return Store.list('k_').sort((a,b)=>(b.at||0)-(a.at||0))}
 function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
+const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in']];
 const LOAD_HELP={chapter:'Pick a chapter and what you want to add. You get step-by-step what to highlight, write and tab in your paper Bible. Tick off each step. It also goes into your Online Bible.',verses:'Same as a chapter, but just for one verse or a few verses.',topic:'Pick a feeling or topic. You get verses to highlight, where to put a tab, and a chain to write in your margins. Saved to Bible Kit › Topics.',book:'Get a heading for each chapter, what to write on the book’s first page, key verses and where to put the book tab.',snote:'A short note in easy words that explains a passage. Write it in your margin, on a sticky note or on an insert. Saved to Online Bible › My notes.',life:'Turn a passage into something for your own life: what it means for you and one thing to do this week. Saved to My notes or your Journal.',inserts:'Make cards and pages to tuck into your Bible. Saved ones go to Bible Kit › Tabs › Inserts.'};
 const LAPP_AREAS=[['family','👨‍👩‍👧 Family'],['friends','🤝 Friends'],['school','🎒 School or work'],['feelings','💭 Feelings'],['faith','🔥 My faith'],['money','💰 Money'],['habits','⏰ Habits'],['love','❤️ Relationships'],['church','⛪ Church']];
 function lappForm(){const N=S.lapp||(S.lapp={v1:'',v2:'',areas:[],situ:'',size:'card',out:'',busy:false});const B=S.build;
@@ -1485,15 +1550,13 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   const bookOpts=sel=>BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===sel?'selected':''}>${esc(b.name)}</option>`).join('');
   let form='';
   if(B.mode==='chapter')form=`<div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${bookOpts(B.book)}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
-    <label class="l">What do you want to add?</label>
-    <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
+    ${partsHtml(B)}
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}</button>`;
   else if(B.mode==='verses'){const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);form=`<div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${bookOpts(B.book)}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
     <div class="row" style="align-items:flex-end"><div><label class="l">From verse</label><input class="f" id="bV1" type="number" inputmode="numeric" min="1" max="176" value="${v1}" style="width:110px"></div><div><label class="l">To verse</label><input class="f" id="bV2" type="number" inputmode="numeric" min="1" max="176" value="${v2}" style="width:110px"></div></div>
     <p class="small muted" style="margin:6px 2px 0">For one verse, use the same number twice.</p>
     <div class="vpreview" id="vPrev">You're loading <b>${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'–'+v2:''}</b></div>
-    <label class="l">What do you want to add?</label>
-    <div class="chips" style="flex-wrap:wrap">${PARTS.map(([k,l])=>`<button class="chip ${B.parts[k]?'on':''}" data-act="bPart" data-p="${k}">${l}</button>`).join('')}</div>
+    ${partsHtml(B)}
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
   else if(B.mode==='inserts')form=insertForm();
   else if(B.mode==='snote')form=snoteForm();
@@ -1511,8 +1574,10 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   if(B.mode==='life'){setTimeout(()=>bindLapp(v),0)}
   v.innerHTML=`<div class="hero"><h2>Load your Bible</h2><p>Grab your Bible, highlighters and a fine pen. Pick a chapter or a feeling — I'll tell you exactly what to highlight, what to write in the margins and where to put tabs. Tick each step off as you do it.</p></div>
   <div class="card">
-    <div class="chips">${[['chapter','📖 A chapter'],['verses','📌 Verses'],['topic','💭 A feeling or topic'],['book','📚 A whole book'],['snote','📝 Study note'],['life','🌱 Life application'],['inserts','🗂️ Inserts']].map(([k,l])=>`<button class="chip ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="stepl" style="margin-top:0"><span>1</span> What do you want to load?</div>
+    <div class="modegrid">${LOAD_MODES.map(([k,e,l,d])=>`<button class="modecard ${B.mode===k?'on':''}" data-act="bMode" data-m="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div>
     <div class="howto">ℹ️ ${LOAD_HELP[B.mode]||''}</div>
+    ${['chapter','verses','snote','life'].includes(B.mode)?'<div class="stepl"><span>2</span> Which passage?</div>':''}
     ${form}</div>
   <div id="buildOut"></div>
   ${loadingListHtml(plans)}
@@ -1731,7 +1796,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   snSave:()=>{const N=S.snote,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);const vs=a?Array.from({length:Math.min(b-a+1,60)},(_,i)=>a+i):[];
     Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'📝 Study note: '+snRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();notesSaved('📝 Study note: '+snRefLabel())},
   bMode:el=>{S.build.mode=el.dataset.m;S.build.planKey=null;S.build.err='';renderView()},
-  bPart:el=>{const p=el.dataset.p;S.build.parts[p]=!S.build.parts[p];el.classList.toggle('on')},
+  bPart:el=>{const p=el.dataset.p;S.build.parts[p]=!S.build.parts[p];renderView()},
   bFeel:el=>{S.build.topic=el.dataset.f;renderView()},
   bGo:()=>runBuild(),
   openPlan:el=>{S.build.planKey=el.dataset.k;renderView();scrollToPlan(el.dataset.k)},
