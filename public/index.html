@@ -930,7 +930,7 @@ const Cache={
 /* ---------- AI (Claude) ---------- */
 let sampleP=null;
 function getSample(){if(!sampleP)sampleP=waitClaude().then(c=>c?c.use('sample'):null).catch(()=>null);return sampleP}
-async function ai(prompt,onText,signal,tier,img){try{if(/paper Bible|PAPER Bible|physical Bible|hand-write|handwrit|marking a/i.test(prompt)){const bc=bibleCtx();if(bc)prompt+='\n\n'+bc}}catch(e){}if(settings().simple&&!/Output the text of/.test(prompt))prompt='IMPORTANT: The reader is new to the Bible or young. Use very simple, short words and short sentences, and explain any hard word.\n'+prompt;
+async function ai(prompt,onText,signal,tier,img){try{if(/paper Bible|PAPER Bible|physical Bible|hand-write|handwrit|marking a/i.test(prompt)){const bc=bibleCtx();if(bc)prompt+='\n\n'+bc}}catch(e){}if(!/Output the text of/.test(prompt))prompt+=langRule();if(settings().simple&&!/Output the text of/.test(prompt))prompt='IMPORTANT: The reader is new to the Bible or young. Use very simple, short words and short sentences, and explain any hard word.\n'+prompt;
   if(STANDALONE)return aiServer(prompt,onText,signal,tier,img);
   const sample=await getSample();
   if(!sample)throw {code:'unavailable_here',message:'AI features need this page open in Claude.'};
@@ -938,10 +938,12 @@ async function ai(prompt,onText,signal,tier,img){try{if(/paper Bible|PAPER Bible
   if(img){let ok=true;try{if(typeof sample.limits==='function')ok=!!(await sample.limits()).images}catch(e){}if(!ok)throw {code:'no_images',message:'This page isn’t allowed to send photos to Claude yet. Reload the page and try again.'};opts.images=[img.blob]}
   return await sample(prompt,opts);
 }
+function quoteTrans(){let b=null;try{b=curBible()}catch(e){}const bt=b&&b.translation;if(bt)return bt+' (their paper Bible)';const t=settings().trans;return t&&t!=='KJV'?TRANS[t]:'a modern, easy-to-read translation (like the CSB, NIV or ESV)'}
+function langRule(){return '\n\nLANGUAGE (very important): write everything in your own words (notes, margin notes, headings, explanations, answers, prayers, tips) in plain, modern, everyday English that a teenager easily understands. NEVER write in old King James style: no thee, thou, thy, thine, ye, hath, doth, unto, or -eth / -est endings, even when a verse you quote uses them. When you quote a Bible verse, use the wording of '+quoteTrans()+'.'}
 function aiErr(e){if(!e)return 'Something went wrong.';if(e.code==='unavailable_here')return e.message;if(e.code==='not_granted')return 'Claude access was not allowed for this page.';if(e.code==='rate_limited')return 'Too many requests — wait a minute and try again.';if(e.name==='AbortError'||e.code==='aborted')return 'Stopped.';return e.message||'Something went wrong.'}
 
 /* ---------- state ---------- */
-const settings=()=>Object.assign({trans:'KJV',font:20,book:'JHN',ch:1,labels:{}},Store.get('settings')||{});
+const settings=()=>Object.assign({trans:'WEB',font:20,book:'JHN',ch:1,labels:{}},Store.get('settings')||{});
 function saveSettings(p){Store.set('settings',Object.assign(settings(),p))}
 const S={tab:'load',onlineSub:'read',verses:null,loadingCh:false,chErr:'',sel:new Set(),ctrl:null,studyRef:'',study:null,studyCtrl:null,notesFilter:'all',notesColor:'',q:'',loadedSub:'key',flashV:null,bookIntro:{}};
 const progress=()=>(Store.get('progress')||{read:{}}).read||{};
@@ -1048,7 +1050,7 @@ async function loadChapter(allowFetch){if(TTS.on&&TTS.kind==='chapter')ttsStop()
   try{
     for(let round=0;round<4;round++){
       const start=all.length+1;
-      const prompt=`This is for a Bible reading app. ${TRANS[s.trans]} is in the public domain. Output the text of ${b.name} chapter ${s.ch}${start>1?`, starting at verse ${start} and continuing to the end of the chapter`:''}, every verse in order, one per line, formatted exactly as:\n<verse number>|<verse text>\nNo title, no headings, no commentary, no blank lines, no other text.`;
+      const prompt=`This is for a Bible reading app. ${quoteTrans()} is in the public domain. Output the text of ${b.name} chapter ${s.ch}${start>1?`, starting at verse ${start} and continuing to the end of the chapter`:''}, every verse in order, one per line, formatted exactly as:\n<verse number>|<verse text>\nNo title, no headings, no commentary, no blank lines, no other text.`;
       const res=await ai(prompt,txt=>{if(chKey()!==key)return;const part=parse(txt);const merged=all.slice();part.forEach((t,i)=>{if(t)merged[i]=t});if(merged.length){S.verses=merged;renderVerses()}},ctrl.signal,'default');
       lastText=res.text||'';const part=parse(lastText);const before=all.length;part.forEach((t,i)=>{if(t)all[i]=t});
       if(!res.truncated||all.length===before)break;
@@ -1134,7 +1136,7 @@ async function runStudy(tool,refText,question,force){
   if(ck&&!force){const c=await Cache.get('studies',ck);if(c&&c.text){S.study.text=c.text;S.study.loading=false;keepStudy(S.study);updateStudyOut();return}}
   let passage='';const s=settings();
   if(p&&p.b===s.book&&p.c===s.ch&&S.verses?.length){const vs=p.v1?S.verses.slice(p.v1-1,(p.v2||p.v1)):S.verses;if(vs.join(' ').length<9000)passage=`\n\nPassage text (${s.trans}):\n${vs.map((t,i)=>((p.v1||1)+i)+' '+t).join('\n')}`}
-  const prompt=SYS+(question?`Answer this question about ${label}: ${question}`:TL(tool)[3].replace(/\{R\}/g,label).replace(/\{T\}/g,TRANS[s.trans]))+passage;
+  const prompt=SYS+(question?`Answer this question about ${label}: ${question}`:TL(tool)[3].replace(/\{R\}/g,label).replace(/\{T\}/g,quoteTrans()))+passage;
   const ctrl=new AbortController();S.studyCtrl=ctrl;const my=S.study;
   try{const res=await ai(prompt,t=>{if(S.study!==my)return;my.text=t;const b=$('#studyBody');if(b)b.innerHTML=md(t)},ctrl.signal,'default');
     my.text=res.text;my.loading=false;if(ck)Cache.put('studies',ck,{text:res.text,at:Date.now()});keepStudy(my)}
@@ -2283,7 +2285,7 @@ async function regenPart(key,sec,mode,id,simple){const pl=Object.assign({key},St
   else{const n=mode==='item'?1:mode==='more'?5:Math.max(cur.length,3);const one=mode==='item'?JSON.stringify(cur[idIndex(pl,id)]||{}):'';
     ask=`Return JSON: {"items": ${secSchema(pl,sec)}} with exactly ${n} item${n>1?'s':''}. ${mode==='item'&&simple?`Rewrite this one in very simple words for someone who just became a Christian or is new to the Bible: short sentences, everyday words, and explain any church word (like grace, sin, covenant, righteous) in plain words. Same verse and same idea, but a fresh, simpler wording: ${one}. Ignore the rest of the list`:mode==='item'&&S._nsz?`Rewrite this note for the SAME verse at the new length, same meaning but with more explanation if longer: ${one}. Ignore the rest of the list`:mode==='item'?`It replaces this one: ${one}. Pick something different from everything already in the list`:mode==='more'?'Add new ones — do NOT repeat any verse or idea already in the list':'Make a fresh set, different from the current list'}: ${JSON.stringify(cur).slice(0,3500)}`}
   const bk=mode==='item'?key+'|'+id+(simple?'|sregen':'|regen'):null;if(bk)S.itemBusy=bk;else{S.secBusy=key+'|'+sec;S.secMode=mode}renderView();
-  try{const r=await ai(JSYS+`I'm loading ${planPassage(pl)} in my paper Bible (${TRANS[s.trans]}).${pl.v1?` Only use verses ${pl.v1}${pl.v2>pl.v1?'-'+pl.v2:''} of ${BM[pl.b].name} ${pl.c}.`:''}\nMy highlighter color key: ${colorKeyText()}.\n${ask}`,null,null,'default');
+  try{const r=await ai(JSYS+`I'm loading ${planPassage(pl)} in my paper Bible (${quoteTrans()}).${pl.v1?` Only use verses ${pl.v1}${pl.v2>pl.v1?'-'+pl.v2:''} of ${BM[pl.b].name} ${pl.c}.`:''}\nMy highlighter color key: ${colorKeyText()}.\n${ask}`,null,null,'default');
     const d=parseJSON(r.text);
     updatePlan(key,p=>{p.checks=Object.assign({},p.checks);p.extra=Object.assign({},p.extra);
       const clear=ids=>ids.forEach(i=>{delete p.checks[i];delete p.extra[i]});
@@ -2299,7 +2301,7 @@ async function regenPart(key,sec,mode,id,simple){const pl=Object.assign({key},St
 async function itemAI(key,id,mode,force){const pl=Object.assign({key},Store.get(key));const it=planItems(pl).find(x=>x.id===id);if(!it)return;const sk=key+'|'+id;
   S.panel[sk]=mode;const have=((pl.extra||{})[id]||{})[mode];if(have&&!force){renderView();return}
   S.streams[sk+'|'+mode]='';S.itemBusy=sk+'|'+mode;renderView();const s=settings();
-  const what=`"${it.text}" (from loading ${planPassage(pl)}, ${TRANS[s.trans]})`;
+  const what=`"${it.text}" (from loading ${planPassage(pl)}, ${quoteTrans()})`;
   const prompt=mode==='simple'?SYS.replace('450','140')+`Explain this to someone who just became a Christian or is new to the Bible, in 50 to 100 very simple words. Use short sentences. If you use a church word (like grace, sin, covenant or righteous), explain it in plain words. No headings. End with one simple sentence on what it means for their life today. ${what}`:mode==='explain'?SYS.replace('450','140')+`In 60–120 words, briefly explain what this means and its context — no headings, 1–2 short paragraphs: ${what}`
     :SYS+`Give an in-depth study of this: ${what}. Use ## headings: Context, What it means, Key words, Connections in Scripture, Living it out. About 350–450 words.`;
   try{const r=await ai(prompt,t=>{S.streams[sk+'|'+mode]=t;const el=document.getElementById('px-'+cssId(sk));if(el&&S.panel[sk]===mode)el.innerHTML=md(t)},null,mode==='deep'?'default':'quick');
@@ -2342,7 +2344,7 @@ async function runInsert(again){const I=S.ins;const src=again||{type:I.type,size
   const T=INS_TYPES.find(t=>t[0]===src.type);if(!src.subject&&src.type!=='gospel'){toast('Type what the insert is about');$('#insSubj')?.focus();return}
   const Z=INS_SIZES.find(z=>z[0]===src.size);const d=Object.assign({},src,{text:'',loading:true});I.drafts.unshift(d);renderBuildOut();
   $('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'});const s=settings();
-  const prompt=SYS+`Make ${Z[2]} to tuck into a paper Bible. It is ${T[3]}${src.subject?` — about: ${src.subject}`:''}. Quote Scripture from the ${TRANS[s.trans]}.
+  const prompt=SYS+`Make ${Z[2]} to tuck into a paper Bible. It is ${T[3]}${src.subject?` — about: ${src.subject}`:''}. Quote Scripture from the ${quoteTrans()}.
 Start with one "# " title line (max 6 words). Then use short lines, bullet points and Bible references with full book names, so it can be printed or copied by hand. ${again?'Make this version clearly different from earlier ones.':''} No introduction or closing remarks about yourself.`;
   try{const r=await ai(prompt,t=>{d.text=t;if(S.build.mode==='inserts')renderBuildOut()},null,'default');d.text=r.text}catch(e){d.err=aiErr(e)}
   d.loading=false;if(d.text&&!d.err){const k='g_'+newId();Store.set(k,{type:src.type,size:src.size,subject:src.subject,text:d.text,at:Date.now(),saved:false});I.drafts.splice(I.drafts.indexOf(d),1);S.openIns=k}renderBuildOut();if(S.openIns)setTimeout(()=>document.getElementById('gi-'+S.openIns)?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
@@ -2369,7 +2371,7 @@ async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert
     if(B.parts.xrefs)keys.push('"xrefs": [{"v": "verse number", "refs": [{"ref": "Book chapter:verse (full book name)", "why": "max 8 words"}]}] — 4-8 verses with 1-3 well-known cross-references each');
     if(B.parts.words)keys.push('"words": [{"v": "verse number", "word": "the English word as it appears", "original": "Hebrew/Greek transliterated", "meaning": "max 8 words"}] — 2-4 key words');
     if(B.parts.soap)keys.push(`"soap": {"v": "key verse number or range", "scripture": "text of that verse in the ${s.trans}", "observation": "2-3 sentences", "application": "2-3 practical, personal sentences", "prayer": "1-2 sentence prayer"}`);
-    prompt=JSYS+`Show me how to load ${name} in my paper Bible (${TRANS[s.trans]}).${isV?` Only cover verses ${v1}${v2>v1?'-'+v2:''} (use fewer items if the passage is short); the context may describe the surrounding chapter.`:''}\nMy highlighter color key: ${colorKeyText()}.\nReturn a JSON object with exactly these keys:\n${keys.join(',\n')}`;
+    prompt=JSYS+`Show me how to load ${name} in my paper Bible (${quoteTrans()}).${isV?` Only cover verses ${v1}${v2>v1?'-'+v2:''} (use fewer items if the passage is short); the context may describe the surrounding chapter.`:''}\nMy highlighter color key: ${colorKeyText()}.\nReturn a JSON object with exactly these keys:\n${keys.join(',\n')}`;
     key=isV?`k_${B.book}.${B.ch}.${v1}-${v2}`:`k_${B.book}.${B.ch}`;meta=isV?{kind:'chapter',b:B.book,c:B.ch,v1,v2}:{kind:'chapter',b:B.book,c:B.ch};}
   else if(B.mode==='topic'){const t=(B.topic||'').trim();if(!t){toast('Type or pick a feeling or topic');return}
     prompt=JSYS+`I want to make a topic tab in my paper Bible for "${t}" — verses to highlight in one color and chain together in the margins.\nMy highlighter color key: ${colorKeyText()}.\nReturn JSON: {"title": "tab label (1-2 words)", "emoji": "one emoji", "color": "best color code from my key", "intro": "2 sentences on what the Bible says about ${t}, gently and honestly", "verses": [{"ref": "Book chapter:verse or chapter:verse-verse (full book name)", "quote": "short quote from the ${s.trans}, max 15 words", "why": "1-2 sentences: why this verse speaks to ${t}, true to its context", "use": "when to turn to it (max 12 words)"}] (7-10 verses in Bible order, Old and New Testament, never ripped out of context), "prayer": "a short prayer"}`;
@@ -2402,7 +2404,7 @@ Object.assign(A,{
   laGo:async()=>{const N=S.lapp;if(N.busy)return;const s=settings();const ref=laRefLabel();
     const size={margin:'VERY short: max 35 words in total, so it fits in a Bible margin.',card:'short: 60 to 90 words, so it fits on a sticky note.',page:'about 150 to 220 words, for a half-page insert.'}[N.size];
     const areas=N.areas.map(k=>LAPP_AREAS.find(x=>x[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
-    const prompt=`Write a life application of ${ref} (${TRANS[s.trans]||s.trans}) that someone will hand-write in their paper Bible. Use four short parts with bold labels: **What it says** (one sentence), **What it means for me** (personal, first person), **Try this week** (one small, concrete action), **Ask yourself** (one honest question).${areas?' Focus on this part of life: '+areas+'.':''}${N.situ.trim()?' Their situation: '+N.situ.trim()+'.':''} Length: ${size}
+    const prompt=`Write a life application of ${ref} (${quoteTrans()||s.trans}) that someone will hand-write in their paper Bible. Use four short parts with bold labels: **What it says** (one sentence), **What it means for me** (personal, first person), **Try this week** (one small, concrete action), **Ask yourself** (one honest question).${areas?' Focus on this part of life: '+areas+'.':''}${N.situ.trim()?' Their situation: '+N.situ.trim()+'.':''} Length: ${size}
 Use easy, everyday words a 12-year-old understands, short sentences, no hard church words. Be faithful to what the passage really says. Only output the four parts.`;
     N.busy=true;N.out='';renderView();
     try{const r=await ai(prompt,t=>{const o=$('#laOut');if(o)o.innerHTML=md(t)},null,'default');N.out=(r.text||'').trim()}catch(e){toast(aiErr(e))}N.busy=false;renderView()},
@@ -2417,7 +2419,7 @@ Use easy, everyday words a 12-year-old understands, short sentences, no hard chu
   snGo:async()=>{const N=S.snote,B=S.build;if(N.busy)return;const ref=snRefLabel();const s=settings();
     const kind={sum:'a short summary of what happens or what is said',explain:'a simple explanation of what it means (with a little background or context if it helps)',life:'what it means for my life today, with one practical idea',all:'three short parts with bold labels: **What happens**, **What it means**, **For my life**'}[N.kind];
     const size={margin:'VERY short: max 30 words in total, so it fits in a Bible margin. Short phrases are fine.',card:'short: 50 to 80 words, so it fits on a sticky note.',page:'about 150 to 220 words, for a half-page insert. Short paragraphs.'}[N.size];
-    const prompt=`Write a study note on ${ref} (${TRANS[s.trans]||s.trans}) that someone will hand-write in their paper Bible. Write ${kind}. Length: ${size}
+    const prompt=`Write a study note on ${ref} (${quoteTrans()||s.trans}) that someone will hand-write in their paper Bible. Write ${kind}. Length: ${size}
 Use easy, everyday words that a 12-year-old or someone new to the Bible understands. No hard church words; if one is needed (like "grace" or "covenant"), explain it in a few words. Short sentences. Be faithful to the text and accurate. No title, no intro, no extra comments: only the note itself.`;
     N.busy=true;N.out='';renderView();
     try{const r=await ai(prompt,t=>{const o=$('#snOut');if(o)o.innerHTML=md(t)},null,'default');N.out=(r.text||'').trim()}catch(e){toast(aiErr(e))}N.busy=false;renderView()},
@@ -2495,7 +2497,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   loadThisChapter:()=>{const s=settings();Object.assign(S.build,{mode:'chapter',book:s.book,ch:s.ch,planKey:null,err:''});setTab('load');runBuild()},
   genSoap:async()=>{const sh=$('#sheet');const ref=$('[data-f="ref"]',sh).value.trim();if(!ref){toast('Add a Scripture reference first');return}
     const btn=$('[data-act="genSoap"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Writing…';const s=settings();
-    try{const r=await ai(JSYS+`Write a S.O.A.P. devotion on ${ref} (${TRANS[s.trans]}). Return JSON: {"scripture": "the verse text", "observation": "3-4 sentences including its context", "application": "3-4 practical, personal sentences", "prayer": "2-3 sentence prayer"}`,null,null,'default');
+    try{const r=await ai(JSYS+`Write a S.O.A.P. devotion on ${ref} (${quoteTrans()}). Return JSON: {"scripture": "the verse text", "observation": "3-4 sentences including its context", "application": "3-4 practical, personal sentences", "prayer": "2-3 sentence prayer"}`,null,null,'default');
       const d=parseJSON(r.text);const set=(k,v)=>{const i=$(`[data-f="${k}"]`,sh);if(i&&v&&!i.value.trim())i.value=v};set('scripture',d.scripture);set('obs',d.observation);set('app',d.application);set('prayer',d.prayer);toast('Filled in — edit it into your own words')}
     catch(e){toast(aiErr(e))}btn.disabled=false;btn.innerHTML='✨ Generate S.O.A.P. for me'},
   genNote:async()=>{const sh=$('#sheet');const ref=$('#nRef').value.trim();if(!ref){toast('Add a reference first');return}const btn=$('[data-act="genNote"]',sh);btn.disabled=true;btn.innerHTML='<span class="spin"></span> Writing…';
