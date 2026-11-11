@@ -77,22 +77,31 @@ async function ai(request, env) {
   let body; try { body = await request.json(); } catch (e) { return json({ error: 'Bad request' }, 400); }
   const prompt = body && body.prompt;
   if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 30000) return json({ error: 'Bad request' }, 400);
+  if (body.image != null && (typeof body.image !== 'string' || body.image.length > 6000000 || !/^[A-Za-z0-9+/=]+$/.test(body.image))) return json({ error: 'That photo is too big. Try another one.' }, 400);
   return env.ANTHROPIC_API_KEY ? claudeAI(body, env) : freeAI(body, env);
 }
 
 // Free: Cloudflare Workers AI (daily free allowance, resets 00:00 UTC). Output is converted to the same stream format the app reads.
 async function freeAI(body, env) {
   if (!env.AI) return json({ error: 'The free AI isn’t connected yet. Please try again in a few minutes.' }, 503);
-  const model = env.MODEL_FREE || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+  const vision = !!body.image;
+  const model = vision ? (env.MODEL_VISION || '@cf/meta/llama-3.2-11b-vision-instruct') : (env.MODEL_FREE || '@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+  const input = {
+    messages: [
+      { role: 'system', content: 'You are a careful, accurate Bible study assistant. Quote and reference Scripture correctly. Follow the requested output format exactly; when JSON is requested, reply with only valid JSON.' },
+      { role: 'user', content: body.prompt }
+    ],
+    stream: true, max_tokens: body.tier === 'quick' ? 1200 : (vision ? 2048 : 4096)
+  };
+  if (vision) { const bin = atob(body.image); const arr = new Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i); input.image = arr; }
   let stream;
   try {
-    stream = await env.AI.run(model, {
-      messages: [
-        { role: 'system', content: 'You are a careful, accurate Bible study assistant. Quote and reference Scripture correctly. Follow the requested output format exactly; when JSON is requested, reply with only valid JSON.' },
-        { role: 'user', content: body.prompt }
-      ],
-      stream: true, max_tokens: body.tier === 'quick' ? 1200 : 4096
-    });
+    try { stream = await env.AI.run(model, input); }
+    catch (e) {
+      // Meta's vision model needs a one-time license "agree" per account.
+      if (vision && /agree|licen[cs]e|5016/i.test(String((e && e.message) || e))) { await env.AI.run(model, { prompt: 'agree' }).catch(() => {}); stream = await env.AI.run(model, input); }
+      else throw e;
+    }
   } catch (e) {
     const m = String((e && e.message) || e);
     console.log('Workers AI error', m);
@@ -125,7 +134,7 @@ async function claudeAI(body, env) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model, max_tokens: 12000, stream: true, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model, max_tokens: 12000, stream: true, messages: [{ role: 'user', content: body.image ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: body.image } }, { type: 'text', text: prompt }] : prompt }] })
   });
   if (!r.ok) {
     console.log('Anthropic error', r.status, (await r.text()).slice(0, 500));

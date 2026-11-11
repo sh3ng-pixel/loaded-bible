@@ -539,6 +539,39 @@ details.more{margin-top:8px}details.more summary{cursor:pointer;color:var(--mute
 @keyframes rot{to{transform:rotate(360deg)}}
 header.top{flex-wrap:wrap;row-gap:6px}
 @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.menu{padding:4px 6px}
+.mrow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 8px;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-radius:12px}
+.mrow:active{background:var(--soft)}.mrow b{display:block;font-size:16px}.mrow small{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62vw}
+.mrow .grow{min-width:0}.mic{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:20px;background:var(--soft)}
+.mchev{color:var(--muted);font-size:18px;transition:transform .25s;flex:none}
+.menu>*+*{border-top:1px solid var(--line)}
+.mfold.open .mchev{transform:rotate(180deg)}
+.mfold .mbody{padding:0 8px 12px;animation:mfold .3s ease-out}.mfold:not(.open) .mbody{display:none}
+@keyframes mfold{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.mbody>.card,.mbody .mucard{box-shadow:none;margin:6px 0}.msub{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.rhythm .rhsteps{display:flex;align-items:center;margin:10px 4px 2px}
+.rhstep{display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;color:var(--ink);font:inherit;cursor:pointer;flex:none}
+.rhstep span{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--soft);border:2px solid var(--line);transition:all .3s}
+.rhstep small{font-size:12px;font-weight:600;color:var(--muted)}
+.rhstep.on span{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800;animation:pop .4s}
+.rhstep.next span{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+.rhline{flex:1;height:3px;border-radius:3px;background:var(--line);margin:0 6px 18px}.rhline.on{background:var(--accent)}
+.contcard{display:flex;align-items:center;gap:12px;width:100%;font:inherit;color:inherit;cursor:pointer;border:1.5px solid var(--accent)!important}
+.contcard b{display:block;font-family:var(--serif);font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.contcard small{display:block}
+.contic{width:46px;height:46px;flex:none;border-radius:14px;display:grid;place-items:center;font-size:24px;background:color-mix(in srgb,var(--accent) 14%,var(--card))}
+.contgo{font-size:26px;color:var(--accent)}
+details.tmore{margin:10px 0}details.tmore>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);cursor:pointer;flex-wrap:wrap}
+details.tmore>summary::-webkit-details-marker{display:none}details.tmore>summary span:first-child{font-weight:700}details.tmore>summary small{flex:1 1 100%;order:3}
+details.tmore>summary .mchev{margin-left:auto}details.tmore[open]>summary .mchev{transform:rotate(180deg)}details.tmore[open]>summary{margin-bottom:10px}
+.scanbox{border:2px dashed var(--line);border-radius:16px;overflow:hidden;background:var(--paper);position:relative;min-height:150px;display:grid;place-items:center}
+.scanbox.has{border-style:solid}.scanbox img{display:block;width:100%;max-height:420px;object-fit:contain;background:#222}
+.scanph{display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px;text-align:center}.scanph span{font-size:40px}.scanph small{color:var(--muted)}
+.scanx{position:absolute;top:8px;right:8px}.scanbtn{justify-content:center;cursor:pointer}
+.scanres{margin-top:12px;border:1.5px solid var(--accent)}
+.scanitem{display:flex;gap:10px;align-items:flex-start;padding:9px 2px;border-top:1px solid var(--line);font-size:14.5px}.scanitem input{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--accent)}
+.scandot{width:28px;height:28px;flex:none;border-radius:8px;display:grid;place-items:center;font-size:14px;background:var(--soft)}
+.scancard{padding:8px 12px}.scanhead{width:100%;border:0;background:none;font:inherit;color:inherit;cursor:pointer;align-items:center;gap:10px;padding:4px 0}
+.bsnow{padding:10px 12px;border-radius:12px;background:var(--soft);margin:6px 0 10px;font-size:14px}
 .achentry{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--gold);font:inherit;color:inherit;cursor:pointer;text-align:left}
 .achtrophy{font-size:34px;animation:mufloat 3s ease-in-out infinite}
 .achhead{margin:4px 0 8px}.achhero{display:flex;gap:16px;align-items:center;padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
@@ -869,7 +902,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -889,11 +922,12 @@ const Cache={
 /* ---------- AI (Claude) ---------- */
 let sampleP=null;
 function getSample(){if(!sampleP)sampleP=waitClaude().then(c=>c?c.use('sample'):null).catch(()=>null);return sampleP}
-async function ai(prompt,onText,signal,tier){try{if(/paper Bible|PAPER Bible|physical Bible|hand-write|handwrit|marking a/i.test(prompt)){const bc=bibleCtx();if(bc)prompt+='\n\n'+bc}}catch(e){}if(settings().simple&&!/Output the text of/.test(prompt))prompt='IMPORTANT: The reader is new to the Bible or young. Use very simple, short words and short sentences, and explain any hard word.\n'+prompt;
-  if(STANDALONE)return aiServer(prompt,onText,signal,tier);
+async function ai(prompt,onText,signal,tier,img){try{if(/paper Bible|PAPER Bible|physical Bible|hand-write|handwrit|marking a/i.test(prompt)){const bc=bibleCtx();if(bc)prompt+='\n\n'+bc}}catch(e){}if(settings().simple&&!/Output the text of/.test(prompt))prompt='IMPORTANT: The reader is new to the Bible or young. Use very simple, short words and short sentences, and explain any hard word.\n'+prompt;
+  if(STANDALONE)return aiServer(prompt,onText,signal,tier,img);
   const sample=await getSample();
   if(!sample)throw {code:'unavailable_here',message:'AI features need this page open in Claude.'};
   const opts={onText:onText?(({text})=>onText(text)):undefined,signal};if(tier)opts.modelTier=tier;
+  if(img){let ok=true;try{if(typeof sample.limits==='function')ok=!!(await sample.limits()).images}catch(e){}if(!ok)throw {code:'no_images',message:'This page isn’t allowed to send photos to Claude yet. Reload the page and try again.'};opts.images=[img.blob]}
   return await sample(prompt,opts);
 }
 function aiErr(e){if(!e)return 'Something went wrong.';if(e.code==='unavailable_here')return e.message;if(e.code==='not_granted')return 'Claude access was not allowed for this page.';if(e.code==='rate_limited')return 'Too many requests — wait a minute and try again.';if(e.name==='AbortError'||e.code==='aborted')return 'Stopped.';return e.message||'Something went wrong.'}
@@ -904,7 +938,7 @@ function saveSettings(p){Store.set('settings',Object.assign(settings(),p))}
 const S={tab:'load',onlineSub:'read',verses:null,loadingCh:false,chErr:'',sel:new Set(),ctrl:null,studyRef:'',study:null,studyCtrl:null,notesFilter:'all',notesColor:'',q:'',loadedSub:'key',flashV:null,bookIntro:{}};
 const progress=()=>(Store.get('progress')||{read:{}}).read||{};
 function isRead(b,c){return (progress()[b]||[]).includes(c)}
-function toggleRead(b,c){const r=JSON.parse(JSON.stringify(progress()));const a=new Set(r[b]||[]);a.has(c)?a.delete(c):a.add(c);r[b]=[...a].sort((x,y)=>x-y);Store.set('progress',{read:r})}
+function toggleRead(b,c){const r=JSON.parse(JSON.stringify(progress()));const a=new Set(r[b]||[]);a.has(c)?a.delete(c):(a.add(c),setTimeout(()=>{try{rhythmMark('read')}catch(e){}},0));r[b]=[...a].sort((x,y)=>x-y);Store.set('progress',{read:r})}
 const chKey=()=>{const s=settings();return `${s.trans}_${s.book}_${s.ch}`};
 
 /* ---------- render scheduling ---------- */
@@ -925,7 +959,7 @@ window.addEventListener('hashchange',()=>{if(Date.now()-NAV.pop<600)return;const
 
 function renderView(){const v=$('#view');
   ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,online:viewOnline,account:viewAccount})[S.tab](v);
-  renderSelbar();if(S.coach!=null)setTimeout(coachHL,60);try{navRecord();biblePill()}catch(e){}}
+  renderSelbar();if(S.coach!=null)setTimeout(coachHL,60);try{navRecord();biblePill();lastTrack()}catch(e){}}
 
 /* ---------- ONLINE BIBLE ---------- */
 function viewOnline(v){v.innerHTML=`<div class="chips" style="padding-top:2px">${[['read','📖 Read'],['notes','🔖 My notes & highlights']].map(([k,l])=>`<button class="chip ${S.onlineSub===k?'on':''}" data-act="onlineSub" data-s="${k}">${l}</button>`).join('')}</div><div class="howto" style="margin:0 2px 8px">ℹ️ ${S.onlineSub==='notes'?'All your notes, highlights and saved studies in one place. Tap a reference to jump to the verse.':'Read the Bible here. Tap a verse to highlight it, write a note or add it to a topic tab.'}</div><div id="onlineBody"></div>`;
@@ -1865,6 +1899,23 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   bibleSetup:el=>bibleSheet(el.dataset.p||''),
   bibOpen:el=>{S.bibOpen=S.bibOpen===el.dataset.p?null:el.dataset.p;renderView()},
   bsEx:el=>{const i=$('#bsQ');if(i)i.value=el.dataset.v},
+  scanJob:el=>{scanS().job=el.dataset.j;scanS().res=null;renderView()},
+  scanClear:()=>{const C=scanS();C.url='';C.blob=null;C.b64='';C.res=null;C.err='';renderView()},
+  scanGo:()=>scanRun(),
+  scanSave:()=>{const C=scanS(),R=C.res;if(!R)return;const id=newId();const L=((Store.get('scans')||{}).list||[]).slice();L.push({id,at:Date.now(),ref:R.ref||'',p:R.p||null,items:R.items||[],checks:{},proj:curProj()||''});Store.set('scans',{list:L});touch();S.scanOpen=id;C.res=null;C.url='';C.blob=null;C.b64='';renderView();toast('Saved! Tick the steps off as you go ✓')},
+  scanFull:()=>{const R=scanS().res;if(!R||!R.p)return;const B=S.build;B.mode='chapter';B.book=R.p.b;B.ch=R.p.c;renderView();runBuild()},
+  scanToggle:el=>{S.scanOpen=S.scanOpen===el.dataset.i?null:el.dataset.i;renderView()},
+  scanTick:el=>{const L=((Store.get('scans')||{}).list||[]).map(x=>{if(x.id!==el.dataset.i)return x;const c=Object.assign({},x.checks||{});c[el.dataset.n]=el.checked;return Object.assign({},x,{checks:c})});Store.set('scans',{list:L});if(el.checked){touch();rhythmMark('load')}setTimeout(renderView,150)},
+  scanDel:el=>{const L=((Store.get('scans')||{}).list||[]).filter(x=>x.id!==el.dataset.i);Store.set('scans',{list:L});renderView();toast('Deleted')},
+  scanSaveNotes:()=>{const R=scanS().res;if(!R)return;let n=0;$$('[data-scn]').forEach(cb=>{if(!cb.checked)return;const x=R.notes[+cb.dataset.scn];const vs=x.verse&&/^\d+/.test(x.verse)?[parseInt(x.verse)]:[];const b=R.p?R.p.b:null,c=R.p?R.p.c:null;
+    Store.set('n_'+newId(),{ref:b?refCode(b,c,vs):'',b,c,vs,title:'✍️ From my Bible'+(x.where?' ('+x.where+')':''),text:x.text,created:Date.now(),updated:Date.now()});n++});touch(n);scanS().res=null;renderView();toast(n+' note'+(n===1?'':'s')+' saved to My notes 📝')},
+  rhGo:el=>{const k=el.dataset.k;if(k==='read'){const rp=Store.get('readplan');if(rp&&rp.id){const d=planDays(rp.id)[Math.max(0,dayNum(rp.start))];if(d&&d[0]){goTo(d[0][0],d[0][1]);return}}S.onlineSub='read';setTab('online')}
+    else if(k==='load'){const op=loadPlans().map(pl=>({pl,pp:planProg(pl)})).filter(r=>!r.pp.done&&r.pp.total)[0];if(op){S.build.planKey=op.pl.key;setTab('load');setTimeout(()=>scrollToPlan(op.pl.key),80)}else setTab('load')}
+    else{S.jSub='pray';setTab('journal')}},
+  contGo:()=>{const L=settings().last;const open=loadPlans().map(pl=>({pl,pp:planProg(pl)})).filter(r=>!r.pp.done&&r.pp.total).sort((a,b)=>(b.pl.at||0)-(a.pl.at||0))[0];
+    if(open&&(!L||Date.now()-L.at>7*864e5||(open.pl.at||0)>L.at)){S.build.planKey=open.pl.key;setTab('load');setTimeout(()=>scrollToPlan(open.pl.key),80);return}
+    if(!L)return;if(L.k==='read')goTo(L.b,L.c);else if(L.k==='study')setTab('study');else if(L.k==='page'){S.loadedSub='cover';setTab('tabs')}},
+  mToggle:el=>{const m=el.dataset.m;S.menuOpen=Object.assign({},S.menuOpen||{});S.menuOpen[m]=!S.menuOpen[m];const y=window.scrollY;renderView();window.scrollTo(0,y);if(S.menuOpen[m])setTimeout(()=>{const f=$('#mf_'+m);if(f){const r=f.getBoundingClientRect();if(r.bottom>innerHeight-80)window.scrollBy({top:Math.min(r.top-120,r.bottom-innerHeight+100),behavior:'smooth'})}},60)},
   goBack:()=>{goBack()},
   achOpen:()=>{S.acctSub='ach';if(S.tab!=='account'){S._navKeep=1;setTab('account');S._navKeep=0}else{renderView();window.scrollTo(0,0)}},
   achBack:()=>{S.acctSub='';renderView();window.scrollTo(0,0)},
@@ -1967,7 +2018,7 @@ Return JSON: {"name":"full edition name","publisher":"...","translation":"short 
   prDiscard:()=>confirmSheet('Throw away this prayer? (It isn’t saved.)','🗑 Throw away',()=>{S.pray.out='';S.pray.edit=false;closeSheet();renderView()}),
   prToggle:el=>{S.prOpen=S.prOpen===el.dataset.k?null:el.dataset.k;renderView()},
   prFav:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.fav=!e.fields.fav;Store.set(el.dataset.k,e)},
-  prPrayed:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.prayed=(e.fields.prayed||0)+1;e.fields.lastPrayed=Date.now();Store.set(el.dataset.k,e);touch();toast('Amen 🙏')},
+  prPrayed:el=>{const e=JSON.parse(JSON.stringify(Store.get(el.dataset.k)));e.fields.prayed=(e.fields.prayed||0)+1;e.fields.lastPrayed=Date.now();Store.set(el.dataset.k,e);touch();rhythmMark('pray');toast('Amen 🙏')},
   prCopyK:el=>copyText(((Store.get(el.dataset.k)||{}).fields||{}).body||''),
   testiDiscard:()=>{const o=$('#testiOut');if(o){o.innerHTML='';o.dataset.t=''}},
   prSave:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;const pr=P.ref&&parseRef(P.ref);const tl=P.topics.map(k=>PRAY_TOPICS.find(t=>t[0]===k)[1].replace(/^\S+\s/,'')).join(', ');
@@ -2069,8 +2120,8 @@ function planItems(pl){const d=pl.data||{},items=[];const add=(group,id,html,tex
 function loadPlans(){return Store.list('k_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0))}
 function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
-const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in']];
-const LOAD_HELP={chapter:'Pick a chapter and what you want to add. You get step-by-step what to highlight, write and tab in your paper Bible. Tick off each step. It also goes into your Online Bible.',verses:'Same as a chapter, but just for one verse or a few verses.',topic:'Pick a feeling or topic. You get verses to highlight, where to put a tab, and a chain to write in your margins. Saved to Bible Kit › Topics.',book:'Get a heading for each chapter, what to write on the book’s first page, key verses and where to put the book tab.',snote:'A short note in easy words that explains a passage. Write it in your margin, on a sticky note or on an insert. Saved to Online Bible › My notes.',life:'Turn a passage into something for your own life: what it means for you and one thing to do this week. Saved to My notes or your Journal.',inserts:'Make cards and pages to tuck into your Bible. Saved ones go to Bible Kit › Tabs › Inserts.'};
+const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in'],['scan','📸','Photo of my page','It helps you load it']];
+const LOAD_HELP={scan:'Take a photo of a page in your paper Bible. We see what’s already marked and where there’s room, and tell you exactly what to add, or we read your handwritten notes and save them.',chapter:'Pick a chapter and what you want to add. You get step-by-step what to highlight, write and tab in your paper Bible. Tick off each step. It also goes into your Online Bible.',verses:'Same as a chapter, but just for one verse or a few verses.',topic:'Pick a feeling or topic. You get verses to highlight, where to put a tab, and a chain to write in your margins. Saved to Bible Kit › Topics.',book:'Get a heading for each chapter, what to write on the book’s first page, key verses and where to put the book tab.',snote:'A short note in easy words that explains a passage. Write it in your margin, on a sticky note or on an insert. Saved to Online Bible › My notes.',life:'Turn a passage into something for your own life: what it means for you and one thing to do this week. Saved to My notes or your Journal.',inserts:'Make cards and pages to tuck into your Bible. Saved ones go to Bible Kit › Tabs › Inserts.'};
 const LAPP_AREAS=[['family','👨‍👩‍👧 Family'],['friends','🤝 Friends'],['school','🎒 School or work'],['feelings','💭 Feelings'],['faith','🔥 My faith'],['money','💰 Money'],['habits','⏰ Habits'],['love','❤️ Relationships'],['church','⛪ Church']];
 function lappForm(){const N=S.lapp||(S.lapp={v1:'',v2:'',areas:[],situ:'',size:'card',out:'',busy:false});const B=S.build;
   return `<div class="row" style="align-items:flex-end"><div class="grow"><label class="l">Book</label><select class="f" id="bBook">${BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===B.book?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div><div><label class="l">Chapter</label><select class="f" id="bCh" style="width:90px">${Array.from({length:BM[B.book].chapters},(_,i)=>`<option ${i+1===B.ch?'selected':''}>${i+1}</option>`).join('')}</select></div></div>
@@ -2110,6 +2161,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
     ${partsHtml(B)}
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:6px" data-act="bGo">✨ Show me how to load ${esc(BM[B.book].name)} ${B.ch}:${v1}${v2>v1?'-'+v2:''}</button>`}
   else if(B.mode==='inserts')form=insertForm();
+  else if(B.mode==='scan')form=scanForm();
   else if(B.mode==='snote')form=snoteForm();
   else if(B.mode==='life')form=lappForm();
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
@@ -2196,7 +2248,7 @@ function secSchema(pl,sec){const s=settings();const t=pl.topic||'';return ({
   chapters:'[{"c": chapter number, "title": "heading to write above the chapter, max 5 words", "summary": "max 10 words"}]',
   context:'{"heading": "short title to write above the passage (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "few words", "setting": "max 15 words", "background": ["2-4 short historical or cultural facts (max 15 words each)"]}',
   soap:`{"v": "key verse number or range", "scripture": "text of that verse in the ${s.trans}", "observation": "2-3 sentences", "application": "2-3 practical, personal sentences", "prayer": "1-2 sentence prayer"}`})[sec]}
-function updatePlan(key,fn){const pl=JSON.parse(JSON.stringify(Store.get(key)));delete pl.key;fn(pl);Store.set(key,pl)}
+function updatePlan(key,fn){const pl=JSON.parse(JSON.stringify(Store.get(key)));delete pl.key;fn(pl);Store.set(key,pl);try{rhythmMark('load')}catch(e){}}
 async function regenPart(key,sec,mode,id){const pl=Object.assign({key},Store.get(key));if(!pl.data)return;const s=settings();const cur=pl.data[sec];const isObj=!Array.isArray(cur);
   let ask;if(isObj)ask=`Return JSON: {"${sec}": ${secSchema(pl,sec)}} — a fresh version that is different from this one: ${JSON.stringify(cur||{}).slice(0,1500)}`;
   else{const n=mode==='item'?1:mode==='more'?5:Math.max(cur.length,3);const one=mode==='item'?JSON.stringify(cur[idIndex(pl,id)]||{}):'';
@@ -2589,7 +2641,7 @@ const BSINFO=[['pub','Publisher','e.g. Crossway, Zondervan, Thomas Nelson'],['is
 function bsInfoRead(){const o={};BSINFO.forEach(([k])=>{const e=$('#bsI_'+k);if(e&&e.value.trim())o[k]=e.value.trim()});return o}
 function bsInfoText(o){return BSINFO.filter(([k])=>o&&o[k]).map(([k,l])=>l+': '+o[k]).join('; ')}
 function bibleSheet(pid,res,q){const cur=bibleOf(pid);const B=res||null;S._bsP=pid;
-  if(!B){openSheet(`<h3>📖 Which Bible do you have?</h3><p class="small muted">Type the Bible you hold in your hands. We look it up and fit every tip to it: margins, paper, study notes and more.</p>
+  if(!B){const pjn=pid?(projList().find(x=>x.id===pid)||{}).name:'';openSheet(`<h3>📖 ${cur?'Change the Bible'+(pjn?' for '+esc(pjn):''):'Which Bible do you have?'}</h3>${cur?`<div class="bsnow">Now set to: <b>${esc(cur.name||cur.query)}</b><br><small>Picked the wrong one? Type the right Bible below and search again.</small></div>`:''}<p class="small muted">Type the Bible you hold in your hands. We look it up and fit every tip to it: margins, paper, study notes and more.</p>
     <input class="f" id="bsQ" value="${esc(q||(cur&&cur.query)||'')}" placeholder="e.g. ESV Pocket Bible, NKJV Study Bible">
     <div class="chips" style="margin-top:6px">${BIBLE_EXAMPLES.map(x=>`<button class="chip" data-act="bsEx" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>
     <details class="bsinfo" ${S._bsInfoOpen?'open':''}><summary><b>➕ Add more info</b> <span class="small muted">— so we find your exact Bible</span></summary>
@@ -2597,7 +2649,7 @@ function bibleSheet(pid,res,q){const cur=bibleOf(pid);const B=res||null;S._bsP=p
      ${BSINFO.map(([k,l,ph])=>`<label class="l">${l}</label><input class="f" id="bsI_${k}" value="${esc((S._bsInfo||{})[k]||'')}" placeholder="${esc(ph)}">`).join('')}
     </details>
     <button class="btn pri wide" style="margin-top:10px" data-act="bsFind">🔍 Find my Bible</button>
-    ${cur?'<button class="btn wide" style="margin-top:6px" data-act="bsClear">Remove this Bible</button>':''}`);setTimeout(()=>{const i=$('#bsQ');if(i)i.focus()},150);return}
+    ${cur?'<button class="btn wide" style="margin-top:6px" data-act="bsClear">Remove this Bible</button>':''}`);setTimeout(()=>{const i=$('#bsQ');if(i){i.focus();if(cur)i.select()}},150);return}
   const sel=(id,obj,v)=>`<select class="f" id="${id}">${Object.entries(obj).map(([k,l])=>`<option value="${k}" ${k===v?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
   openSheet(`<h3>📖 Is this your Bible?</h3>
    <div class="biblefound"><b style="font-size:19px;font-family:var(--serif)">${esc(/unidentified|unknown|general guidance/i.test(B.name||'')?q:(B.name||q))}</b><div class="small muted">${esc([B.publisher,B.translation,B.format].filter(Boolean).join(' · '))}</div>
@@ -2618,7 +2670,7 @@ function bibleCard(id,emoji,title,sub,b,st,cur){const open=S.bibOpen===(id||'_me
    ${b?`<div class="bibchips">${[b.translation,MARGINS[b.margins],PAPERS[b.paper],b.interleaved?'📄 Interleaved':'',b.studyNotes?'📚 Study notes':'',b.crossRefs&&b.crossRefs!=='none'?'🔗 Cross-refs':''].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:`<button class="biblebar unset" style="margin:10px 0 0" data-act="bibleSetup" data-p="${id}"><span>🔍</span><span class="grow"><b>Which Bible is this?</b><br><small>Set it up so tips fit this Bible</small></span><span>›</span></button>`}
    <div class="bibstats"><span><b>${st.ch}</b> chapters loaded</span><span><b>${st.plans}</b> loadings</span><span><b>${st.ins}</b> inserts</span><span><b>${st.pages}</b> pages</span></div>
    ${open&&b?`<div class="bibmore">${(b.tips||[]).length?`<b>💡 Tips for this Bible</b><ul>${b.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}${b.pens||b.highlighters?`<b>🖊️ Best supplies</b><ul>${b.pens?`<li>Pens: ${esc(b.pens)}</li>`:''}${b.highlighters?`<li>Highlighters: ${esc(b.highlighters)}</li>`:''}</ul>`:''}${TRANS[(b.translation||'').toUpperCase()]?`<button class="btn sm" data-act="setTrans" data-t="${esc(b.translation.toUpperCase())}">Use ${esc(b.translation.toUpperCase())} in the Online Bible</button>`:''}</div>`:''}
-   <div class="row pgacts">${cur?'':`<button class="btn sm pri grow" data-act="projUse" data-p="${id}">📖 Use this Bible</button>`}${b?`<button class="btn sm ${cur?'grow':''}" data-act="bibOpen" data-p="${id||'_me'}">${open?'▴ Less':'💡 Tips'}</button><button class="iconbtn" data-act="bibleSetup" data-p="${id}" title="Change Bible">🔍</button>`:''}${id?`<button class="iconbtn" data-act="projEdit" data-p="${id}" title="Rename">✏️</button><button class="iconbtn" data-act="projDel" data-p="${id}" title="Delete">🗑</button>`:''}</div></div>`}
+   <div class="row pgacts">${cur?'':`<button class="btn sm pri grow" data-act="projUse" data-p="${id}">📖 Use this Bible</button>`}${b?`<button class="btn sm ${cur?'grow':''}" data-act="bibOpen" data-p="${id||'_me'}">${open?'▴ Less':'💡 Tips'}</button><button class="btn sm" data-act="bibleSetup" data-p="${id}">🔁 Change Bible</button>`:''}${id?`<button class="iconbtn" data-act="projEdit" data-p="${id}" title="Rename">✏️</button><button class="iconbtn" data-act="projDel" data-p="${id}" title="Delete">🗑</button>`:''}</div></div>`}
 function projBar(){const pj=curProjObj();return pj?`<div class="projbar"><span class="grow">${esc(pj.emoji||'📖')} Working on <b>${esc(pj.name)}</b></span><button class="btn sm" data-act="projUse" data-p="">↩ My Bible</button></div>`:''}
 function projStats(id){const f=x=>(x.proj||'')===id;const ch=new Set();Store.list('k_').filter(f).forEach(pl=>{if(pl.kind==='chapter'&&Object.values(pl.checks||{}).some(Boolean))ch.add(pl.b+pl.c)});Object.entries((((Store.get('maploaded')||{})[id||'_me'])||{})).forEach(([b,cs])=>cs.forEach(c=>ch.add(b+c)));return {plans:Store.list('k_').filter(f).length,ins:Store.list('i_').filter(f).length,pages:Store.list('p_').filter(f).length,ch:ch.size}}
 function loadedProjects(el){const L=projList();const cur=curProj();
@@ -2726,13 +2778,16 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
   v.innerHTML=`<div class="todayhead tod-${tod}"><div class="grow"><div class="small">${tico} ${new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div><h2>${hi}${nm?', '+esc(nm):''}!</h2><div class="small" style="opacity:.8">${esc(['A little time with God changes the whole day.','His mercies are new every morning.','Your Word is a lamp to my feet.','Be still, and know that I am God.','Grab your Bible, He has something for you today.'][dayIdx(5)])}</div></div><div class="tstreak"><b>🔥 ${st.streak}</b><span>day streak</span></div></div>
    ${isSimple()?`<div class="simplebar">🌱 Simple mode is on <button class="btn sm" data-act="simpleToggle">Turn off</button></div>`:''}
    <button class="todaysearch" data-act="search"><span>🔍</span>Search your notes, prayers, studies…</button>
-   <div class="tgoal"><span class="small"><b>Today:</b> ${Math.min(st.today,goal)}/${goal} things done</span><div class="prog grow"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div></div>
-   ${codeNag}${!curBible()?bibleBar():''}
+   ${continueCard()}${rhythmCard()}
+   <div class="tgoal" style="display:none"><span class="small"><b>Today:</b> ${Math.min(st.today,goal)}/${goal} things done</span><div class="prog grow"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div></div>
+   ${codeNag}
    <div class="tcard votdc"><div class="th"><span>☀️</span><b class="grow">Verse of the day</b><button class="iconbtn" data-act="sayVerse" data-r="${vref}" title="Listen">🔊</button><button class="iconbtn" data-act="votdNext" title="Another verse">🎲</button></div>
      <h3 style="margin:6px 0 2px;font-size:22px">${refA(vref,codeToLabel(vref))}</h3>${vt?`<p class="tverse">${esc(vt)}</p>`:KJV||S.todayKjv===2?'<p class="small muted">Tap the reference to read it.</p>':'<p class="small muted">Loading the verse…</p>'}
      <div class="row" style="margin-top:6px"><button class="btn sm pri grow" data-act="votdLoad" data-r="${vref}">✨ Load it</button><button class="btn sm grow" data-act="shareVerse" data-r="${vref}">📤 Share</button></div></div>
-   ${reading}${cont}${pray}${mem}
+   <details class="tmore" ${S.todayMore?'open':''}><summary><span>📋 More for today</span><small class="muted">Reading plan · prayer · memory verse · thanks</small><span class="mchev">⌄</span></summary>
+   ${reading}${pray}${mem}
    <div class="tcard"><div class="th"><span>🙌</span><b class="grow">One thing I’m thankful for</b></div><div class="row" style="margin-top:6px"><input class="f grow" id="tGrat" placeholder="Today I’m thankful for…" style="margin:0"><button class="btn sm pri" data-act="tGratSave">Save</button></div></div>
+   </details>
    <div class="tquick"><button data-act="tab" data-tab="load"><span>🖍</span>Load a chapter</button><button data-act="tab" data-tab="study"><span>🔎</span>Study</button><button data-act="jOpen" data-s="write"><span>✍️</span>Write</button><button data-act="tab" data-tab="online"><span>📖</span>Read</button></div>
    <button class="fab" id="qadd" data-act="qadd" aria-label="Quick add">＋</button>
    <button class="tcard maplink tmap" data-act="goKit" data-s="books"><span style="font-size:26px">🗺️</span><div class="grow" style="text-align:left"><b>My Bible map</b><div class="small muted">See how loaded your Bible is, book by book</div></div><span>›</span></button>
@@ -2822,9 +2877,9 @@ const COACH=[
  {tab:'online',pre:()=>{S.onlineSub='read'},sel:'.readerbar',t:'📖 Online Bible',p:'Read here. Tap a verse to highlight it, write a note, bookmark it or add it to a topic. 🎧 Listen reads the chapter out loud.'},
  {tab:'today',sel:'#biblePill',t:'📖 Your Bible',p:'This shows which Bible you’re using right now. Tap it to switch to another Bible (like a project Bible) or to change its details. All tips fit the Bible shown here.'},
  {tab:'today',sel:'#backBtn',t:'‹ Go back',p:'Took a wrong turn? This button takes you back to the page you were on before. It also closes pop-ups.'},
- {tab:'account',pre:()=>{S.acctSub=''},sel:'.achentry',t:'🏆 Achievements',p:'Earn '+66+' badges for reading, loading, praying and more. Tap here to see them all and how close you are.'},
- {tab:'account',pre:()=>{S.acctSub=''},sel:'.mucard',t:'🎵 Study music',p:'Turn on calm hymns and quiet music while you read and study. Skip with ⏭, go back with ⏮, or pick a sound like Piano or Strings.'},
- {tab:'account',pre:()=>{S.acctSub=''},sel:'#backupCard',t:'👤 My Account',p:'Your profile, looks (themes), badges, your Bible code, 💾 backups and 🌱 Simple mode live here.'},
+ {tab:'account',pre:()=>{S.acctSub=''},sel:'#mr_ach',t:'🏆 Achievements',p:'Earn '+66+' badges for reading, loading, praying and more. Tap here to see them all and how close you are.'},
+ {tab:'account',pre:()=>{S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{music:true})},sel:'.mucard',t:'🎵 Study music',p:'Turn on calm hymns and quiet music while you read and study. Skip with ⏭, go back with ⏮, or pick a sound like Piano or Strings.'},
+ {tab:'account',pre:()=>{S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{safe:true})},sel:'#backupCard',t:'👤 My Account',p:'Your profile, looks (themes), badges, your Bible code, 💾 backups and 🌱 Simple mode live here.'},
  {tab:'today',sel:null,t:'🎉 You’re ready!',p:'Grab your Bible, a fine pen and a highlighter. Lost? Tap 📘 Guide at the bottom of Today any time.'}];
 function showTour(){const pf=profile();openSheet(`<div class="tour"><div class="tourwave">👋</div><h3>Welcome to Loaded Bible</h3><p>Let’s fill your paper Bible with what God teaches you, one step at a time.</p>
   <label class="l" style="text-align:left">What should we call you?</label><input class="f" id="twName" maxlength="30" value="${esc(pf.name||'')}" placeholder="Your name">
@@ -3034,6 +3089,79 @@ function introFinish(go){introRead();const I=S.intro||{};if(I.name)saveProfile({
   if(go&&go.startsWith('kit:')){S.loadedSub=go.slice(4);setTab('tabs')}else if(go&&go.startsWith('j:')){S.jSub=go.slice(2);setTab('journal')}else setTab(['study','load','today'].includes(go)?go:'today');
   if(bq)setTimeout(()=>A.bsFind(null,bq,''),400);else if(go!=='today'&&I.name)toast('Welcome, '+I.name+'! 🎉');if(typeof confetti==='function'&&go==='today')confetti('Welcome'+(I.name?', '+I.name:'')+'! 🎉')}
 
+/* ===== 📸 SCAN MY BIBLE PAGE ===== */
+function scanS(){return S.scan||(S.scan={job:'todo',url:'',blob:null,b64:'',busy:false,err:'',res:null})}
+function scanList(){return ((Store.get('scans')||{}).list||[]).filter(inProj)}
+function scanForm(){const C=scanS();const L=scanList();
+  return `<div class="stepl"><span>2</span> Take a photo of your Bible page</div>
+  <div class="scanbox ${C.url?'has':''}">${C.url?`<img src="${C.url}" alt="Your Bible page"><button class="btn sm scanx" data-act="scanClear">✕ New photo</button>`:`<div class="scanph"><span>📖</span><b>Lay your Bible flat in good light</b><small>Get the whole page in the photo, straight from above</small></div>`}</div>
+  ${C.url?'':`<div class="row" style="margin-top:8px"><label class="btn pri grow scanbtn">📷 Take a photo<input type="file" accept="image/*" capture="environment" id="scanCam" hidden></label><label class="btn grow scanbtn">🖼️ Choose a photo<input type="file" accept="image/*" id="scanPick" hidden></label></div>`}
+  <div class="stepl"><span>3</span> What should we do?</div>
+  <div class="modegrid">${[['todo','🖍','Help me load this page','What to mark, and where there’s room'],['read','📝','Read my handwriting','Turn my notes into saved notes']].map(([k,e,l,d])=>`<button class="modecard ${C.job===k?'on':''}" data-act="scanJob" data-j="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div>
+  <button class="btn pri" style="width:100%;justify-content:center;margin-top:10px" data-act="scanGo" ${C.url&&!C.busy?'':'disabled'}>${C.busy?'<span class="spin"></span> Looking at your page…':C.job==='read'?'✨ Read my notes':'✨ Look at my page'}</button>
+  <p class="small muted" style="margin:6px 2px 0">🔒 Your photo is only used for this one question and is not saved.</p>
+  ${C.err?`<div class="err">${esc(C.err)}</div>`:''}
+  ${C.res?scanResHtml(C.res):''}
+  ${L.length?`<h3 style="margin:18px 2px 6px;font-size:17px">📸 My page scans</h3>${L.slice().reverse().slice(0,8).map(scanCard).join('')}`:''}`}
+function scanResHtml(R){if(R.job==='read')return `<div class="card scanres"><div class="row"><b class="grow">📝 ${esc(R.ref||'Your notes')}</b><span class="small muted">${(R.notes||[]).length} notes found</span></div>
+   ${(R.notes||[]).length?R.notes.map((n,i)=>`<label class="scanitem"><input type="checkbox" data-scn="${i}" checked><span><b>${n.verse?'v'+esc(n.verse)+' · ':''}${esc(n.where||'')}</b><br>${esc(n.text)}</span></label>`).join(''):'<p class="small muted">We couldn’t read any handwriting. Try a sharper photo, closer and in good light.</p>'}
+   ${(R.notes||[]).length?`<button class="btn pri wide" style="margin-top:8px" data-act="scanSaveNotes">💾 Save ticked notes to My notes</button>`:''}</div>`;
+  return `<div class="card scanres"><div class="row"><b class="grow">🖍 ${esc(R.ref||'Your page')}</b></div>${R.seen?`<p class="small" style="margin:4px 0 8px">👀 ${esc(R.seen)}</p>`:''}
+   ${(R.items||[]).map(it=>`<div class="scanitem"><span class="scandot" style="${it.color?'background:'+esc(colorCss(it.color)):''}">${esc(SCAN_ICON[it.do]||'•')}</span><span><b>${it.verse?'v'+esc(it.verse)+' · ':''}${esc(it.what)}</b>${it.where?`<br><small class="muted">📍 ${esc(it.where)}</small>`:''}</span></div>`).join('')}
+   <div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn pri grow" data-act="scanSave">💾 Save as a to-do list</button>${R.p?`<button class="btn grow" data-act="scanFull">📖 Load all of ${esc(BM[R.p.b].name)} ${R.p.c}</button>`:''}</div></div>`}
+const SCAN_ICON={highlight:'🖍',write:'✎',underline:'＿',tab:'🏷️',sticky:'🗒️',draw:'✏️',circle:'◯',box:'▢'};
+function colorCss(c){const m={yellow:'#ffe27a',green:'#a8e6a3',blue:'#a9d0ff',pink:'#ffbfd0',orange:'#ffc98a',purple:'#d6c2ff',red:'#ffaba1',teal:'#93e0d8',brown:'#e3c7a2',gray:'#d6d6d6',grey:'#d6d6d6'};return m[String(c).toLowerCase().split(/\s/).pop()]||m[String(c).toLowerCase()]||'var(--soft)'}
+function scanCard(x){const done=(x.items||[]).filter((_,i)=>(x.checks||{})[i]).length,tot=(x.items||[]).length;const open=S.scanOpen===x.id;
+  return `<div class="card scancard"><button class="row scanhead" data-act="scanToggle" data-i="${x.id}"><span style="font-size:22px">📸</span><span class="grow" style="text-align:left"><b>${esc(x.ref||'Bible page')}</b><br><small class="muted">${fmtDate(x.at)} · ${done}/${tot} done</small></span><span class="pstat ${done===tot&&tot?'done':''}">${done===tot&&tot?'✓ Done':Math.round(done/(tot||1)*100)+'%'}</span></button>
+   ${open?`<div style="margin-top:6px">${(x.items||[]).map((it,i)=>`<label class="scanitem"><input type="checkbox" data-act="scanTick" data-i="${x.id}" data-n="${i}" ${(x.checks||{})[i]?'checked':''}><span class="scandot" style="${it.color?'background:'+esc(colorCss(it.color)):''}">${esc(SCAN_ICON[it.do]||'•')}</span><span><b>${it.verse?'v'+esc(it.verse)+' · ':''}${esc(it.what)}</b>${it.where?`<br><small class="muted">📍 ${esc(it.where)}</small>`:''}</span></label>`).join('')}
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="scanDel" data-i="${x.id}">🗑 Delete</button></div></div>`:''}</div>`}
+async function scanFile(f){if(!f)return;const C=scanS();C.err='';C.res=null;
+  try{const url=URL.createObjectURL(f);const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('bad'));i.src=url});
+    const mx=1600,sc=Math.min(1,mx/Math.max(img.naturalWidth,img.naturalHeight));const cv=document.createElement('canvas');cv.width=Math.round(img.naturalWidth*sc);cv.height=Math.round(img.naturalHeight*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);
+    const blob=await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.85));C.blob=blob;C.url=cv.toDataURL('image/jpeg',.85);C.b64=C.url.split(',')[1]}
+  catch(e){C.err='That photo couldn’t be opened. Try another one.'}renderView()}
+document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.classList&&d.classList.contains('tmore'))S.todayMore=d.open},true);
+document.addEventListener('change',e=>{const t=e.target;if(t&&(t.id==='scanCam'||t.id==='scanPick')&&t.files&&t.files[0])scanFile(t.files[0])});
+async function scanRun(){const C=scanS();if(!C.blob||C.busy)return;C.busy=true;C.err='';C.res=null;renderView();
+  const job=C.job;let prompt;
+  if(job==='read')prompt=`This is a photo of a page from someone’s PAPER Bible. They wrote notes by hand on it. 1) Work out which passage is on the page. 2) Read EVERY handwritten note (in margins, between lines, at the top or bottom, on sticky notes). Copy the words exactly as written; if a word is unclear, write your best guess with [?]. Ignore the printed Bible text and printed study notes. Reply with ONLY JSON: {"ref":"Book chapter:verses","notes":[{"verse":"16","where":"left margin","text":"the exact handwritten words"}]}. Use "" for verse if a note isn’t next to a verse.`;
+  else prompt=`This is a photo of a page from someone’s PAPER Bible. Help them "load" (mark up) THIS exact page by hand. 1) Work out which passage is on the page. 2) Look closely at what is already marked (highlights and their colors, underlines, handwritten notes, tabs) and where there is empty space (outer margin, inner margin, top, bottom, between columns, after the chapter end). 3) Give 5 to 10 concrete steps to load this page: key verses to highlight and in which color, short notes to hand-write (give the exact words, max 12 words each) and EXACTLY where on this page there is room for them, cross-references to write, and where a tab or sticky note fits. Do NOT repeat things that are already marked. Their color key: ${colorKeyText()||'yellow = promises, green = growth, blue = God, pink = love, orange = commands'}. Reply with ONLY JSON: {"ref":"Book chapter:verses","seen":"one short sentence about what is already marked and where the free space is","items":[{"do":"highlight|write|underline|circle|tab|sticky|draw","what":"the exact instruction (and the words to write)","where":"exact place on this page","verse":"16","color":"yellow or empty"}]}`;
+  try{const r=await ai(prompt,null,null,'default',{blob:C.blob,b64:C.b64});const j=parseJSON(r.text);j.job=job;
+    const p=j.ref?parseRef(String(j.ref).split(/[,;]/)[0].replace(/[–—]/g,'-').trim()):null;j.p=p&&p.c?{b:p.b,c:p.c}:null;
+    if(job==='read')j.notes=(j.notes||[]).filter(n=>n&&n.text);else j.items=(j.items||[]).filter(x=>x&&x.what).slice(0,12);
+    C.res=j}
+  catch(e){C.err=e&&e.code==='no_images'?e.message:aiErr(e)}
+  C.busy=false;renderView();setTimeout(()=>{const r=$('.scanres');if(r)r.scrollIntoView({behavior:'smooth',block:'start'})},60)}
+
+/* ===== 🌅 DAILY RHYTHM + CONTINUE ===== */
+function rhy(){const r=settings().rh||{};return r.d===todayStr()?r:{d:todayStr()}}
+function rhythmMark(k){const r=rhy();if(r[k])return;r[k]=1;saveSettings({rh:r});if(r.read&&r.load&&r.pray&&!r.all){r.all=1;saveSettings({rh:r});setTimeout(()=>{try{confetti('🎉 Read, load, pray: all done today!')}catch(e){}},400)}}
+function rhythmState(){const r=rhy();const sameDay=t=>t&&new Date(t).toDateString()===new Date().toDateString();
+  const J=Store.list('j_');const pray=r.pray||J.some(e=>['prayer','prayed','soap'].includes(e.type)&&(sameDay(e.date)||sameDay((e.fields||{}).lastPrayed)));
+  let read=r.read;const rp=Store.get('readplan');if(!read&&rp&&rp.id){const t=dayNum(rp.start);if((rp.done||{})[t])read=1}
+  return {read:!!read,load:!!r.load,pray:!!pray}}
+function rhythmCard(){const s=rhythmState();const steps=[['read','📖','Read'],['load','🖍','Load'],['pray','🙏','Pray']];const next=steps.find(x=>!s[x[0]]);
+  const nextTxt={read:'Read today’s chapter',load:'Load something in your Bible',pray:'Spend a moment in prayer'};
+  return `<div class="tcard rhythm"><div class="th"><span>🌱</span><b class="grow">Today’s rhythm</b><span class="small muted">${steps.filter(x=>s[x[0]]).length}/3</span></div>
+   <div class="rhsteps">${steps.map(([k,e,l],i)=>`${i?'<i class="rhline '+(s[k]?'on':'')+'"></i>':''}<button class="rhstep ${s[k]?'on':''} ${next&&next[0]===k?'next':''}" data-act="rhGo" data-k="${k}"><span>${s[k]?'✓':e}</span><small>${l}</small></button>`).join('')}</div>
+   ${next?`<button class="btn pri wide" style="margin-top:10px" data-act="rhGo" data-k="${next[0]}">${next[1]} ${nextTxt[next[0]]} →</button>`:'<p class="small" style="margin:10px 0 0;text-align:center">🎉 You did all three today. Well done!</p>'}</div>`}
+function lastSave(o){const L=settings().last||{};if(L.label===o.label&&Date.now()-(L.at||0)<6e4)return;saveSettings({last:Object.assign(o,{at:Date.now()})})}
+function lastTrack(){try{
+  if(S.tab==='online'&&S.onlineSub==='read'&&S.verses&&S.verses.length){const s=settings();lastSave({k:'read',label:`Reading ${BM[s.book].name} ${s.ch}`,b:s.book,c:s.ch});rhythmMark('read')}
+  else if(S.tab==='study'&&S.study&&S.study.refLabel){lastSave({k:'study',label:`Studying ${S.study.refLabel}`})}
+  else if(S.tab==='tabs'&&S.loadedSub==='cover'&&S.pm&&S.pm.cur){lastSave({k:'page',label:`Making a page: ${S.pm.cur.title||'page'}`})}
+}catch(e){}}
+function continueCard(){const L=settings().last;const open=loadPlans().map(pl=>({pl,pp:planProg(pl)})).filter(r=>!r.pp.done&&r.pp.total).sort((a,b)=>(b.pl.at||0)-(a.pl.at||0))[0];
+  let o=null;if(L&&Date.now()-L.at<7*864e5)o=L;
+  if(open&&(!o||((open.pl.at||0)>o.at)))o={k:'load',label:`Loading ${planTitle(open.pl)}`,sub:`${open.pp.dn} of ${open.pp.total} steps done`,key:open.pl.key};
+  if(!o)return '';const ic={read:'📖',study:'🔎',page:'📄',load:'🖍'}[o.k]||'▶';
+  return `<button class="tcard contcard" data-act="contGo"><span class="contic">${ic}</span><span class="grow" style="text-align:left;min-width:0"><small class="muted">Continue where you left off</small><b>${esc(o.label)}</b>${o.sub?`<small class="muted">${esc(o.sub)}</small>`:''}</span><span class="contgo">›</span></button>`}
+
+/* ===== ☰ PROFILE MENU ===== */
+function mrow(id,ic,title,sub,body,act){const open=(S.menuOpen||{})[id];
+  if(act)return `<button class="mrow" id="mr_${id}" ${act}><span class="mic">${ic}</span><span class="grow"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</span><span class="mchev">›</span></button>`;
+  return `<div class="mfold ${open?'open':''}" id="mf_${id}"><button class="mrow" id="mr_${id}" data-act="mToggle" data-m="${id}" aria-expanded="${open?'true':'false'}"><span class="mic">${ic}</span><span class="grow"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</span><span class="mchev">⌄</span></button><div class="mbody">${open?body():''}</div></div>`}
+
 /* ===== 🔍 SEARCH ===== */
 function searchSheet(){openSheet(`<h3>🔍 Search everything</h3><input class="f" id="srchIn" placeholder="Search notes, prayers, studies, pages…" value="${esc(S.srchQ||'')}" autocomplete="off"><div id="srchOut" class="small muted" style="margin-top:8px">Type at least 2 letters.</div>`);
   const i=$('#srchIn');i.focus();i.addEventListener('input',()=>{S.srchQ=i.value;runSearch(i.value)});if(S.srchQ)runSearch(S.srchQ)}
@@ -3078,33 +3206,33 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <div class="tile"><b>📖 ${st.loaded}</b><span>chapters loaded</span></div>
      <div class="tile"><b>✅ ${st.steps}</b><span>steps done</span></div>
      <button class="tile" data-act="achOpen" style="font:inherit;color:inherit"><b>🏅 ${got.length}</b><span>of ${BADGES.length} badges ›</span></button></div>
-   <div class="card"><div class="row"><b class="grow">🎯 Today's goal</b><span class="small muted">${Math.min(st.today,goal)}/${goal}</span></div>
+   <div class="card menu">
+   ${mrow('ach','🏆','Achievements',got.length+' of '+BADGES.length+' earned '+got.slice(-3).map(b=>b[1]).join(''),null,'data-act="achOpen"')}
+   ${mrow('goal','🎯','Today’s goal',Math.min(st.today,goal)+' of '+goal+' things done today',()=>`<div class="card"><div class="row"><b class="grow">🎯 Today's goal</b><span class="small muted">${Math.min(st.today,goal)}/${goal}</span></div>
      <div class="prog" style="margin:8px 0"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div>
      <p class="small muted" style="margin:0 0 6px">${st.today>=goal?'Goal reached today — well done! 🎉':'Every ticked step, highlight, note or journal entry counts.'}</p>
-     <div class="chips">${[3,5,10,20].map(g=>`<button class="chip ${goal===g?'on':''}" data-act="setGoal" data-g="${g}">${g} a day</button>`).join('')}</div></div>
-   <button class="card achentry" data-act="achOpen"><span class="achtrophy">🏆</span><span class="grow" style="text-align:left"><b>Achievements</b><br><small class="muted">${got.length} of ${BADGES.length} earned · ${got.slice(-4).map(b=>b[1]).join(' ')||'Start earning!'}</small><span class="prog" style="display:block;margin-top:6px"><i style="width:${Math.round(got.length/BADGES.length*100)}%"></i></span></span><span style="font-size:22px;color:var(--muted)">›</span></button>
-   <div class="card donatecard"><div class="row"><span style="font-size:30px">❤️</span><div class="grow"><b>Support Loaded Bible</b><div class="small muted">Help keep it free and growing.</div></div><button class="btn pri" data-act="donate">Donate</button></div></div>
-   <h2 class="sec">My profile</h2>
-   <div class="card"><label class="l" style="margin-top:0">Username</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
+     <div class="chips">${[3,5,10,20].map(g=>`<button class="chip ${goal===g?'on':''}" data-act="setGoal" data-g="${g}">${g} a day</button>`).join('')}</div></div>`)}
+   ${mrow('me','✏️','My profile',esc(pf.name||displayName())+(pf.fav?' · '+esc(codeToLabel(pf.fav)):''),()=>`<div><label class="l" style="margin-top:0">Username</label><input class="f" id="pfName" value="${esc(pf.name||displayName())}" maxlength="40">
      <label class="l">Favorite verse</label><input class="f" id="pfFav" value="${esc(pf.fav?codeToLabel(pf.fav):'')}" placeholder="e.g. Psalm 46:10">
      ${pf.fav&&parseRef(pf.fav)?`<p class="small" style="margin:6px 2px 0">${refA(pf.fav,'Open '+codeToLabel(pf.fav))}</p>`:''}
-     <label class="l">Look</label>${[['☀️ Light looks',[['','✨','Auto','#f6efe2','#fffaf0','#8b2e24'],['light','☀️','Light','#f6efe2','#fffaf0','#8b2e24'],['sepia','📜','Sepia','#efe2c4','#f8eed6','#8b2e24'],['blush','🌸','Blush','#fdf1f3','#fff8f9','#d45d7f'],['lavender','💜','Lavender','#f5f1fb','#fcfaff','#8a5cc7'],['peach','🍑','Peach','#fff4ec','#fffaf6','#e57d5a'],['sage','🌿','Sage','#f1f4ee','#fafcf8','#5f8a65'],['ocean','🌊','Ocean','#eef6f8','#f8fcfd','#2a8aa8'],['rose','🌹','Rose','#fbeeee','#fff8f7','#c0475a'],['mint','🍃','Mint','#eef8f3','#f9fdfb','#2f9e78'],['sky','☁️','Sky','#eef3fb','#f9fbff','#3d6fd1'],['sunshine','🌻','Sunshine','#fff8e6','#fffdf5','#d0900c'],['linen','🧺','Linen','#f3f0ea','#fbfaf7','#5e5a52'],['lilac','🪻','Lilac','#f6effa','#fdf9ff','#b05cc6']]],['🌙 Dark looks',[['dark','🌙','Dark','#17130f','#221c16','#8b2e24'],['forest','🌲','Forest','#121b15','#1a271e','#7fae6d'],['navy','⚓','Navy','#111827','#1a2335','#5b8fd6'],['coffee','☕','Coffee','#1b1512','#261d18','#c58b5a'],['midnight','🌌','Midnight','#15111f','#1f1a2e','#a07ce0'],['ember','🔥','Ember','#141414','#1e1e1e','#e2733a'],['plum','🍇','Plum','#1a1219','#251a23','#d06fa0'],['abyss','🐋','Deep sea','#0d1719','#142226','#3fb9b0'],['slate','🪨','Slate','#16181c','#1f2228','#8fa3c4'],['olive','🫒','Olive','#151710','#1f2218','#a8b85a'],['wine','🍷','Wine','#1a0f10','#261718','#d0524f'],['aurora','🌠','Aurora','#0f1420','#171e2e','#5fd3a0']]]].map(([g,list])=>`<div class="small muted" style="margin:8px 2px 4px;font-weight:600">${g}</div><div class="themegrid">${list.map(([k,e,l,bg,cd,ac])=>`<button class="themecard ${(pf.theme||'')===k?'on':''}" data-act="setTheme" data-t="${k}" style="--tbg:${bg};--tcd:${cd};--tac:${ac}"><span class="tprev"><i class="tbar"></i><i class="tl1"></i><i class="tl2"></i><i class="tdot"></i></span><span class="tname">${e} ${l}</span>${(pf.theme||'')===k?'<span class="tcheck">✓</span>':''}</button>`).join('')}</div>`).join('')}
-     <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div>
-   <h2 class="sec">Study music</h2>
-   ${muCard()}
-   <h2 class="sec">My progress</h2>
-   ${STANDALONE&&Code.value?`<div class="card codecard"><div class="row"><b class="grow">🔑 My Bible code</b><button class="btn sm ghost" data-act="codeShow">${S.codeShown?'🙈 Hide':'👁 Show'}</button></div>
+</div>`)}
+   ${mrow('looks','🎨','Looks',(()=>{const t=pf.theme||'';return t?t[0].toUpperCase()+t.slice(1):'Auto'})()+' · '+settings().trans+(isSimple()?' · Simple mode':''),()=>`<div><label class="l">Look</label>${[['☀️ Light looks',[['','✨','Auto','#f6efe2','#fffaf0','#8b2e24'],['light','☀️','Light','#f6efe2','#fffaf0','#8b2e24'],['sepia','📜','Sepia','#efe2c4','#f8eed6','#8b2e24'],['blush','🌸','Blush','#fdf1f3','#fff8f9','#d45d7f'],['lavender','💜','Lavender','#f5f1fb','#fcfaff','#8a5cc7'],['peach','🍑','Peach','#fff4ec','#fffaf6','#e57d5a'],['sage','🌿','Sage','#f1f4ee','#fafcf8','#5f8a65'],['ocean','🌊','Ocean','#eef6f8','#f8fcfd','#2a8aa8'],['rose','🌹','Rose','#fbeeee','#fff8f7','#c0475a'],['mint','🍃','Mint','#eef8f3','#f9fdfb','#2f9e78'],['sky','☁️','Sky','#eef3fb','#f9fbff','#3d6fd1'],['sunshine','🌻','Sunshine','#fff8e6','#fffdf5','#d0900c'],['linen','🧺','Linen','#f3f0ea','#fbfaf7','#5e5a52'],['lilac','🪻','Lilac','#f6effa','#fdf9ff','#b05cc6']]],['🌙 Dark looks',[['dark','🌙','Dark','#17130f','#221c16','#8b2e24'],['forest','🌲','Forest','#121b15','#1a271e','#7fae6d'],['navy','⚓','Navy','#111827','#1a2335','#5b8fd6'],['coffee','☕','Coffee','#1b1512','#261d18','#c58b5a'],['midnight','🌌','Midnight','#15111f','#1f1a2e','#a07ce0'],['ember','🔥','Ember','#141414','#1e1e1e','#e2733a'],['plum','🍇','Plum','#1a1219','#251a23','#d06fa0'],['abyss','🐋','Deep sea','#0d1719','#142226','#3fb9b0'],['slate','🪨','Slate','#16181c','#1f2228','#8fa3c4'],['olive','🫒','Olive','#151710','#1f2218','#a8b85a'],['wine','🍷','Wine','#1a0f10','#261718','#d0524f'],['aurora','🌠','Aurora','#0f1420','#171e2e','#5fd3a0']]]].map(([g,list])=>`<div class="small muted" style="margin:8px 2px 4px;font-weight:600">${g}</div><div class="themegrid">${list.map(([k,e,l,bg,cd,ac])=>`<button class="themecard ${(pf.theme||'')===k?'on':''}" data-act="setTheme" data-t="${k}" style="--tbg:${bg};--tcd:${cd};--tac:${ac}"><span class="tprev"><i class="tbar"></i><i class="tl1"></i><i class="tl2"></i><i class="tdot"></i></span><span class="tname">${e} ${l}</span>${(pf.theme||'')===k?'<span class="tcheck">✓</span>':''}</button>`).join('')}</div>`).join('')}
+     <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div><div class="msub"><div class="row"><div class="grow"><b>🌱 Simple mode</b><div class="small muted">Bigger text, fewer buttons and easier words. Great for kids or if you’re new to the Bible.</div></div><button class="switch ${settings().simple?'on':''}" data-act="simpleToggle" aria-label="Simple mode"><i></i></button></div></div>`)}
+   ${mrow('music','🎵','Study music',MU.on?(MU.playing?'♪ Playing: ':'Paused: ')+esc(muTitle(TRACKS[MU.cur]).name):'Calm hymns while you study',()=>muCard())}
+   ${mrow('bibles','📖','My Bibles',curBible()?esc((curBible().name||curBible().query)):'Tell us which Bible you have',null,'data-act="goKit" data-s="projects"')}
+   ${mrow('safe','🔑','Code & backup',settings().lastBackup?'Last backup: '+fmtDate(settings().lastBackup):'Keep your work safe',()=>`${STANDALONE&&Code.value?`<div class="card codecard"><div class="row"><b class="grow">🔑 My Bible code</b><button class="btn sm ghost" data-act="codeShow">${S.codeShown?'🙈 Hide':'👁 Show'}</button></div>
      <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
      <div class="row"><button class="btn sm pri" data-act="codeCopyMine">⧉ Copy code</button><button class="btn sm" data-act="codeSwitch">🚪 Log out</button></div></div>`:''}
 
    <div class="card" id="backupCard"><b>💾 Backup</b><p class="small muted" style="margin:4px 0 8px">Download everything you made into one file. If you ever lose your code or your phone, you can restore it.${settings().lastBackup?' Last backup: '+fmtDate(settings().lastBackup)+'.':''}</p>
-     <div class="row" style="flex-wrap:wrap"><button class="btn sm pri" data-act="backupDl">⬇️ Download my backup</button><button class="btn sm" data-act="backupCopy">⧉ Copy as text</button><button class="btn sm" data-act="backupRestore">⬆️ Restore</button></div></div>
-   <div class="card"><div class="row"><div class="grow"><b>🌱 Simple mode</b><div class="small muted">Bigger text, fewer buttons and easier words. Great for kids or if you’re new to the Bible.</div></div><button class="switch ${settings().simple?'on':''}" data-act="simpleToggle" aria-label="Simple mode"><i></i></button></div></div>
-   <div class="card"><div class="row"><b class="grow">👋 Help</b><button class="btn sm" data-act="guide">📘 Guide</button><button class="btn sm" data-act="tourAgain">▶ Tour</button></div></div>
+     <div class="row" style="flex-wrap:wrap"><button class="btn sm pri" data-act="backupDl">⬇️ Download my backup</button><button class="btn sm" data-act="backupCopy">⧉ Copy as text</button><button class="btn sm" data-act="backupRestore">⬆️ Restore</button></div></div>`)}
+   ${mrow('help','👋','Help & tour','Guide, tour and the intro',()=>`<div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn sm" data-act="guide">📘 Guide</button><button class="btn sm" data-act="tourAgain">▶ Take the tour</button></div>`)}
+   ${mrow('give','❤️','Support Loaded Bible','Help keep it free and growing',null,'data-act="donate"')}
+   </div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
-  const nm=$('#pfName',v);nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
-  const fv=$('#pfFav',v);fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
+  const nm=$('#pfName',v);if(nm)nm.addEventListener('change',()=>{saveProfile({name:nm.value.trim()});toast('Name saved')});
+  const fv=$('#pfFav',v);if(fv)fv.addEventListener('change',()=>{const p=parseRef(fv.value);if(fv.value.trim()&&!p){toast('Try a reference like "Psalm 46:10"');return}saveProfile({fav:p?rc(p):''});toast('Favorite verse saved');renderView()});
   updateAvatar()}
 
 function donAmount(){const a=S.donCustom?parseFloat(String(S.donCustomVal||'').replace(',','.')):S.donAmt;return a>0&&a<100000?Math.round(a*100)/100:0}
@@ -3173,8 +3301,8 @@ async function initAuth(){showAuth('loading');Store.readyResolve();
       else{Store.disconnect();Store.useNamespace('none');showAuth(S.authMode==='loading'?'signin':S.authMode)}
       applyTheme();updateAvatar();renderView()});
   }catch(e){console.warn(e);Auth.noFirebase=true;startGuest();toast('Couldn’t reach the login service — using guest mode')}}
-async function aiServer(prompt,onText,signal,tier){
-  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json','X-Code':Code.value||''},body:JSON.stringify({prompt,tier:tier||'default'}),signal});
+async function aiServer(prompt,onText,signal,tier,img){
+  const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json','X-Code':Code.value||''},body:JSON.stringify(img?{prompt,tier:tier||'default',image:img.b64}:{prompt,tier:tier||'default'}),signal});
   if(!r.ok){let m='The AI helper isn’t available right now.';try{const j=await r.json();m=j.error||m}catch(e){}throw {code:r.status===429?'rate_limited':'server',message:m}}
   const rd=r.body.getReader(),dec=new TextDecoder();let buf='',text='',stop=null;
   for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
