@@ -614,11 +614,10 @@ header.top:has(.backbtn.show) .brand svg{display:none}
 .mubtns .mubig{width:62px;height:62px;font-size:24px;background:var(--accent);color:#fff;border-color:var(--accent)}
 .mubtns button.on{background:color-mix(in srgb,var(--accent) 18%,var(--card));border-color:var(--accent)}
 .muvol{display:flex;align-items:center;gap:8px;margin:10px 0}.muvol input{flex:1;accent-color:var(--accent)}
-#mupill{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:26;display:flex;align-items:center;gap:2px;max-width:560px;margin:0 auto;padding:5px 6px 5px 8px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:0 8px 26px rgba(0,0,0,.16);animation:pop .3s ease-out}
-#mupill button{border:0;background:none;color:var(--ink);font:inherit;font-size:17px;width:36px;height:36px;border-radius:50%;cursor:pointer;flex:none}
-#mupill .mupname{flex:1;width:auto;display:flex;align-items:center;gap:8px;text-align:left;min-width:0;border-radius:12px;padding:0 4px}
-#mupill .mupname b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#mupill .mupname small{display:block;font-size:11.5px;color:var(--muted)}
-#mupill .mupname .grow{min-width:0}
+#mupill{position:fixed;left:14px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:26;animation:pop .3s ease-out}
+#mupill .mudisc{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);box-shadow:0 6px 18px rgba(0,0,0,.16);font-size:20px;cursor:pointer;display:grid;place-items:center;padding:0}
+#mupill.playing .mudisc{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent),0 6px 18px rgba(0,0,0,.16)}
+#mupill.playing .mudn{animation:mufloat 1.8s ease-in-out infinite}
 .mueq{display:inline-block;animation:mufloat 1.6s ease-in-out infinite}
 @keyframes mufloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(4deg)}}
 body.introon{overflow:hidden}
@@ -2950,8 +2949,8 @@ function bibleSwitchSheet(){const cur=settings().proj||'';const pl=projList();
    <div class="row" style="margin-top:12px"><button class="btn grow" data-act="bibleSetup" data-p="${esc(cur)}">✏️ ${curBible()?'Change this Bible':'Set this Bible'}</button><button class="btn grow" data-act="bpNew">＋ New Bible</button></div>`)}
 
 /* ===== 🎵 STUDY MUSIC ===== */
-const MU_MOODS=[['piano','🎹','Piano'],['ambient','🌫️','Ambient'],['strings','🎻','Strings'],['box','🎐','Music box'],['organ','⛪','Organ']];
-const MOOD_SET={piano:{tm:1,wet:.28},ambient:{tm:.82,wet:.6},strings:{tm:.92,wet:.42},box:{tm:.95,wet:.36},organ:{tm:.88,wet:.46}};
+const MU_MOODS=[['piano','🎹','Piano'],['ambient','🌫️','Ambient'],['strings','🎻','Strings'],['harp','🎶','Harp'],['guitar','🎸','Guitar'],['flute','🪈','Flute'],['choir','🎤','Choir'],['box','🎐','Music box'],['organ','⛪','Organ'],['lofi','🌙','Night piano']];
+const MOOD_SET={piano:{tm:1,wet:.28},ambient:{tm:.82,wet:.6},strings:{tm:.92,wet:.42},box:{tm:.95,wet:.36},organ:{tm:.88,wet:.46},harp:{tm:.9,wet:.45},guitar:{tm:.95,wet:.25},flute:{tm:.88,wet:.42},choir:{tm:.8,wet:.55},lofi:{tm:.75,wet:.35}};
 const HYMNS=[
  ['Amazing Grace',7,3,1,72,'D4 G4:2 B4:.5 G4:.5 B4:2 A4 G4:2 E4 D4:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 D5:3 r:2 B4 D5:1.5 B4:.5 D5:.5 B4:.5 G4:2 D4 E4:1.5 G4:.5 G4:.5 E4:.5 D4:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 G4:3'],
  ['Doxology (Old Hundredth)',7,4,0,72,'G4:2 G4 F#4 E4 D4 G4 A4 B4:4 B4:2 B4 B4 A4 G4 C5 B4 A4:4 G4:2 A4 B4 A4 G4 E4 F#4 G4:4 D5:2 B4 G4 A4 C5 B4 A4 G4:4'],
@@ -2963,7 +2962,7 @@ const HYMNS=[
  ['Jesu, Joy of Man’s Desiring',7,3,0,72,'G4:.5 A4:.5 B4:.5 D5:.5 C5:.5 C5:.5 E5:.5 D5:.5 D5:.5 G5:.5 F#5:.5 G5:.5 D5:.5 B4:.5 G4:.5 A4:.5 B4:.5 C5:.5 D5:.5 E5:.5 D5:.5 C5:.5 B4:.5 A4:.5 B4:1.5 A4:1.5 G4:3'],
  ['Canon in D',2,4,0,60,'F#5:2 E5:2 D5:2 C#5:2 B4:2 A4:2 B4:2 C#5:2 D5:2 C#5:2 B4:2 A4:2 G4:2 F#4:2 G4:2 E4:2 D4:.5 F#4:.5 A4:.5 G4:.5 F#4:.5 D4:.5 F#4:.5 E4:.5 D4:.5 B3:.5 D4:.5 A4:.5 G4:.5 B4:.5 A4:.5 G4:.5',[0,7,9,4,5,0,5,7]],
  ['Goin’ Home',0,4,0,58,'E4 G4 G4:2 E4 D4 C4:2 D4 E4 G4 E4 D4:4 E4 G4 G4:2 E4 D4 C4:2 D4 E4 D4 C4 C4:4']];
-const ORIG=['Still Waters','Green Pastures','Selah','Morning Mercies','Quiet Time','Lamp to My Feet','Be Still','Grace Upon Grace','Mustard Seed','Living Water','The Narrow Road','Olive Grove','Sabbath Rest','Galilee Shore','Upper Room','Emmaus Road','Mercy Seat','Daily Bread','Cedars of Lebanon','Psalm of Ascent'];
+const ORIG=['Still Waters','Green Pastures','Selah','Morning Mercies','Quiet Time','Lamp to My Feet','Be Still','Grace Upon Grace','Mustard Seed','Living Water','The Narrow Road','Olive Grove','Sabbath Rest','Galilee Shore','Upper Room','Emmaus Road','Mercy Seat','Daily Bread','Cedars of Lebanon','Psalm of Ascent','Shepherd’s Field','Jordan River','Mount of Olives','Bread of Life','Morning Star','Refuge','Light of the World','Rivers in the Desert','New Every Morning','Abide in the Vine','Wings Like Eagles','The Potter’s House','Fields of Boaz','Quiet Waters of Bethesda','Garden Tomb','Sea of Glass','Rest for the Weary','Firm Foundation','Lilies of the Field','Peace Like a River'];
 const PIECES=HYMNS.map(h=>({name:h[0],hymn:1,d:h})).concat(ORIG.map((n,i)=>({name:n,orig:i})));
 const TRACKS=MU_MOODS.flatMap((m,mi)=>PIECES.map((p,pi)=>({id:mi*PIECES.length+pi,p:pi,mood:m[0]})));
 const MU={ctx:null,on:false,playing:false,cur:null,q:[],qi:0,t0:0,spb:.8,endB:0,tg:null,wet:null,timer:null,startAt:0};
@@ -3023,19 +3022,31 @@ function voice(kind,m,t,dur,vel){const c=MU.ctx,f=mf(m);const g=c.createGain();g
   else if(kind==='bell'){osc('sine',f,1,0,g);osc('sine',f*2.76,.14,0,g);osc('sine',f*5.4,.04,0,g);g.gain.linearRampToValueAtTime(vel,t+.004);g.gain.setTargetAtTime(0,t+.01,.45+Math.min(.6,dur*.2));end=t+3.2}
   else if(kind==='organ'){const l=lp(2800);osc('sine',f,1,0,l);osc('sine',f*2,.45,0,l);osc('sine',f*3,.2,0,l);osc('sine',f*4,.1,0,l);
     g.gain.linearRampToValueAtTime(vel,t+.07);const r=t+dur;g.gain.setValueAtTime(vel,r);g.gain.setTargetAtTime(0,r,.12);end=r+.9}
+  else if(kind==='harp'){const l=lp(Math.min(5000,f*6));osc('triangle',f,1,0,l);osc('sine',f*2,.3,0,l);osc('sine',f*4,.06,0,l);g.gain.linearRampToValueAtTime(vel,t+.004);g.gain.setTargetAtTime(0,t+.01,.55+Math.min(.9,f<300?.9:.5));end=t+4}
+  else if(kind==='guitar'){const l=c.createBiquadFilter();l.type='lowpass';l.Q.value=2;l.frequency.setValueAtTime(Math.min(6000,f*8),t);l.frequency.setTargetAtTime(f*1.5,t,.18);l.connect(g);osc('sawtooth',f,.6,0,l);osc('triangle',f,1,3,l);g.gain.linearRampToValueAtTime(vel,t+.004);g.gain.setTargetAtTime(vel*.35,t+.01,.12);g.gain.setTargetAtTime(0,t+Math.max(.3,dur),.5);end=t+Math.max(.3,dur)+2.5}
+  else if(kind==='flute'){const l=lp(Math.min(5000,f*4));const a=osc('sine',f,1,0,l);osc('sine',f*2,.12,0,l);osc('triangle',f,.15,0,l);const lfo=c.createOscillator();lfo.frequency.value=4.8;const lg=c.createGain();lg.gain.value=0;lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(9,t+Math.min(.6,dur*.6));lfo.connect(lg);lg.connect(a.detune);os.push(lfo);
+    g.gain.linearRampToValueAtTime(vel,t+.08);const r=t+dur;g.gain.setValueAtTime(vel*.9,r);g.gain.setTargetAtTime(0,r,.12);end=r+1}
+  else if(kind==='choir'){const bp1=c.createBiquadFilter();bp1.type='bandpass';bp1.frequency.value=700;bp1.Q.value=4;const bp2=c.createBiquadFilter();bp2.type='bandpass';bp2.frequency.value=1150;bp2.Q.value=5;const mix=c.createGain();mix.gain.value=2.2;bp1.connect(mix);bp2.connect(mix);mix.connect(g);const lo=c.createGain();lo.gain.value=.35;lo.connect(g);
+    [-11,-4,4,11].forEach(d=>{const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=d;o.connect(bp1);o.connect(bp2);os.push(o)});osc('sine',f,1,0,lo);
+    g.gain.linearRampToValueAtTime(vel,t+Math.min(.5,dur*.4));const r=t+dur;g.gain.setValueAtTime(vel,r);g.gain.setTargetAtTime(0,r,.4);end=r+2.5}
   else{osc('sine',f,1,0,g);osc('triangle',f,.3,0,g);g.gain.linearRampToValueAtTime(vel,t+.03);g.gain.setTargetAtTime(vel*.6,t+.05,.4);const r=t+dur;g.gain.setTargetAtTime(0,r,.25);end=r+1.5}
   os.forEach(o=>{o.start(t);o.stop(end)})}
 function voicing(pcs,lo){return pcs.map(p=>{let m=lo+((p-lo)%12+12)%12;return m}).sort((a,b)=>a-b)}
 function arrange(b,mood){const ev=[];const add=(t,fn)=>ev.push({b:t,fn});const passes=Math.max(2,Math.ceil(95/(b.len*60/(b.tempo*MOOD_SET[mood].tm))));
   for(let p=0;p<passes;p++){const o=1+p*b.len,last=p===passes-1;
     b.notes.forEach(x=>{const m=x.m+(mood==='box'?12:0)+(mood==='piano'&&p===1&&b.notes.length<60?12:0);
-      const k=mood==='piano'?'piano':mood==='ambient'?(p%2?'bell':'piano'):mood==='strings'?'strings':mood==='box'?'bell':'organ';
-      const v=k==='piano'?.24:k==='bell'?.15:k==='strings'?.12:.1;add(o+x.t,(w,s)=>voice(k,m,w,x.d*s*(k==='strings'||k==='organ'?.96:1),v))});
+      const k={piano:'piano',lofi:'piano',ambient:p%2?'bell':'piano',strings:'strings',box:'bell',organ:'organ',harp:'harp',guitar:'guitar',flute:'flute',choir:'choir'}[mood]||'piano';
+      const v=mood==='lofi'?.17:{piano:.24,bell:.15,strings:.12,harp:.22,guitar:.2,flute:.13,choir:.09}[k]||.1;add(o+x.t,(w,s)=>voice(k,m,w,x.d*s*(k==='strings'||k==='organ'?.96:1),v))});
     b.chords.forEach((c,ci)=>{const d=c.d+(last&&ci===b.chords.length-1?3:0);const bass=36+((c.root-36)%12+12)%12;const vo=voicing(c.pcs,mood==='box'?60:52);
       if(mood==='piano'){add(o+c.t,(w,s)=>voice('piano',bass,w,d*s,.16));for(let j=0;j<c.d;j++){const nt=vo[(j+1)%vo.length]+(j%2?0:12*(j===2?1:0));add(o+c.t+j+(b.meter===3?0:.0),(w,s)=>voice('piano',nt,w,1.4*s,.075))}}
       else if(mood==='ambient'){add(o+c.t,(w,s)=>{vo.forEach(n=>voice('pad',n,w,d*s,.045));voice('bass',bass+12,w,d*s,.07)})}
       else if(mood==='strings'){add(o+c.t,(w,s)=>{vo.forEach(n=>voice('strings',n,w,d*s*.98,.035));voice('strings',bass,w,d*s*.98,.05)})}
       else if(mood==='box'){for(let j=0;j<c.d;j++){const nt=vo[j%vo.length];add(o+c.t+j+.5,(w,s)=>voice('bell',nt,w,.5*s,.05))}}
+      else if(mood==='harp'){add(o+c.t,(w,s)=>voice('harp',bass,w,d*s,.12));vo.concat(vo.map(n=>n+12)).forEach((n,j)=>{if(j<c.d*2)add(o+c.t+j*.5,(w,s)=>voice('harp',n,w,.5*s,.06))})}
+      else if(mood==='guitar'){for(let j=0;j<c.d;j++){const dn=j%2===0;add(o+c.t+j,(w,s)=>{(dn?[bass+12].concat(vo):vo.slice().reverse()).forEach((n,q)=>voice('guitar',n,w+q*.022,.9*s,dn?.06:.04))})}}
+      else if(mood==='flute'){add(o+c.t,(w,s)=>{vo.forEach(n=>voice('strings',n,w,d*s*.98,.022))});for(let j=0;j<c.d;j++){const nt=vo[j%vo.length];add(o+c.t+j,(w,s)=>voice('harp',nt,w,.8*s,.045))}}
+      else if(mood==='choir'){add(o+c.t,(w,s)=>{vo.forEach(n=>voice('choir',n,w,d*s*.98,.03));voice('pad',bass+12,w,d*s,.03)})}
+      else if(mood==='lofi'){add(o+c.t,(w,s)=>{voice('bass',bass+12,w,d*s,.08);vo.forEach((n,q)=>voice('piano',n,w+q*.05,d*s,.05))})}
       else{add(o+c.t,(w,s)=>{vo.forEach(n=>voice('organ',n,w,d*s*.98,.035));voice('organ',bass,w,d*s*.98,.05)})}})}
   ev.sort((a,c)=>a.b-c.b);return {ev,endB:1+passes*b.len+4}}
 function muStopTrack(){const tg=MU.tg;if(tg&&MU.ctx){try{tg.gain.setTargetAtTime(0,MU.ctx.currentTime,.12);setTimeout(()=>{try{tg.disconnect()}catch(e){}},700)}catch(e){}}MU.tg=null;MU.q=[];MU.qi=0}
@@ -3063,11 +3074,11 @@ function muCard(){const s=muS(),L=muList();const t=TRACKS[MU.cur!=null?MU.cur:s.
    <div class="chips" style="justify-content:center">${[['all','✨','All']].concat(MU_MOODS).map(([k,e,l])=>`<button class="chip ${s.mood===k?'on':''}" data-act="muMood" data-m="${k}">${e} ${l}</button>`).join('')}</div>
    <label class="muvol"><span>🔈</span><input type="range" id="muVol" min="0" max="1" step="0.05" value="${s.vol}"><span>🔊</span></label>
    <button class="btn wide" data-act="muTracks">📃 All ${L.length} tracks</button>
-   <p class="small muted" style="margin:8px 0 0">Made live on your phone: old hymns that are free to use, plus calm original pieces. On iPhone it may stop when the screen locks.</p></div>`}
+   <p class="small muted" style="margin:8px 0 0">Made live on your phone: old hymns that are free to use, plus calm original pieces, in ${MU_MOODS.length} sounds. While it plays, a small 🎵 button sits in the corner. Tap it for these controls. On iPhone it may stop when the screen locks.</p></div>`}
 function muUI(){$$('.mucard').forEach(x=>{x.outerHTML=muCard()});let p=$('#mupill');
   if(!MU.on){if(p)p.remove();return}
   if(!p){p=document.createElement('div');p.id='mupill';document.body.appendChild(p)}const T=muTitle(TRACKS[MU.cur]);
-  p.innerHTML=`<button class="mupname" data-act="muSheet"><span class="${MU.playing?'mueq':''}">🎵</span><span class="grow"><b>${esc(T.name)}</b><small>${esc(T.mood)}</small></span></button><button data-act="muPrev" aria-label="Previous">⏮</button><button data-act="muToggle" aria-label="Play or pause">${MU.playing?'⏸':'▶'}</button><button data-act="muNext" aria-label="Next">⏭</button><button data-act="muOff" aria-label="Turn music off">✕</button>`}
+  p.className=MU.playing?'playing':'';p.innerHTML=`<button class="mudisc" data-act="muSheet" aria-label="Music: ${esc(T.name)}. Tap for controls"><span class="mudn">${MU.playing?'🎵':'⏸'}</span></button>`}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='muVol'){const v=+e.target.value;muSave({vol:v});if(MU.master)MU.master.gain.value=v}
   if(e.target&&e.target.id==='inName'){const g=$('.igreet');const n=e.target.value.trim();if(g)g.innerHTML=n?`Nice to meet you, <b>${esc(n)}</b>! 😊`:'&nbsp;'}});
 
