@@ -2,7 +2,14 @@
 // No accounts: every person gets a personal "Bible code" (like GRACE-7K4M-2QXT).
 // Their progress is stored online under that code, so they can open it on any device.
 // ✨ features use Cloudflare's free Workers AI by default (no key needed, free daily allowance).
-// Optional: add the secret ANTHROPIC_API_KEY to use Claude instead (paid).
+// AI chain: the first helper that answers wins; if one is at its limit or fails, the next one is tried.
+//   1. Claude      — secret ANTHROPIC_API_KEY (paid, optional)
+//   2. Gemini      — secret GEMINI_API_KEY (free tier at Google AI Studio)
+//   3. ChatGPT     — secret OPENAI_API_KEY (paid, optional)
+//   4. Grok        — secret XAI_API_KEY (paid, optional)
+//   5. Groq/Llama  — secret GROQ_API_KEY (free tier)
+//   6. Cloudflare Workers AI — always on, free: Llama 3.3, then Mistral / Qwen as backups
+// Keys are Cloudflare *secrets* (Worker → Settings → Variables and Secrets). Never put them in this file.
 // Optional vars: MODEL_FREE, MODEL, MODEL_QUICK, DAILY_LIMIT (✨ per code per day, default 80), DAILY_TOTAL (whole site, default 500)
 import { DurableObject } from 'cloudflare:workers';
 
@@ -78,17 +85,83 @@ async function ai(request, env) {
   const prompt = body && body.prompt;
   if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 30000) return json({ error: 'Bad request' }, 400);
   if (body.image != null && (typeof body.image !== 'string' || body.image.length > 6000000 || !/^[A-Za-z0-9+/=]+$/.test(body.image))) return json({ error: 'That photo is too big. Try another one.' }, 400);
-  return env.ANTHROPIC_API_KEY ? claudeAI(body, env) : freeAI(body, env);
+  return aiChain(body, env);
+}
+
+const APP_CONTEXT = 'You are the AI helper inside "Loaded Bible", an app that helps people "load" (mark up) their PAPER Bible by hand: highlighting with a color key, margin notes, sticky notes, inserts, study pages with colored section boxes, cross-references, prayers and a faith journal. Be accurate with Scripture and references. Write in plain, modern, everyday English (never King James style). Follow the requested output format exactly; when JSON is requested, reply with ONLY valid JSON (no markdown fences, no extra text).';
+
+async function aiChain(body, env) {
+  const vision = !!body.image;
+  const steps = [];
+  if (env.ANTHROPIC_API_KEY) steps.push(['Claude', () => claudeAI(body, env)]);
+  if (env.GEMINI_API_KEY) steps.push(['Gemini', () => geminiAI(body, env)]);
+  if (env.OPENAI_API_KEY) steps.push(['ChatGPT', () => openaiLike(body, 'https://api.openai.com/v1/chat/completions', env.OPENAI_API_KEY, env.MODEL_OPENAI || 'gpt-4o-mini', vision)]);
+  if (env.XAI_API_KEY) steps.push(['Grok', () => openaiLike(body, 'https://api.x.ai/v1/chat/completions', env.XAI_API_KEY, env.MODEL_XAI || 'grok-3-mini', vision)]);
+  if (env.GROQ_API_KEY && !vision) steps.push(['Groq', () => openaiLike(body, 'https://api.groq.com/openai/v1/chat/completions', env.GROQ_API_KEY, env.MODEL_GROQ || 'llama-3.3-70b-versatile', false)]);
+  if (env.AI) {
+    steps.push(['Cloudflare', () => freeAI(body, env)]);
+    if (!vision) for (const m of (env.MODELS_BACKUP || '@cf/mistralai/mistral-small-3.1-24b-instruct,@cf/qwen/qwen2.5-coder-32b-instruct').split(',')) steps.push(['Cloudflare ' + m.split('/').pop(), () => freeAI(body, env, m.trim())]);
+  }
+  let last = null;
+  for (const [name, run] of steps) {
+    try {
+      const r = await run();
+      if (r && r.ok) { const h = new Headers(r.headers); h.set('X-AI-Provider', name); return new Response(r.body, { status: 200, headers: h }); }
+      last = r; console.log('AI step failed', name, r && r.status);
+    } catch (e) { console.log('AI step error', name, String((e && e.message) || e)); }
+  }
+  return json({ error: 'All the AI helpers are busy right now. Please try again in a little while.' }, last && last.status === 429 ? 429 : 503);
+}
+
+// Convert any provider's stream (OpenAI-style, Gemini or Workers AI) into the stream format the app reads.
+function toAppStream(stream) {
+  const enc = new TextEncoder(), dec = new TextDecoder(); let buf = '';
+  const out = (text) => enc.encode('data: ' + JSON.stringify({ type: 'content_block_delta', delta: { type: 'text_delta', text } }) + '\n\n');
+  const ts = new TransformStream({
+    transform(chunk, ctrl) {
+      buf += dec.decode(chunk, { stream: true }); let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (!line.startsWith('data:')) continue;
+        const d = line.slice(5).trim(); if (!d || d === '[DONE]') continue;
+        let j; try { j = JSON.parse(d); } catch (e) { continue; }
+        const c = j.choices && j.choices[0];
+        const g = j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts;
+        const t = j.response ?? (c && ((c.delta && c.delta.content) || c.text)) ?? (g ? g.map(p => p.text || '').join('') : '') ?? '';
+        if (t) ctrl.enqueue(out(t));
+      }
+    },
+    flush(ctrl) { ctrl.enqueue(enc.encode('data: ' + JSON.stringify({ type: 'message_delta', delta: { stop_reason: 'end_turn' } }) + '\n\n')); }
+  });
+  return new Response(stream.pipeThrough(ts), { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
+}
+
+async function openaiLike(body, url, key, model, vision) {
+  const user = vision ? [{ type: 'text', text: body.prompt }, { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + body.image } }] : body.prompt;
+  const r = await fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, stream: true, max_tokens: body.tier === 'quick' ? 1500 : 6000, messages: [{ role: 'system', content: APP_CONTEXT }, { role: 'user', content: user }] }) });
+  if (!r.ok) { console.log('provider error', url, r.status, (await r.text()).slice(0, 300)); return json({ error: 'busy' }, r.status === 429 ? 429 : 502); }
+  return toAppStream(r.body);
+}
+
+async function geminiAI(body, env) {
+  const model = env.MODEL_GEMINI || 'gemini-2.5-flash';
+  const parts = [{ text: body.prompt }]; if (body.image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: body.image } });
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
+    body: JSON.stringify({ systemInstruction: { parts: [{ text: APP_CONTEXT }] }, contents: [{ role: 'user', parts }], generationConfig: { maxOutputTokens: body.tier === 'quick' ? 1500 : 6000 } }) });
+  if (!r.ok) { console.log('Gemini error', r.status, (await r.text()).slice(0, 300)); return json({ error: 'busy' }, r.status === 429 ? 429 : 502); }
+  return toAppStream(r.body);
 }
 
 // Free: Cloudflare Workers AI (daily free allowance, resets 00:00 UTC). Output is converted to the same stream format the app reads.
-async function freeAI(body, env) {
+async function freeAI(body, env, forceModel) {
   if (!env.AI) return json({ error: 'The free AI isn’t connected yet. Please try again in a few minutes.' }, 503);
   const vision = !!body.image;
-  const model = vision ? (env.MODEL_VISION || '@cf/meta/llama-3.2-11b-vision-instruct') : (env.MODEL_FREE || '@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+  const model = forceModel || (vision ? (env.MODEL_VISION || '@cf/meta/llama-3.2-11b-vision-instruct') : (env.MODEL_FREE || '@cf/meta/llama-3.3-70b-instruct-fp8-fast'));
   const input = {
     messages: [
-      { role: 'system', content: 'You are a careful, accurate Bible study assistant. Quote and reference Scripture correctly. Follow the requested output format exactly; when JSON is requested, reply with only valid JSON.' },
+      { role: 'system', content: APP_CONTEXT },
       { role: 'user', content: body.prompt }
     ],
     stream: true, max_tokens: body.tier === 'quick' ? 1200 : (vision ? 2048 : 4096)
@@ -108,24 +181,7 @@ async function freeAI(body, env) {
     if (/3036|allocation|neuron|limit/i.test(m)) return json({ error: 'Today’s free AI is used up. It resets every night at 1:00 (Amsterdam time) — please try again then!' }, 429);
     return json({ error: 'The free AI had a problem. Please try again.' }, 502);
   }
-  const enc = new TextEncoder(), dec = new TextDecoder(); let buf = '';
-  const out = (text) => enc.encode('data: ' + JSON.stringify({ type: 'content_block_delta', delta: { type: 'text_delta', text } }) + '\n\n');
-  const ts = new TransformStream({
-    transform(chunk, ctrl) {
-      buf += dec.decode(chunk, { stream: true }); let i;
-      while ((i = buf.indexOf('\n')) >= 0) {
-        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
-        if (!line.startsWith('data:')) continue;
-        const d = line.slice(5).trim(); if (!d || d === '[DONE]') continue;
-        let j; try { j = JSON.parse(d); } catch (e) { continue; }
-        const c = j.choices && j.choices[0];
-        const t = j.response ?? (c && ((c.delta && c.delta.content) || c.text)) ?? '';
-        if (t) ctrl.enqueue(out(t));
-      }
-    },
-    flush(ctrl) { ctrl.enqueue(enc.encode('data: ' + JSON.stringify({ type: 'message_delta', delta: { stop_reason: 'end_turn' } }) + '\n\n')); }
-  });
-  return new Response(stream.pipeThrough(ts), { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
+  return toAppStream(stream);
 }
 
 async function claudeAI(body, env) {
@@ -134,19 +190,32 @@ async function claudeAI(body, env) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model, max_tokens: 12000, stream: true, messages: [{ role: 'user', content: body.image ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: body.image } }, { type: 'text', text: prompt }] : prompt }] })
+    body: JSON.stringify({ model, max_tokens: 12000, stream: true, system: APP_CONTEXT, messages: [{ role: 'user', content: body.image ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: body.image } }, { type: 'text', text: prompt }] : prompt }] })
   });
   if (!r.ok) {
     console.log('Anthropic error', r.status, (await r.text()).slice(0, 500));
-    return json({ error: r.status === 429 ? 'The AI helper is busy — try again in a minute.' : r.status === 401 ? 'The Anthropic key isn’t working — check ANTHROPIC_API_KEY in Cloudflare.' : 'The AI helper had a problem. Please try again.' }, 502);
+    return json({ error: 'busy' }, r.status === 429 ? 429 : 502);
   }
   return new Response(r.body, { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
 }
 
-export default {
+const handlers = {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
     if (!pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    // The Claude version of the app may call the AI here as a backup when Claude's limit is reached.
+    // Access still needs a valid Bible code, so allowing other origins only opens these two endpoints.
+    const CORS_PATHS = ['/api/ai', '/api/code/check'];
+    if (CORS_PATHS.includes(pathname)) {
+      const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, X-Code', 'Access-Control-Expose-Headers': 'X-AI-Provider', 'Access-Control-Max-Age': '86400' };
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+      const res = await handlers.route(request, env, pathname);
+      const h = new Headers(res.headers); Object.entries(cors).forEach(([k, v]) => h.set(k, v));
+      return new Response(res.body, { status: res.status, headers: h });
+    }
+    return handlers.route(request, env, pathname);
+  },
+  async route(request, env, pathname) {
 
     // Real Bible text for public-domain translations (cached for 30 days)
     if (pathname === '/api/bible' && request.method === 'GET') {
@@ -233,3 +302,4 @@ export default {
     return res;
   }
 };
+export default handlers;
