@@ -958,17 +958,30 @@ async function ai(prompt,onText,signal,tier,img){try{if(/paper Bible|PAPER Bible
   try{return await sample(prompt,opts)}
   catch(e){if(!isLimitErr(e))throw e;return backupAI(prompt,onText,signal,tier,img)}
 }
-const SITE='https://loadmybible.shengcremers.workers.dev';
 function isLimitErr(e){if(!e||e.code==='not_granted'||e.name==='AbortError'||e.code==='aborted')return false;return ['rate_limited','quota_exceeded','usage_limit','usage_limit_exceeded','limit_reached','overloaded'].includes(e.code)||/limit|quota|usage|capacity|too many/i.test(String(e.message||''))}
-async function backupAI(prompt,onText,signal,tier,img){const bc=(settings().backupCode||'').trim();
-  if(!bc){backupSheet('nocode');throw {code:'claude_limit',message:'Claude’s limit is reached. Add your website code in Profile → 🔑 Code & backup to keep going with a backup AI.'}}
-  if(!S._bkToast){S._bkToast=1;toast('Claude’s limit is reached: using a backup AI for now 🤖')}
-  try{return await aiServer(prompt,onText,signal,tier,img,SITE,bc)}
-  catch(e){if(e&&(e.name==='TypeError'||/fetch|network|load failed/i.test(String(e.message||'')))){backupSheet('blocked');throw {code:'claude_limit',message:'Claude’s limit is reached, and Claude doesn’t let this page reach the backup AI. Open the website to keep going.'}}throw e}}
-function backupSheet(why){if(S._bkSheet===why)return;S._bkSheet=why;
-  openSheet(`<h3>⏳ Claude’s limit is reached</h3><p>${why==='nocode'?'You can keep going with a free backup AI through your Loaded Bible website. Add your website’s Bible code once, and the app switches by itself whenever Claude is at its limit.':'Claude doesn’t let this page reach the backup AI. Keep going on your website: it has the same app and switches between AIs by itself.'}</p>
-   ${why==='nocode'?`<label class="l">Your website Bible code</label><input class="f" id="bkCode" placeholder="e.g. GRACE-7K4M-2QXT" autocomplete="off"><button class="btn pri wide" style="margin-top:8px" data-act="bkSave">Save and test</button>`:''}
-   <a class="btn wide" style="margin-top:8px;justify-content:center" href="${SITE}" target="_blank" rel="noopener">🌐 Open the website</a>`)}
+const APP_CONTEXT='You are the AI helper inside "Loaded Bible", an app that helps people "load" (mark up) their PAPER Bible by hand: highlighting with a color key, margin notes, sticky notes, inserts, study pages with colored section boxes, cross-references, prayers and a faith journal. Be accurate with Scripture and references. Write in plain, modern, everyday English (never King James style). Follow the requested output format exactly; when JSON is requested, reply with ONLY valid JSON (no markdown fences, no extra text).';
+const BK_PROV=[['gemini','Gemini','aistudio.google.com'],['groq','Groq (Llama)','console.groq.com']];
+function bkKeys(){const k=settings().aikeys||{};return BK_PROV.filter(([id])=>k[id]).map(([id,n])=>({id,n,key:k[id]}))}
+async function streamSSE(r,pick,onText){const rd=r.body.getReader(),dec=new TextDecoder();let buf='',text='';
+  for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
+    while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;const d=line.slice(5).trim();if(!d||d==='[DONE]')continue;let j;try{j=JSON.parse(d)}catch(e){continue}const t=pick(j);if(t){text+=t;onText&&onText(text)}}}
+  return {text,truncated:false}}
+async function callProvider(p,prompt,onText,signal,tier,img){const max=tier==='quick'?1500:6000;let r;
+  if(p.id==='gemini'){const parts=[{text:prompt}];if(img&&img.b64)parts.push({inline_data:{mime_type:'image/jpeg',data:img.b64}});
+    r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+(settings().geminiModel||'gemini-2.5-flash')+':streamGenerateContent?alt=sse',{method:'POST',signal,headers:{'Content-Type':'application/json','x-goog-api-key':p.key},body:JSON.stringify({systemInstruction:{parts:[{text:APP_CONTEXT}]},contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:max}})});
+    if(!r.ok)throw {status:r.status};return streamSSE(r,j=>{const c=j.candidates&&j.candidates[0]&&j.candidates[0].content;return c&&c.parts?c.parts.map(x=>x.text||'').join(''):''},onText)}
+  if(p.id==='groq'){if(img)throw {status:415};
+    r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+p.key},body:JSON.stringify({model:settings().groqModel||'llama-3.3-70b-versatile',stream:true,max_tokens:max,messages:[{role:'system',content:APP_CONTEXT},{role:'user',content:prompt}]})});
+    if(!r.ok)throw {status:r.status};return streamSSE(r,j=>{const c=j.choices&&j.choices[0];return c&&c.delta&&c.delta.content||''},onText)}
+  throw {status:400}}
+async function backupAI(prompt,onText,signal,tier,img){const L=bkKeys();
+  if(!L.length){backupSheet();throw {code:'claude_limit',message:'Claude’s limit is reached. Add a free backup AI key in Profile → 🤖 Backup AI to keep going.'}}
+  let blocked=0,lastErr=null;
+  for(const p of L){try{const r=await callProvider(p,prompt,onText,signal,tier,img);if(!S._bkToast||S._bkToast!==p.id){S._bkToast=p.id;toast('Claude’s limit is reached: '+p.n+' is helping for now 🤖')}return r}
+    catch(e){if(e&&(e.name==='AbortError'))throw e;if(e&&e.name==='TypeError')blocked++;lastErr=e}}
+  if(blocked===L.length)throw {code:'claude_limit',message:'Claude’s limit is reached, and Claude doesn’t let this page reach the backup AI. Please try again later.'};
+  throw {code:'claude_limit',message:'Claude’s limit is reached and the backup AIs are busy too'+(lastErr&&lastErr.status===400||lastErr&&lastErr.status===401||lastErr&&lastErr.status===403?' (check your key in Profile → 🤖 Backup AI)':'')+'. Please try again later.'}}
+function backupSheet(){if(S._bkSheet)return;S._bkSheet=1;openSheet(`<h3>⏳ Claude’s limit is reached</h3><p>You can keep going with a free backup AI. Add a free Gemini or Groq key once, and the app switches by itself whenever Claude is at its limit. Only then.</p><button class="btn pri wide" data-act="bkOpen">🤖 Set up a backup AI</button>`)}
 function quoteTrans(){let b=null;try{b=curBible()}catch(e){}const bt=b&&b.translation;if(bt)return bt+' (their paper Bible)';const t=settings().trans;return t&&t!=='KJV'?TRANS[t]:'a modern, easy-to-read translation (like the CSB, NIV or ESV)'}
 function langRule(){return '\n\nLANGUAGE (very important): write everything in your own words (notes, margin notes, headings, explanations, answers, prayers, tips) in plain, modern, everyday English that a teenager easily understands. NEVER write in old King James style: no thee, thou, thy, thine, ye, hath, doth, unto, or -eth / -est endings, even when a verse you quote uses them. When you quote a Bible verse, use the wording of '+quoteTrans()+'.'}
 function aiErr(e){if(!e)return 'Something went wrong.';if(e.code==='unavailable_here')return e.message;if(e.code==='not_granted')return 'Claude access was not allowed for this page.';if(e.code==='claude_limit')return e.message;if(e.code==='rate_limited')return e.message&&!/^Too many/.test(e.message)?e.message:'Too many requests — wait a minute and try again.';if(e.name==='AbortError'||e.code==='aborted')return 'Stopped.';return e.message||'Something went wrong.'}
@@ -1986,11 +1999,11 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     if(m==='all'||m==='none')keys.forEach(k=>st[k]=m==='all');else if(m==='basic')keys.forEach(k=>st[k]=PBASIC[t].includes(k));else el.dataset.g.split(',').forEach(k=>st[k]=m==='gall');renderView()},
   stepMore:el=>{const k=el.dataset.sk;S.stepOpen=Object.assign({},S.stepOpen);S.stepOpen[k]=!S.stepOpen[k];const box=el.closest('.stepacts');if(box){box.classList.toggle('open',S.stepOpen[k]);el.textContent=S.stepOpen[k]?'‹ Less':'⋯ More'}},
   nextStep:el=>{const g=[...document.querySelectorAll('[data-act=tick][data-k="'+el.dataset.k+'"]')].find(b=>b.dataset.i===el.dataset.i);if(g){const st=g.closest('.step');st.scrollIntoView({behavior:'smooth',block:'center'});st.classList.add('flash');setTimeout(()=>st.classList.remove('flash'),1600)}},
-  bkSave:async()=>{const i=$('#bkCode');const c=(i&&i.value||'').trim().toUpperCase();if(!c){toast('Type your website code first');return}saveSettings({backupCode:c});S._bkSheet=null;toast('Testing…');
-    try{const r=await fetch(SITE+'/api/code/check',{method:'POST',headers:{'Content-Type':'application/json','X-Code':c},body:'{}'});if(r.ok)toast('✓ Backup AI is ready');else toast(r.status===401?'That code doesn’t exist on the website. Check it and try again.':'The website didn’t answer. Try again later.')}
-    catch(e){toast('Saved, but Claude blocks this page from reaching the website. When Claude’s limit is reached, use the website instead.')}
-    if(sheetOpen())closeSheet();renderView()},
-  bkClear:()=>{saveSettings({backupCode:''});renderView();toast('Backup AI turned off')},
+  bkSave:async()=>{const k=Object.assign({},settings().aikeys||{});BK_PROV.forEach(([id])=>{const e=$('#bk_'+id);if(e)k[id]=e.value.trim()});saveSettings({aikeys:k});S._bkSheet=null;S.bkTest={};const L=bkKeys();if(!L.length){toast('Paste a key first');renderView();return}toast('Testing…');
+    for(const p of L){try{const r=await callProvider(p,'Reply with only the word OK.',null,null,'quick');S.bkTest[p.id]=/ok/i.test(r.text)?'✓ Works! Ready as backup.':'✓ Connected.'}catch(e){S.bkTest[p.id]=e&&e.name==='TypeError'?'⛔ Claude blocks this page from reaching '+p.n+'. A backup AI isn’t possible inside the Claude app.':e&&[400,401,403].includes(e.status)?'✕ This key doesn’t work. Check it and paste it again.':e&&e.status===429?'⏳ Works, but this key is at its limit right now.':'✕ Something went wrong. Try again later.'}}
+    renderView()},
+  bkOpen:()=>{closeSheet();S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{bk:true});setTab('account');setTimeout(()=>{const f=$('#mf_bk');if(f)f.scrollIntoView({block:'start',behavior:'smooth'})},120)},
+  bkClear:()=>{saveSettings({aikeys:{}});S.bkTest={};renderView();toast('Backup keys removed')},
   goBack:()=>{goBack()},
   achOpen:()=>{S.acctSub='ach';if(S.tab!=='account'){S._navKeep=1;setTab('account');S._navKeep=0}else{renderView();window.scrollTo(0,0)}},
   achBack:()=>{S.acctSub='';renderView();window.scrollTo(0,0)},
@@ -3419,10 +3432,11 @@ function viewAch(v,st){const got=BADGES.filter(b=>b[4](st));const f=S.achF||'all
    <div class="chips achf">${[['all','✨ All'],['got','✓ Earned'],['todo','🔒 To earn']].concat(BGROUPS.map(g=>[g[0],g[1]+' '+g[2]])).map(([k,l])=>`<button class="chip ${f===k?'on':''}" data-act="achF" data-f="${k}">${l}</button>`).join('')}</div>
    ${groups.map(g=>{let L=BADGES.filter(b=>(BG_OLD[b[0]]||'mile')===g[0]);if(f==='got')L=L.filter(b=>b[4](st));if(f==='todo')L=L.filter(b=>!b[4](st));if(!L.length)return '';const n=L.filter(b=>b[4](st)).length;
      return `<div class="row" style="margin:16px 2px 8px"><h3 class="grow" style="margin:0;font-size:18px">${g[1]} ${g[2]}</h3><span class="small muted">${f==='todo'?L.length+' to go':n+' / '+L.length}</span></div><div class="achgrid">${L.map(card).join('')}</div>`}).join('')}`}
-function bkCard(){const c=settings().backupCode||'';return `<div><p class="small" style="margin-top:0">When Claude’s limit is reached, the app switches by itself to a backup AI on your Loaded Bible website (Gemini, Groq, Llama and others). <b>Only then.</b> Normally it always uses Claude.</p>
-  <label class="l">Your website Bible code</label><input class="f" id="bkCode" value="${esc(c)}" placeholder="e.g. GRACE-7K4M-2QXT" autocomplete="off">
-  <div class="row" style="margin-top:8px"><button class="btn pri grow" data-act="bkSave">${c?'Save and test':'Save and test'}</button>${c?'<button class="btn" data-act="bkClear">Turn off</button>':''}</div>
-  <p class="small muted" style="margin-bottom:0">Find your code on the website under Profile → Code &amp; backup. It stays private in your app.</p></div>`}
+function bkCard(){const k=settings().aikeys||{};const T=S.bkTest||{};
+  return `<div><p class="small" style="margin-top:0">When Claude’s limit is reached, the app switches by itself to a free backup AI. <b>Only then.</b> Normally it always uses Claude. It tries them in this order.</p>
+   ${BK_PROV.map(([id,n,site])=>`<label class="l">${n} key <span class="small muted">· free at ${site}</span></label><div class="row"><input class="f grow" id="bk_${id}" type="password" value="${esc(k[id]||'')}" placeholder="Paste your ${n.split(' ')[0]} key" autocomplete="off" style="margin:0">${k[id]?'<span class="tag">saved</span>':''}</div>${T[id]?`<div class="small" style="margin-top:4px">${esc(T[id])}</div>`:''}`).join('')}
+   <div class="row" style="margin-top:10px"><button class="btn pri grow" data-act="bkSave">💾 Save and test</button>${Object.keys(k).some(x=>k[x])?'<button class="btn" data-act="bkClear">Remove keys</button>':''}</div>
+   <p class="small muted" style="margin-bottom:0">🔒 Your keys stay in your own private app data. Never share them with anyone, not even in a chat.</p></div>`}
 function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);const got=BADGES.filter(b=>b[4](st));
   const goal=pf.goal||5;const vref=votdRef();const vp=parseRef(vref);
   const vtxt=KJV&&vp?vrange(vp).map(n=>plainV((KJV[vp.b]&&KJV[vp.b][vp.c]||[])[n-1]||'')).join(' '):'';
@@ -3450,7 +3464,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
      <label class="l">Bible translation</label><div class="chips">${Object.keys(TRANS).map(t=>`<button class="chip ${settings().trans===t?'on':''}" data-act="setTrans" data-t="${t}">${t}</button>`).join('')}</div></div><div class="msub"><div class="row"><div class="grow"><b>🌱 Simple mode</b><div class="small muted">Bigger text, fewer buttons and easier words. Great for kids or if you’re new to the Bible.</div></div><button class="switch ${settings().simple?'on':''}" data-act="simpleToggle" aria-label="Simple mode"><i></i></button></div></div>`)}
    ${mrow('music','🎵','Study music',MU.on?(MU.playing?'♪ Playing: ':'Paused: ')+esc(muTitle(TRACKS[MU.cur]).name):'Calm hymns while you study',()=>muCard())}
    ${mrow('bibles','📖','My Bibles',curBible()?esc((curBible().name||curBible().query)):'Tell us which Bible you have',null,'data-act="goKit" data-s="projects"')}
-   ${!STANDALONE?mrow('bk','🤖','Backup AI',settings().backupCode?'On: used only when Claude’s limit is reached':'Keep going when Claude’s limit is reached',()=>bkCard()):''}
+   ${!STANDALONE?mrow('bk','🤖','Backup AI',bkKeys().length?'On: '+bkKeys().map(p=>p.n.split(' ')[0]).join(' → ')+', only when Claude’s limit is reached':'Keep going when Claude’s limit is reached',()=>bkCard()):''}
    ${mrow('safe','🔑','Code & backup',settings().lastBackup?'Last backup: '+fmtDate(settings().lastBackup):'Keep your work safe',()=>`${STANDALONE&&Code.value?`<div class="card codecard"><div class="row"><b class="grow">🔑 My Bible code</b><button class="btn sm ghost" data-act="codeShow">${S.codeShown?'🙈 Hide':'👁 Show'}</button></div>
      <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
