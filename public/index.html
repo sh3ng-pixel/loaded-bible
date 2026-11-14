@@ -601,6 +601,7 @@ details.tmore>summary .mchev{margin-left:auto}details.tmore[open]>summary .mchev
 .step.flash{animation:stflash 1.6s ease-out}@keyframes stflash{0%,40%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
 .pnext{display:flex;align-items:center;gap:8px;margin:4px 0 10px}
 .limitbox{border:1.5px solid var(--gold)}
+.bkres{margin-top:6px;padding:8px 10px;border-radius:10px;font-size:14px;font-weight:600;background:var(--soft)}.bkres.ok{background:color-mix(in srgb,#5f8a65 22%,var(--card))}.bkres.bad{background:color-mix(in srgb,#c0392b 18%,var(--card))}
 .achentry{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--gold);font:inherit;color:inherit;cursor:pointer;text-align:left}
 .achtrophy{font-size:34px;animation:mufloat 3s ease-in-out infinite}
 .achhead{margin:4px 0 8px}.achhero{display:flex;gap:16px;align-items:center;padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
@@ -2010,9 +2011,13 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     if(m==='all'||m==='none')keys.forEach(k=>st[k]=m==='all');else if(m==='basic')keys.forEach(k=>st[k]=PBASIC[t].includes(k));else el.dataset.g.split(',').forEach(k=>st[k]=m==='gall');renderView()},
   stepMore:el=>{const k=el.dataset.sk;S.stepOpen=Object.assign({},S.stepOpen);S.stepOpen[k]=!S.stepOpen[k];const box=el.closest('.stepacts');if(box){box.classList.toggle('open',S.stepOpen[k]);el.textContent=S.stepOpen[k]?'‹ Less':'⋯ More'}},
   nextStep:el=>{const g=[...document.querySelectorAll('[data-act=tick][data-k="'+el.dataset.k+'"]')].find(b=>b.dataset.i===el.dataset.i);if(g){const st=g.closest('.step');st.scrollIntoView({behavior:'smooth',block:'center'});st.classList.add('flash');setTimeout(()=>st.classList.remove('flash'),1600)}},
-  bkSave:async()=>{const k=Object.assign({},settings().aikeys||{});BK_PROV.forEach(([id])=>{const e=$('#bk_'+id);if(e)k[id]=e.value.trim()});saveSettings({aikeys:k});S._bkSheet=null;S.bkTest={};const L=bkKeys();if(!L.length){toast('Paste a key first');renderView();return}toast('Testing…');
-    for(const p of L){try{const r=await callProvider(p,'Reply with only the word OK.',null,null,'quick');S.bkTest[p.id]=/ok/i.test(r.text)?(STANDALONE?'✓ Works! Your key is ready.':'✓ Works! Ready as backup.'):'✓ Connected.'}catch(e){S.bkTest[p.id]=e&&e.name==='TypeError'?(STANDALONE?'⛔ Couldn’t reach '+p.n+'. Check your internet and try again.':'⛔ Claude blocks this page from reaching '+p.n+'. A backup AI isn’t possible inside the Claude app. Use your key on the website instead.'):e&&[400,401,403].includes(e.status)?'✕ This key doesn’t work'+(e.msg?': '+String(e.msg).slice(0,140):'')+'. Check it and paste it again.':e&&e.status===429?'⏳ Works, but this key is at its limit right now.':'✕ It didn’t work'+(e&&e.status?' (error '+e.status+')':'')+(e&&e.msg?': '+String(e.msg).slice(0,160):'')+'.'}}
-    renderView()},
+  bkSave:async()=>{const k=Object.assign({},settings().aikeys||{});BK_PROV.forEach(([id])=>{const e=$('#bk_'+id);if(e)k[id]=e.value.trim().replace(/\s+/g,'')});saveSettings({aikeys:k});S._bkSheet=null;S.bkTest={};const L=bkKeys();if(!L.length){toast('Paste a key first');renderView();return}
+    L.forEach(p=>S.bkTest[p.id]='⏳ Testing…');renderView();
+    for(const p of L){const ctrl=new AbortController();const tm=setTimeout(()=>ctrl.abort(),25000);
+      try{const r=await callProvider(p,'Reply with only the word OK.',null,ctrl.signal,'quick');S.bkTest[p.id]=(r.text||'').trim()?'✅ WORKS! '+(STANDALONE?'Your key is ready.':'Ready as backup.'):'❌ FAILED: no answer came back.'}
+      catch(e){S.bkTest[p.id]=e&&e.name==='AbortError'?'❌ FAILED: no answer within 25 seconds. Try again.':e&&e.name==='TypeError'?(STANDALONE?'❌ FAILED: couldn’t reach '+p.n+'. Check your internet.':'❌ FAILED: Claude blocks this page from reaching '+p.n+'. Use your key on the website instead.'):'❌ FAILED'+(e&&e.status?' (error '+e.status+')':'')+(e&&e.msg?': '+String(e.msg).slice(0,160):'')}
+      finally{clearTimeout(tm)}
+      toast(p.n+': '+(S.bkTest[p.id].startsWith('✅')?'works ✅':'failed ❌'));renderView()}},
   bkOpen:()=>{closeSheet();S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{bk:true});setTab('account');setTimeout(()=>{const f=$('#mf_bk');if(f)f.scrollIntoView({block:'start',behavior:'smooth'})},120)},
   bkClear:()=>{saveSettings({aikeys:{}});S.bkTest={};renderView();toast('Backup keys removed')},
   qLater:el=>{const w=el.dataset.w;if(w==='load'){const B=S.build;const lab=B.mode==='topic'?'Loading: '+(B.topic||'topic'):B.mode==='book'?'Loading: '+BM[B.bookOnly].name:'Loading: '+BM[B.book].name+' '+B.ch+(B.mode==='verses'?':'+(B.v1||1)+'-'+(B.v2||B.v1||1):'');
@@ -2026,7 +2031,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
       let copied=false;try{await navigator.clipboard.writeText(code);copied=true}catch(e){}
       S.move.msg=(copied?'✓ Copied! ':'Copy didn’t work here, so use the button above to open the website. ')+r.n+' items'+(r.dropped?' (without your profile pictures, they were too big)':'')+'. Now paste it on the website.';toast(copied?'Move code copied ✓':'Use “open the website” instead')}
     catch(e){S.move={msg:'Something went wrong. Try again, or use 💾 Backup instead.'}}renderView()},
-  mvLoad:()=>{const t=(($('#mvIn')||{}).value||'').trim().replace(/^LB1:/,'').replace(/^.*#lbsync=/,'').replace(/\s+/g,'');if(!t){toast('Paste your move code first');return}S.pendingSync=t;showSyncPrompt()},
+  mvLoad:()=>{const t=(($('#mvIn')||{}).value||'').trim().replace(/^.*#lbsync=/,'').replace(/^\s*LB1:/i,'').replace(/[^A-Za-z0-9_+\/-]/g,'');if(!t){toast('Paste your move code first');return}S.pendingSync=t;showSyncPrompt()},
   goBack:()=>{goBack()},
   achOpen:()=>{S.acctSub='ach';if(S.tab!=='account'){S._navKeep=1;setTab('account');S._navKeep=0}else{renderView();window.scrollTo(0,0)}},
   achBack:()=>{S.acctSub='';renderView();window.scrollTo(0,0)},
@@ -3502,7 +3507,7 @@ function viewAch(v,st){const got=BADGES.filter(b=>b[4](st));const f=S.achF||'all
    ${groups.map(g=>{let L=BADGES.filter(b=>(BG_OLD[b[0]]||'mile')===g[0]);if(f==='got')L=L.filter(b=>b[4](st));if(f==='todo')L=L.filter(b=>!b[4](st));if(!L.length)return '';const n=L.filter(b=>b[4](st)).length;
      return `<div class="row" style="margin:16px 2px 8px"><h3 class="grow" style="margin:0;font-size:18px">${g[1]} ${g[2]}</h3><span class="small muted">${f==='todo'?L.length+' to go':n+' / '+L.length}</span></div><div class="achgrid">${L.map(card).join('')}</div>`}).join('')}`}
 function moveCard(){if(STANDALONE)return `<div><p class="small" style="margin-top:0">In the Claude app: Profile → 🌐 <b>Move my progress to the website</b> → <b>📋 Copy my move code</b>. Then paste it here.</p>
-   <textarea class="f" id="mvIn" rows="3" placeholder="Paste your move code here (it starts with LB1:)" style="font-size:13px"></textarea>
+   <textarea class="f" id="mvIn" rows="3" placeholder="Paste your move code here (it starts with LB1:)" style="font-size:13px" autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>
    <button class="btn pri wide" style="margin-top:8px" data-act="mvLoad">📥 Load my progress</button>
    <p class="small muted" style="margin-bottom:0">Things with the same name get replaced by the version from the Claude app. Everything else stays.</p></div>`;
   const M=S.move||{};return `<div><p class="small" style="margin-top:0">This makes a <b>move code</b> with all your progress: loadings, ticks, notes, journal, keys, Bibles and settings. Paste it on the website under Profile → 🌐 <b>Bring my Claude app progress</b>.</p>
@@ -3512,7 +3517,7 @@ function moveCard(){if(STANDALONE)return `<div><p class="small" style="margin-to
    <p class="small muted" style="margin-bottom:0">Log in on the website with your Bible code first, so it’s saved under your code.</p></div>`}
 function bkCard(){const k=settings().aikeys||{};const T=S.bkTest||{};
   return `<div><p class="small" style="margin-top:0">${STANDALONE?'With your own free key, the ✨ AI uses <b>your</b> Gemini or Groq first: smarter, and no daily limit from this website. If your key is busy, it uses the website’s free AI.':'When Claude’s limit is reached, the app switches by itself to a free backup AI. <b>Only then.</b> Normally it always uses Claude. It tries them in this order.'}</p>
-   ${BK_PROV.map(([id,n,site])=>`<label class="l">${n} key <span class="small muted">· free at ${site}</span></label><div class="row"><input class="f grow" id="bk_${id}" type="password" value="${esc(k[id]||'')}" placeholder="Paste your ${n.split(' ')[0]} key" autocomplete="off" style="margin:0">${k[id]?'<span class="tag">saved</span>':''}</div>${T[id]?`<div class="small" style="margin-top:4px">${esc(T[id])}</div>`:''}`).join('')}
+   ${BK_PROV.map(([id,n,site])=>`<label class="l">${n} key <span class="small muted">· free at ${site}</span></label><div class="row"><input class="f grow" id="bk_${id}" type="password" value="${esc(k[id]||'')}" placeholder="Paste your ${n.split(' ')[0]} key" autocomplete="off" style="margin:0">${k[id]?'<span class="tag">saved</span>':''}</div>${T[id]?`<div class="bkres ${T[id].startsWith('✅')?'ok':T[id].startsWith('⏳')?'':'bad'}">${esc(T[id])}</div>`:''}`).join('')}
    <div class="row" style="margin-top:10px"><button class="btn pri grow" data-act="bkSave">💾 Save and test</button>${Object.keys(k).some(x=>k[x])?'<button class="btn" data-act="bkClear">Remove keys</button>':''}</div>
    <p class="small muted" style="margin-bottom:0">🔒 Your keys stay in your own private app data. Never share them with anyone, not even in a chat.</p></div>`}
 function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);const got=BADGES.filter(b=>b[4](st));
@@ -3955,7 +3960,11 @@ async function buildSyncLink(){const items={};for(const [k,v] of Store.items)if(
   let packed=b64u.enc(await gzip(JSON.stringify({app:'loadedbible',v:1,items})));let dropped=false;
   if(packed.length>700000){delete items.pic_banner;delete items.pic_avatar;dropped=true;packed=b64u.enc(await gzip(JSON.stringify({app:'loadedbible',v:1,items})))}
   return {url:SITE_URL+'/#lbsync='+packed,n:Object.keys(items).length,dropped}}
-async function showSyncPrompt(){const raw=S.pendingSync;if(!raw)return;let d;try{d=JSON.parse(await gunzip(b64u.dec(raw)))}catch(e){S.pendingSync=null;toast('That link from the Claude app didn’t work — try sending again.');return}
+function moveFail(n,e){openSheet(`<h3>❌ The move code didn’t work</h3><p>${n<200?'The code is too short: it looks like only part of it was pasted.':'The code seems <b>cut off or changed</b> while copying ('+n+' characters arrived).'}</p>
+  <p><b>Try this:</b></p><ol><li>In the Claude app, tap <b>📋 Copy my move code</b> again.</li><li>Here, tap in the box, hold, and choose <b>Paste</b>. Don’t type in it.</li></ol>
+  <p class="small muted">Still not working? Use the file way: in the Claude app go to 🔑 Code &amp; backup → <b>Download my backup</b>, then here 🔑 Code &amp; backup → <b>Restore</b> and pick that file.</p>
+  <p class="small muted">(${esc(String((e&&e.message)||e||'').slice(0,80))})</p>`)}
+async function showSyncPrompt(){const raw=S.pendingSync;if(!raw)return;let d;try{d=JSON.parse(await gunzip(b64u.dec(raw)))}catch(e){S.pendingSync=null;moveFail(raw.length,e);return}
   if(!d||d.app!=='loadedbible'||!d.items){S.pendingSync=null;return}const n=Object.keys(d.items).filter(isItemKey).length;S._syncData=d;
   openSheet(`<div style="text-align:center"><div style="font-size:40px">📲</div><h3>Load your Claude progress?</h3><p>Add <b>${n} items</b> from the Claude app to <b>${esc(Code.value||'')}</b>?</p><p class="small muted">Items with the same name are replaced with the Claude version. Everything else stays.</p></div>
     <div class="row"><button class="btn pri grow" data-act="syncYes">✅ Yes, load it</button><button class="btn grow" data-act="syncNo">Not now</button></div>`)}
