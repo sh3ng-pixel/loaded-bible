@@ -969,11 +969,18 @@ async function streamSSE(r,pick,onText){const rd=r.body.getReader(),dec=new Text
   return {text,truncated:false}}
 async function callProvider(p,prompt,onText,signal,tier,img){const max=tier==='quick'?1500:6000;let r;
   if(p.id==='gemini'){const parts=[{text:prompt}];if(img&&img.b64)parts.push({inline_data:{mime_type:'image/jpeg',data:img.b64}});
-    r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+(settings().geminiModel||'gemini-2.5-flash')+':streamGenerateContent?alt=sse',{method:'POST',signal,headers:{'Content-Type':'application/json','x-goog-api-key':p.key},body:JSON.stringify({systemInstruction:{parts:[{text:APP_CONTEXT}]},contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:max}})});
-    if(!r.ok)throw {status:r.status};return streamSSE(r,j=>{const c=j.candidates&&j.candidates[0]&&j.candidates[0].content;return c&&c.parts?c.parts.map(x=>x.text||'').join(''):''},onText)}
+    const body=JSON.stringify({systemInstruction:{parts:[{text:APP_CONTEXT}]},contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:max}});
+    const models=[settings().geminiModel,S._gemOK,'gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash','gemini-1.5-flash'].filter((m,i,a)=>m&&a.indexOf(m)===i);let last={status:0};
+    for(const m of models){for(const how of ['header','query']){
+      const url='https://generativelanguage.googleapis.com/v1beta/models/'+m+':streamGenerateContent?alt=sse'+(how==='query'?'&key='+encodeURIComponent(p.key):'');
+      r=await fetch(url,{method:'POST',signal,headers:how==='header'?{'Content-Type':'application/json','x-goog-api-key':p.key}:{'Content-Type':'application/json'},body});
+      if(r.ok){S._gemOK=m;return streamSSE(r,j=>{const c=j.candidates&&j.candidates[0]&&j.candidates[0].content;return c&&c.parts?c.parts.map(x=>x.text||'').join(''):''},onText)}
+      let msg='';try{const t=await r.text();msg=(JSON.parse(t).error||{}).message||t.slice(0,160)}catch(e){}last={status:r.status,msg,model:m};
+      if(r.status===429)throw last;if(r.status===404)break;}}
+    throw last}
   if(p.id==='groq'){if(img)throw {status:415};
     r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+p.key},body:JSON.stringify({model:settings().groqModel||'llama-3.3-70b-versatile',stream:true,max_tokens:max,messages:[{role:'system',content:APP_CONTEXT},{role:'user',content:prompt}]})});
-    if(!r.ok)throw {status:r.status};return streamSSE(r,j=>{const c=j.choices&&j.choices[0];return c&&c.delta&&c.delta.content||''},onText)}
+    if(!r.ok){let msg='';try{msg=((await r.json()).error||{}).message||''}catch(e){}throw {status:r.status,msg}}return streamSSE(r,j=>{const c=j.choices&&j.choices[0];return c&&c.delta&&c.delta.content||''},onText)}
   throw {status:400}}
 async function backupAI(prompt,onText,signal,tier,img,quiet){const L=bkKeys();
   if(!L.length){backupSheet();throw {code:'claude_limit',message:'Claude’s limit is reached. Add a free backup AI key in Profile → 🤖 Backup AI to keep going.'}}
@@ -2004,7 +2011,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   stepMore:el=>{const k=el.dataset.sk;S.stepOpen=Object.assign({},S.stepOpen);S.stepOpen[k]=!S.stepOpen[k];const box=el.closest('.stepacts');if(box){box.classList.toggle('open',S.stepOpen[k]);el.textContent=S.stepOpen[k]?'‹ Less':'⋯ More'}},
   nextStep:el=>{const g=[...document.querySelectorAll('[data-act=tick][data-k="'+el.dataset.k+'"]')].find(b=>b.dataset.i===el.dataset.i);if(g){const st=g.closest('.step');st.scrollIntoView({behavior:'smooth',block:'center'});st.classList.add('flash');setTimeout(()=>st.classList.remove('flash'),1600)}},
   bkSave:async()=>{const k=Object.assign({},settings().aikeys||{});BK_PROV.forEach(([id])=>{const e=$('#bk_'+id);if(e)k[id]=e.value.trim()});saveSettings({aikeys:k});S._bkSheet=null;S.bkTest={};const L=bkKeys();if(!L.length){toast('Paste a key first');renderView();return}toast('Testing…');
-    for(const p of L){try{const r=await callProvider(p,'Reply with only the word OK.',null,null,'quick');S.bkTest[p.id]=/ok/i.test(r.text)?(STANDALONE?'✓ Works! Your key is ready.':'✓ Works! Ready as backup.'):'✓ Connected.'}catch(e){S.bkTest[p.id]=e&&e.name==='TypeError'?(STANDALONE?'⛔ Couldn’t reach '+p.n+'. Check your internet and try again.':'⛔ Claude blocks this page from reaching '+p.n+'. A backup AI isn’t possible inside the Claude app. Use your key on the website instead.'):e&&[400,401,403].includes(e.status)?'✕ This key doesn’t work. Check it and paste it again.':e&&e.status===429?'⏳ Works, but this key is at its limit right now.':'✕ Something went wrong. Try again later.'}}
+    for(const p of L){try{const r=await callProvider(p,'Reply with only the word OK.',null,null,'quick');S.bkTest[p.id]=/ok/i.test(r.text)?(STANDALONE?'✓ Works! Your key is ready.':'✓ Works! Ready as backup.'):'✓ Connected.'}catch(e){S.bkTest[p.id]=e&&e.name==='TypeError'?(STANDALONE?'⛔ Couldn’t reach '+p.n+'. Check your internet and try again.':'⛔ Claude blocks this page from reaching '+p.n+'. A backup AI isn’t possible inside the Claude app. Use your key on the website instead.'):e&&[400,401,403].includes(e.status)?'✕ This key doesn’t work'+(e.msg?': '+String(e.msg).slice(0,140):'')+'. Check it and paste it again.':e&&e.status===429?'⏳ Works, but this key is at its limit right now.':'✕ It didn’t work'+(e&&e.status?' (error '+e.status+')':'')+(e&&e.msg?': '+String(e.msg).slice(0,160):'')+'.'}}
     renderView()},
   bkOpen:()=>{closeSheet();S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{bk:true});setTab('account');setTimeout(()=>{const f=$('#mf_bk');if(f)f.scrollIntoView({block:'start',behavior:'smooth'})},120)},
   bkClear:()=>{saveSettings({aikeys:{}});S.bkTest={};renderView();toast('Backup keys removed')},
@@ -2015,6 +2022,11 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   basicLoad:()=>basicPlan(),
   qDel:el=>{qSave(qList().filter(x=>x.id!==el.dataset.i));renderView()},
   qTry:()=>{toast('Trying…');qRun(true)},
+  mvMake:async()=>{S.move={busy:true};renderView();try{const r=await buildSyncLink();const code='LB1:'+r.url.split('#lbsync=')[1];S.move={url:r.url,code};
+      let copied=false;try{await navigator.clipboard.writeText(code);copied=true}catch(e){}
+      S.move.msg=(copied?'✓ Copied! ':'Copy didn’t work here, so use the button above to open the website. ')+r.n+' items'+(r.dropped?' (without your profile pictures, they were too big)':'')+'. Now paste it on the website.';toast(copied?'Move code copied ✓':'Use “open the website” instead')}
+    catch(e){S.move={msg:'Something went wrong. Try again, or use 💾 Backup instead.'}}renderView()},
+  mvLoad:()=>{const t=(($('#mvIn')||{}).value||'').trim().replace(/^LB1:/,'').replace(/^.*#lbsync=/,'').replace(/\s+/g,'');if(!t){toast('Paste your move code first');return}S.pendingSync=t;showSyncPrompt()},
   goBack:()=>{goBack()},
   achOpen:()=>{S.acctSub='ach';if(S.tab!=='account'){S._navKeep=1;setTab('account');S._navKeep=0}else{renderView();window.scrollTo(0,0)}},
   achBack:()=>{S.acctSub='';renderView();window.scrollTo(0,0)},
@@ -3489,6 +3501,15 @@ function viewAch(v,st){const got=BADGES.filter(b=>b[4](st));const f=S.achF||'all
    <div class="chips achf">${[['all','✨ All'],['got','✓ Earned'],['todo','🔒 To earn']].concat(BGROUPS.map(g=>[g[0],g[1]+' '+g[2]])).map(([k,l])=>`<button class="chip ${f===k?'on':''}" data-act="achF" data-f="${k}">${l}</button>`).join('')}</div>
    ${groups.map(g=>{let L=BADGES.filter(b=>(BG_OLD[b[0]]||'mile')===g[0]);if(f==='got')L=L.filter(b=>b[4](st));if(f==='todo')L=L.filter(b=>!b[4](st));if(!L.length)return '';const n=L.filter(b=>b[4](st)).length;
      return `<div class="row" style="margin:16px 2px 8px"><h3 class="grow" style="margin:0;font-size:18px">${g[1]} ${g[2]}</h3><span class="small muted">${f==='todo'?L.length+' to go':n+' / '+L.length}</span></div><div class="achgrid">${L.map(card).join('')}</div>`}).join('')}`}
+function moveCard(){if(STANDALONE)return `<div><p class="small" style="margin-top:0">In the Claude app: Profile → 🌐 <b>Move my progress to the website</b> → <b>📋 Copy my move code</b>. Then paste it here.</p>
+   <textarea class="f" id="mvIn" rows="3" placeholder="Paste your move code here (it starts with LB1:)" style="font-size:13px"></textarea>
+   <button class="btn pri wide" style="margin-top:8px" data-act="mvLoad">📥 Load my progress</button>
+   <p class="small muted" style="margin-bottom:0">Things with the same name get replaced by the version from the Claude app. Everything else stays.</p></div>`;
+  const M=S.move||{};return `<div><p class="small" style="margin-top:0">This makes a <b>move code</b> with all your progress: loadings, ticks, notes, journal, keys, Bibles and settings. Paste it on the website under Profile → 🌐 <b>Bring my Claude app progress</b>.</p>
+   <button class="btn pri wide" data-act="mvMake" ${M.busy?'disabled':''}>${M.busy?'<span class="spin"></span> Making…':'📋 Copy my move code'}</button>
+   ${M.url?`<a class="btn wide" style="margin-top:8px;justify-content:center" href="${esc(M.url)}" target="_blank" rel="noopener">🌐 Or open the website with my progress</a>`:''}
+   ${M.msg?`<p class="small" style="margin:8px 0 0">${esc(M.msg)}</p>`:''}
+   <p class="small muted" style="margin-bottom:0">Log in on the website with your Bible code first, so it’s saved under your code.</p></div>`}
 function bkCard(){const k=settings().aikeys||{};const T=S.bkTest||{};
   return `<div><p class="small" style="margin-top:0">${STANDALONE?'With your own free key, the ✨ AI uses <b>your</b> Gemini or Groq first: smarter, and no daily limit from this website. If your key is busy, it uses the website’s free AI.':'When Claude’s limit is reached, the app switches by itself to a free backup AI. <b>Only then.</b> Normally it always uses Claude. It tries them in this order.'}</p>
    ${BK_PROV.map(([id,n,site])=>`<label class="l">${n} key <span class="small muted">· free at ${site}</span></label><div class="row"><input class="f grow" id="bk_${id}" type="password" value="${esc(k[id]||'')}" placeholder="Paste your ${n.split(' ')[0]} key" autocomplete="off" style="margin:0">${k[id]?'<span class="tag">saved</span>':''}</div>${T[id]?`<div class="small" style="margin-top:4px">${esc(T[id])}</div>`:''}`).join('')}
@@ -3522,6 +3543,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
    ${mrow('music','🎵','Study music',MU.on?(MU.playing?'♪ Playing: ':'Paused: ')+esc(muTitle(TRACKS[MU.cur]).name):'Calm hymns while you study',()=>muCard())}
    ${mrow('bibles','📖','My Bibles',curBible()?esc((curBible().name||curBible().query)):'Tell us which Bible you have',null,'data-act="goKit" data-s="projects"')}
    ${mrow('bk','🤖',STANDALONE?'My own AI key':'Backup AI',bkKeys().length?'On: '+bkKeys().map(p=>p.n.split(' ')[0]).join(' → ')+(STANDALONE?', then the free AI':', only when Claude’s limit is reached'):(STANDALONE?'Use your own free Gemini or Groq key':'Keep going when Claude’s limit is reached'),()=>bkCard())}
+   ${mrow('move','🌐',STANDALONE?'Bring my Claude app progress':'Move my progress to the website',STANDALONE?'Paste the move code from the Claude app':'Make a move code the website can read',()=>moveCard())}
    ${mrow('safe','🔑','Code & backup',settings().lastBackup?'Last backup: '+fmtDate(settings().lastBackup):'Keep your work safe',()=>`${STANDALONE&&Code.value?`<div class="card codecard"><div class="row"><b class="grow">🔑 My Bible code</b><button class="btn sm ghost" data-act="codeShow">${S.codeShown?'🙈 Hide':'👁 Show'}</button></div>
      <div class="bigcode small-code">${S.codeShown?esc(Code.value):esc(Code.value.split('-')[0]+'-••••-••••')}</div>
      <p class="small muted" style="margin:4px 0 10px">Use this code on any phone or computer to open your Loaded Bible with all your progress. Keep it safe — nobody can recover it for you.</p>
