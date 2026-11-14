@@ -972,10 +972,11 @@ async function callProvider(p,prompt,onText,signal,tier,img){const max=tier==='q
   if(p.id==='gemini'){const parts=[{text:prompt}];if(img&&img.b64)parts.push({inline_data:{mime_type:'image/jpeg',data:img.b64}});
     const body=JSON.stringify({systemInstruction:{parts:[{text:APP_CONTEXT}]},contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:max}});
     const models=[settings().geminiModel,S._gemOK,'gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash','gemini-1.5-flash'].filter((m,i,a)=>m&&a.indexOf(m)===i);let last={status:0};
-    for(const m of models){for(const how of ['header','query']){
+    const hows=/^AQ\./.test(p.key)?['bearer','header','query']:['header','query','bearer'];
+    for(const m of models){for(const how of hows){
       const url='https://generativelanguage.googleapis.com/v1beta/models/'+m+':streamGenerateContent?alt=sse'+(how==='query'?'&key='+encodeURIComponent(p.key):'');
-      r=await fetch(url,{method:'POST',signal,headers:how==='header'?{'Content-Type':'application/json','x-goog-api-key':p.key}:{'Content-Type':'application/json'},body});
-      if(r.ok){S._gemOK=m;return streamSSE(r,j=>{const c=j.candidates&&j.candidates[0]&&j.candidates[0].content;return c&&c.parts?c.parts.map(x=>x.text||'').join(''):''},onText)}
+      r=await fetch(url,{method:'POST',signal,headers:how==='header'?{'Content-Type':'application/json','x-goog-api-key':p.key}:how==='bearer'?{'Content-Type':'application/json','Authorization':'Bearer '+p.key}:{'Content-Type':'application/json'},body});
+      if(r.ok){S._gemOK=m;S._gemHow=how;return streamSSE(r,j=>{const c=j.candidates&&j.candidates[0]&&j.candidates[0].content;return c&&c.parts?c.parts.map(x=>x.text||'').join(''):''},onText)}
       let msg='';try{const t=await r.text();msg=(JSON.parse(t).error||{}).message||t.slice(0,160)}catch(e){}last={status:r.status,msg,model:m};
       if(r.status===429)throw last;if(r.status===404)break;}}
     throw last}
