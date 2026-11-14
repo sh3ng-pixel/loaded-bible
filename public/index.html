@@ -600,6 +600,7 @@ details.tmore>summary .mchev{margin-left:auto}details.tmore[open]>summary .mchev
 .stxt .hand{line-height:1.5}.stxt .hand a{color:inherit}
 .step.flash{animation:stflash 1.6s ease-out}@keyframes stflash{0%,40%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
 .pnext{display:flex;align-items:center;gap:8px;margin:4px 0 10px}
+.limitbox{border:1.5px solid var(--gold)}
 .achentry{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--gold);font:inherit;color:inherit;cursor:pointer;text-align:left}
 .achtrophy{font-size:34px;animation:mufloat 3s ease-in-out infinite}
 .achhead{margin:4px 0 8px}.achhero{display:flex;gap:16px;align-items:center;padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
@@ -929,7 +930,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p|q)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p|q)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans','aiqueue'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -984,6 +985,7 @@ async function backupAI(prompt,onText,signal,tier,img){const L=bkKeys();
 function backupSheet(){if(S._bkSheet)return;S._bkSheet=1;openSheet(`<h3>⏳ Claude’s limit is reached</h3><p>You can keep going with a free backup AI. Add a free Gemini or Groq key once, and the app switches by itself whenever Claude is at its limit. Only then.</p><button class="btn pri wide" data-act="bkOpen">🤖 Set up a backup AI</button>`)}
 function quoteTrans(){let b=null;try{b=curBible()}catch(e){}const bt=b&&b.translation;if(bt)return bt+' (their paper Bible)';const t=settings().trans;return t&&t!=='KJV'?TRANS[t]:'a modern, easy-to-read translation (like the CSB, NIV or ESV)'}
 function langRule(){return '\n\nLANGUAGE (very important): write everything in your own words (notes, margin notes, headings, explanations, answers, prayers, tips) in plain, modern, everyday English that a teenager easily understands. NEVER write in old King James style: no thee, thou, thy, thine, ye, hath, doth, unto, or -eth / -est endings, even when a verse you quote uses them. When you quote a Bible verse, use the wording of '+quoteTrans()+'.'}
+const isClaudeLimit=e=>!!e&&(e.code==='claude_limit'||isLimitErr(e));
 function aiErr(e){if(!e)return 'Something went wrong.';if(e.code==='unavailable_here')return e.message;if(e.code==='not_granted')return 'Claude access was not allowed for this page.';if(e.code==='claude_limit')return e.message;if(e.code==='rate_limited')return e.message&&!/^Too many/.test(e.message)?e.message:'Too many requests — wait a minute and try again.';if(e.name==='AbortError'||e.code==='aborted')return 'Stopped.';return e.message||'Something went wrong.'}
 
 /* ---------- state ---------- */
@@ -1103,7 +1105,9 @@ async function loadChapter(allowFetch){if(TTS.on&&TTS.kind==='chapter')ttsStop()
     for(let i=0;i<all.length;i++)if(all[i]==null)all[i]='';
     if(!all.length)throw {message:'Claude didn\u2019t send the verses back'+(lastText?` (it replied: “${lastText.slice(0,140)}”)`:'')+'. Try again, or switch to KJV.'};
     S.verses=all;Cache.put('chapters',key,{verses:all,at:Date.now()});
-  }catch(e){if(chKey()!==key)return;S.chErr=aiErr(e);if(!S.verses?.length)S.verses=null}
+  }catch(e){if(chKey()!==key)return;
+    if(isClaudeLimit(e)&&!kjvFailed){try{if(!KJV)await loadKJV();const raw=KJV&&KJV[s.book]&&KJV[s.book][s.ch];if(raw&&raw.length&&chKey()===key){S.verses=raw.map(x=>plainV(x||''));S.loadingCh=false;S.ctrl=null;renderVerses();renderSelbar();toast('Claude is at its limit, so you’re reading the King James text for now.');return}}catch(_){}}
+    S.chErr=aiErr(e);if(!S.verses?.length)S.verses=null}
   S.loadingCh=false;S.ctrl=null;renderVerses();renderSelbar();
 }
 function goTo(b,c,v,v2){const bk=BM[b];if(!bk)return;c=Math.max(1,Math.min(bk.chapters,c));saveSettings({book:b,ch:c});S.flashV=v?{a:v,b:v2&&v2>v?Math.min(v2,v+40):v}:null;S.verses=null;
@@ -1149,7 +1153,7 @@ function simpBlock(k){if(!k)return '';const y=Store.get(k)||{};const qa=qaBtn('s
    ${open&&txt!=null?`<div class="subpanel simppanel"><div class="row" style="gap:6px"><b class="small grow">🌱 Simple version</b>${txt&&!busy?`<button class="mini" data-act="studySimp" data-k="${k}" data-f="1" title="Make a new one">↻</button>`:''}<button class="mini" data-act="studySimpClose" data-k="${k}">✕</button></div><div class="out" id="simp-${k}">${txt?md(txt):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>'}</div></div>`:''}${qa}`}
 function studyOutHtml(){const st=S.study;if(!st)return '';
   return `<div class="card out"><div class="row" style="margin-bottom:6px"><span class="tag">${esc(st.title)}</span><b class="grow" style="font-family:var(--serif);font-size:19px">${esc(st.refLabel)}</b>${st.loading?'<span class="spin"></span>':''}</div>
-   <div id="studyBody">${st.err?`<p class="muted">${esc(st.err)}</p>`:(st.text?md(st.text):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>')}</div>
+   <div id="studyBody">${st.err?(st.limit?limitBox('study'):`<p class="muted">${esc(st.err)}</p>`):(st.text?md(st.text):'<div class="loadingline"></div><div class="loadingline" style="width:70%"></div>')}</div>
    ${st.loading?'<div class="row" style="justify-content:flex-end"><button class="btn sm" data-act="stopStudy">Stop</button></div>':
    (st.text?studyActions(st.key,1):'')}</div>
    <p class="small muted">Study helps are written by Claude — test them against Scripture (Acts 17:11) and a trusted pastor or commentary.</p>`}
@@ -1184,7 +1188,7 @@ async function runStudy(tool,refText,question,force){
   const ctrl=new AbortController();S.studyCtrl=ctrl;const my=S.study;
   try{const res=await ai(prompt,t=>{if(S.study!==my)return;my.text=t;const b=$('#studyBody');if(b)b.innerHTML=md(t)},ctrl.signal,'default');
     my.text=res.text;my.loading=false;if(ck)Cache.put('studies',ck,{text:res.text,at:Date.now()});keepStudy(my)}
-  catch(e){my.loading=false;if(!my.text)my.err=aiErr(e)}
+  catch(e){my.loading=false;if(!my.text){my.err=aiErr(e);my.limit=isClaudeLimit(e)&&!S._qRunning;my.qargs=[tool,refText,question]}}
   if(S.study===my)updateStudyOut();
 }
 
@@ -2004,6 +2008,13 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     renderView()},
   bkOpen:()=>{closeSheet();S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{bk:true});setTab('account');setTimeout(()=>{const f=$('#mf_bk');if(f)f.scrollIntoView({block:'start',behavior:'smooth'})},120)},
   bkClear:()=>{saveSettings({aikeys:{}});S.bkTest={};renderView();toast('Backup keys removed')},
+  qLater:el=>{const w=el.dataset.w;if(w==='load'){const B=S.build;const lab=B.mode==='topic'?'Loading: '+(B.topic||'topic'):B.mode==='book'?'Loading: '+BM[B.bookOnly].name:'Loading: '+BM[B.book].name+' '+B.ch+(B.mode==='verses'?':'+(B.v1||1)+'-'+(B.v2||B.v1||1):'');
+      qAdd({kind:'load',label:lab,data:JSON.parse(JSON.stringify(Object.assign({},B,{err:'',limit:false,loading:false,planKey:null})))});B.err='';B.limit=false;renderView()}
+    else if(w==='study'){const st=S.study;if(!st||!st.qargs)return;qAdd({kind:'study',label:'Study: '+(st.refLabel||'')+(st.title?' ('+st.title+')':''),data:{args:st.qargs}});st.limit=false;st.err='⏳ Saved. We’ll make it by ourselves when Claude is back.';updateStudyOut()}
+    toast('⏳ Saved. You’ll get a message when it’s ready.')},
+  basicLoad:()=>basicPlan(),
+  qDel:el=>{qSave(qList().filter(x=>x.id!==el.dataset.i));renderView()},
+  qTry:()=>{toast('Trying…');qRun(true)},
   goBack:()=>{goBack()},
   achOpen:()=>{S.acctSub='ach';if(S.tab!=='account'){S._navKeep=1;setTab('account');S._navKeep=0}else{renderView();window.scrollTo(0,0)}},
   achBack:()=>{S.acctSub='';renderView();window.scrollTo(0,0)},
@@ -2271,6 +2282,7 @@ function planItems(pl){const d=pl.data||{},items=[];const one=hlOne();const add=
     if(d.remember&&d.remember.text)add('📌 Remember this','rm',`Write and star it: <span class="hand" style="display:inline">★ ${esc(d.remember.text)}</span>`,`Remember: ${d.remember.text}`);
     (d.symbol||[]).forEach((x,i)=>{if(x&&x.draw)add('🎨 Draw a symbol','sy'+i,`Next to ${vr(x.v)} draw: <b>${esc(x.draw)}</b>${x.why?` <span class="small muted">(${esc(x.why)})</span>`:''}`,`Draw by v.${x.v}: ${x.draw}`)});
     if(d.prayer&&d.prayer.text)add('🙏 Prayer line','py',`At the bottom of the ${pl.v1?'passage':'chapter'}, write: <span class="hand" style="display:inline">${esc(d.prayer.text)}</span>`,`Prayer: ${d.prayer.text}`);
+    (d.diy||[]).forEach((t,i)=>add('✍️ Your own notes','dy'+i,esc(t),t));
     if(d.sections)secItems(pl,add);
     if(d.truth&&d.truth.text)add('💬 Big truth','bt',`Write big, as a callout${d.truth.v?' near '+vr(d.truth.v):''}: <span class="hand sectruth">${esc(d.truth.text)}</span>`,`Big truth: ${d.truth.text}`);
     (d.tricky||[]).forEach((x,i)=>{if(x&&x.text)add('❓ Tricky verses','tq'+i,`Next to ${vr(x.v)} write: <span class="hand" style="display:inline">${esc(x.text)}</span>`,`Tricky v.${x.v}: ${x.text}`)});
@@ -2293,7 +2305,7 @@ function planItems(pl){const d=pl.data||{},items=[];const one=hlOne();const add=
   return items}
 
 function loadPlans(){return Store.list('k_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0))}
-function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}${(pl.data||{}).sections?' · 📑 sections':''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
+function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}${(pl.data||{}).sections?' · 📑 sections':''}${pl.basic?' · 📖 basic':''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
 const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in'],['scan','📸','Photo of my page','It helps you load it']];
 const LOAD_HELP={scan:'Take a photo of a page in your paper Bible. We see what’s already marked and where there’s room, and tell you exactly what to add, or we read your handwritten notes and save them.',chapter:'Pick a chapter and what you want to add. You get step-by-step what to highlight, write and tab in your paper Bible. Tick off each step. It also goes into your Online Bible.',verses:'Same as a chapter, but just for one verse or a few verses.',topic:'Pick a feeling or topic. You get verses to highlight, where to put a tab, and a chain to write in your margins. Saved to Bible Kit › Topics.',book:'Get a heading for each chapter, what to write on the book’s first page, key verses and where to put the book tab.',snote:'A short note in easy words that explains a passage. Write it in your margin, on a sticky note or on an insert. Saved to Online Bible › My notes.',life:'Turn a passage into something for your own life: what it means for you and one thing to do this week. Saved to My notes or your Journal.',inserts:'Make cards and pages to tuck into your Bible. Saved ones go to Bible Kit › Tabs › Inserts.'};
@@ -2511,7 +2523,7 @@ function loadingListHtml(plans){if(!plans.length)return '';const B=S.build;
    ${fin.length?`<div class="row" style="margin:16px 2px 4px"><h3 class="grow" style="margin:0;font-size:20px">✓ Finished</h3><button class="btn sm ghost" data-act="clearDone">🗑 Clear all finished</button></div>${fin.map(card).join('')}`:''}`}
 function renderBuildOut(){const o=$('#buildOut');if(!o)return;const B=S.build;if(B.mode==='inserts'){o.innerHTML=insertOutHtml();return}
   if(B.loading){o.innerHTML=`<div class="card" style="text-align:center"><span class="spin"></span><p><b>Preparing your steps…</b><br><span class="small muted">${B.prog?`Writing (${Math.round(B.prog/100)/10}k characters)`:'Reading the passage and its context'}</span></p><div class="loadingline"></div><div class="loadingline" style="width:70%"></div></div>`;return}
-  o.innerHTML=B.err?`<div class="card"><p class="muted">${esc(B.err)}</p></div>`:''}
+  o.innerHTML=B.err?(B.limit?limitBox('load'):`<div class="card"><p class="muted">${esc(B.err)}</p></div>`):''}
 function scrollToPlan(k){setTimeout(()=>{const el=document.getElementById('plan-'+k);if(el){const y=el.getBoundingClientRect().top+window.scrollY-70;window.scrollTo({top:y,behavior:'smooth'})}},60)}
 function archivePlan(pl){const pp=planProg(pl);const st=Object.assign({},Store.get('stats')||{});const ar=Object.assign({loaded:0,topics:0,books:0,psalms:0,steps:0},st.arch||{});
   ar.steps+=pp.dn;if(pp.done){if(pl.kind==='chapter'){ar.loaded++;if(pl.b==='PSA')ar.psalms++}else if(pl.kind==='topic')ar.topics++;else ar.books++}st.arch=ar;Store.set('stats',st)}
@@ -2552,8 +2564,8 @@ async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert
   B.loading=true;B.err='';B.prog=0;B.planKey=null;renderBuildOut();$('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'});
   try{const res=await ai(prompt,t=>{B.prog=t.length;if(B.prog%400<60)renderBuildOut()},null,'default');
     const data=parseJSON(res.text);Store.set(key,Object.assign({data,checks:{},at:Date.now()},meta));B.planKey=key;}
-  catch(e){B.err=aiErr(e)}
-  B.loading=false;if(S.tab==='load')renderView();if(B.planKey)scrollToPlan(B.planKey);else setTimeout(()=>$('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'}),50)}
+  catch(e){B.err=aiErr(e);B.limit=isClaudeLimit(e)&&!S._qRunning}
+  B.loading=false;if(S.tab==='load')renderView();if(S._qRunning){}else if(B.planKey)scrollToPlan(B.planKey);else setTimeout(()=>$('#buildOut')?.scrollIntoView({behavior:'smooth',block:'start'}),50)}
 
 function planOnline(pl){const d=pl.data;
   if(pl.kind==='chapter'){const b=pl.b,c=pl.c,V=v=>vrange(parseRef(`${b} ${c}:${v}`));
@@ -2985,7 +2997,7 @@ function viewToday(v){const pf=profile(),st=computeStats();const h=new Date().ge
   v.innerHTML=`<div class="todayhead tod-${tod}"><div class="grow"><div class="small">${tico} ${new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div><h2>${hi}${nm?', '+esc(nm):''}!</h2><div class="small" style="opacity:.8">${esc(['A little time with God changes the whole day.','His mercies are new every morning.','Your Word is a lamp to my feet.','Be still, and know that I am God.','Grab your Bible, He has something for you today.'][dayIdx(5)])}</div></div><div class="tstreak"><b>🔥 ${st.streak}</b><span>day streak</span></div></div>
    ${isSimple()?`<div class="simplebar">🌱 Simple mode is on <button class="btn sm" data-act="simpleToggle">Turn off</button></div>`:''}
    <button class="todaysearch" data-act="search"><span>🔍</span>Search your notes, prayers, studies…</button>
-   ${continueCard()}${rhythmCard()}
+   ${queueCard()}${continueCard()}${rhythmCard()}
    <div class="tgoal" style="display:none"><span class="small"><b>Today:</b> ${Math.min(st.today,goal)}/${goal} things done</span><div class="prog grow"><i style="width:${Math.min(100,st.today/goal*100)}%"></i></div></div>
    ${codeNag}
    <div class="tcard votdc"><div class="th"><span>☀️</span><b class="grow">Verse of the day</b><button class="iconbtn" data-act="sayVerse" data-r="${vref}" title="Listen">🔊</button><button class="iconbtn" data-act="votdNext" title="Another verse">🎲</button></div>
@@ -3399,8 +3411,47 @@ async function qaAsk(sc,q){q=String(q||'').trim();if(!q){toast('Type a question 
   const prompt=SYS+`Someone using a Bible study app asks a question about this:\n"""${String(ctx).slice(0,7000)}"""\n${prev?'\nEarlier in this conversation:\n'+prev+'\n':''}\nTheir question: ${q}\n\nAnswer warmly, clearly and accurately in about 60 to 160 words (more only if they ask). Mention Bible verses where they help. If Christians disagree on it, say so briefly and fairly. No headings unless needed.`;
   try{const r=await ai(prompt,t=>{S.qaLive[sc]=t;const o=document.getElementById('qal-'+cssId(sc));if(o)o.innerHTML=md(t)},null,'default');
     Store.set(qaKey(sc),{list:L.concat({q,a:r.text,at:Date.now()}).slice(-20)});touch()}
-  catch(e){toast(aiErr(e))}
+  catch(e){if(isClaudeLimit(e)&&!S._qRunning){qAdd({kind:'ask',label:'Answer: “'+q.slice(0,40)+'”',data:{sc,q,ctx}});toast('⏳ Claude is at its limit. Your question is saved and will be answered by itself when Claude is back.')}else toast(aiErr(e))}
   S.qaBusy=null;delete S.qaLive[sc];renderView();setTimeout(()=>{const i=document.getElementById('qai-'+cssId(sc));if(i)i.scrollIntoView({block:'center',behavior:'smooth'})},60)}
+/* ===== ⏳ WHEN CLAUDE IS AT ITS LIMIT ===== */
+function qList(){return ((Store.get('aiqueue')||{}).list)||[]}
+function qSave(L){Store.set('aiqueue',{list:L})}
+function qAdd(it){const L=qList();if(L.some(x=>x.label===it.label))return;L.push(Object.assign({id:newId(),at:Date.now()},it));qSave(L);qKick()}
+function limitBox(where){const B=S.build;const canBasic=where==='load'&&(B.mode==='chapter'||B.mode==='verses');
+  return `<div class="card limitbox"><b>⏳ ${STANDALONE?'The AI is':'Claude is'} at its limit right now</b><p class="small" style="margin:6px 0 10px">Your other features keep working. For this one you can:</p>
+   <button class="btn pri wide" data-act="qLater" data-w="${where}">⏳ Do it later, by itself</button><p class="small muted" style="margin:4px 2px 10px">We save it and make it as soon as Claude is back. You get a message when it’s ready.</p>
+   ${canBasic?`<button class="btn wide" data-act="basicLoad">📖 Make a basic loading now</button><p class="small muted" style="margin:4px 2px 0">Without AI: the key verse to highlight and simple steps to write your own notes.</p>`:''}</div>`}
+function basicPlan(){const B=S.build;const b=B.book,c=B.ch;const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);
+  const keyv=[...new Set(VOTD.filter(r=>r.startsWith(b+' '+c+':')).map(r=>parseInt(r.split(':')[1])))].filter(v=>!isV||(v>=v1&&v<=v2)).sort((x,y)=>x-y).slice(0,4);
+  const sec=(B.style||noteStyle())==='section';
+  const diy=[sec?'Read it slowly. Split it into 2 to 4 parts where the story or topic changes. Draw a colored border around each part.':'Read it slowly, then write your own short title above it.',
+    sec?'Next to each part, make a matching colored box: in your own words, what happens and what it means.':'Which verse stands out most to you? Underline it and write why in the margin.',
+    'Is there a word or verse you don’t understand? Circle it, and tap 💬 Ask when Claude is back.',
+    'Write one sentence: what does this show about God?',
+    'Write a one-line prayer at the bottom.'];
+  const key=(isV?`k_${b}.${c}.${v1}-${v2}`:`k_${b}.${c}`)+'~basic';
+  Store.set(key,{kind:'chapter',b,c,...(isV?{v1,v2}:{}),basic:true,at:Date.now(),checks:{},data:{highlights:keyv.map(v=>({v,color:'y',why:'A key verse of this chapter'})),diy}});
+  B.err='';B.limit=false;B.planKey=key;renderView();scrollToPlan(key);toast('📖 Basic loading made. You can still make the full one later.')}
+let qTimer=null;
+function qKick(){if(qTimer)return;qTimer=setInterval(qRun,10*60*1000);setTimeout(qRun,30000)}
+async function qRun(force){if(S._qRunning)return;const L=qList();if(!L.length){if(qTimer){clearInterval(qTimer);qTimer=null}return}
+  S._qRunning=true;let done=0;
+  try{for(const it of L){let ok=false;
+      try{
+        if(it.kind==='load'){const keep=JSON.parse(JSON.stringify(S.build));Object.assign(S.build,JSON.parse(JSON.stringify(it.data)));await runBuild();ok=!S.build.err&&!!S.build.planKey;const pk=S.build.planKey;Object.assign(S.build,keep);if(ok)S.build.planKey=pk}
+        else if(it.kind==='study'){const [tool,ref,q]=it.data.args;const keep=S.study;await runStudy(tool,ref,q,true);ok=!!(S.study&&S.study.text&&!S.study.err);if(!ok)S.study=keep}
+        else if(it.kind==='ask'){S.qaCtx=S.qaCtx||{};S.qaCtx[it.data.sc]=it.data.ctx;const n=qaThread(it.data.sc).length;await qaAsk(it.data.sc,it.data.q);ok=qaThread(it.data.sc).length>n}
+      }catch(e){ok=false}
+      if(!ok)break;qSave(qList().filter(x=>x.id!==it.id));done++;toast('✅ Ready: '+it.label)}}
+  finally{S._qRunning=false}
+  if(done)renderView();else if(force)toast('Claude is still at its limit. We’ll keep trying by ourselves.')}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&qList().length)setTimeout(qRun,3000)});
+setTimeout(()=>{try{if(qList().length)qKick()}catch(e){}},8000);
+function queueCard(){const L=qList();if(!L.length)return '';
+  return `<div class="tcard"><div class="th"><span>⏳</span><b class="grow">Waiting for Claude</b><span class="small muted">${L.length}</span></div>
+   <p class="small muted" style="margin:4px 0 8px">These get made by themselves as soon as Claude is back.</p>
+   ${L.map(x=>`<div class="row" style="gap:8px;padding:6px 0;border-top:1px solid var(--line)"><span class="grow small">${esc(x.label)}</span><button class="mini" data-act="qDel" data-i="${x.id}" aria-label="Remove">✕</button></div>`).join('')}
+   <button class="btn sm" style="margin-top:8px" data-act="qTry">↻ Try now</button></div>`}
 /* ===== 🔍 SEARCH ===== */
 function searchSheet(){openSheet(`<h3>🔍 Search everything</h3><input class="f" id="srchIn" placeholder="Search notes, prayers, studies, pages…" value="${esc(S.srchQ||'')}" autocomplete="off"><div id="srchOut" class="small muted" style="margin-top:8px">Type at least 2 letters.</div>`);
   const i=$('#srchIn');i.focus();i.addEventListener('input',()=>{S.srchQ=i.value;runSearch(i.value)});if(S.srchQ)runSearch(S.srchQ)}
