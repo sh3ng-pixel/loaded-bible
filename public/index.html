@@ -969,6 +969,9 @@ async function streamSSE(r,pick,onText){const rd=r.body.getReader(),dec=new Text
     while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;const d=line.slice(5).trim();if(!d||d==='[DONE]')continue;let j;try{j=JSON.parse(d)}catch(e){continue}const t=pick(j);if(t){text+=t;onText&&onText(text)}}}
   return {text,truncated:false}}
 async function callProvider(p,prompt,onText,signal,tier,img){const max=tier==='quick'?1500:6000;let r;
+  if(p.id==='gemini'&&STANDALONE){r=await fetch('/api/ai',{method:'POST',signal,headers:{'Content-Type':'application/json','X-Code':Code.value||'','X-Gemini-Key':p.key},body:JSON.stringify(img?{prompt,tier:tier||'default',image:img.b64}:{prompt,tier:tier||'default'})});
+    if(!r.ok){let msg='';try{const j=await r.json();msg=j.msg||j.error||''}catch(e){}throw {status:r.status,msg}}
+    return streamSSE(r,j=>j.type==='content_block_delta'&&j.delta?j.delta.text||'':'',onText)}
   if(p.id==='gemini'){const parts=[{text:prompt}];if(img&&img.b64)parts.push({inline_data:{mime_type:'image/jpeg',data:img.b64}});
     const body=JSON.stringify({systemInstruction:{parts:[{text:APP_CONTEXT}]},contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:max}});
     const models=[settings().geminiModel,S._gemOK,'gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash','gemini-1.5-flash'].filter((m,i,a)=>m&&a.indexOf(m)===i);let last={status:0};
@@ -2016,7 +2019,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     L.forEach(p=>S.bkTest[p.id]='⏳ Testing…');renderView();
     for(const p of L){const ctrl=new AbortController();const tm=setTimeout(()=>ctrl.abort(),25000);
       try{const r=await callProvider(p,'Reply with only the word OK.',null,ctrl.signal,'quick');S.bkTest[p.id]=(r.text||'').trim()?'✅ WORKS! '+(STANDALONE?'Your key is ready.':'Ready as backup.'):'❌ FAILED: no answer came back.'}
-      catch(e){S.bkTest[p.id]=e&&e.name==='AbortError'?'❌ FAILED: no answer within 25 seconds. Try again.':e&&e.name==='TypeError'?(STANDALONE?'❌ FAILED: couldn’t reach '+p.n+'. Check your internet.':'❌ FAILED: Claude blocks this page from reaching '+p.n+'. Use your key on the website instead.'):'❌ FAILED'+(e&&e.status?' (error '+e.status+')':'')+(e&&e.msg?': '+String(e.msg).slice(0,160):'')}
+      catch(e){S.bkTest[p.id]=e&&e.name==='AbortError'?'❌ FAILED: no answer within 25 seconds. Try again.':e&&e.name==='TypeError'?(STANDALONE?'❌ FAILED: couldn’t reach '+p.n+'. Check your internet.':'❌ FAILED: Claude blocks this page from reaching '+p.n+'. Use your key on the website instead.'):'❌ FAILED'+(e&&e.status?' (error '+e.status+')':'')+(e&&e.msg?': '+String(e.msg).slice(0,160):'')+(/ACCESS_TOKEN_TYPE|OAuth|UNAUTHENTICATED/i.test((e&&e.msg)||'')?' → This is a known problem on Google’s side with some new AQ keys. Try: make a brand-new key in AI Studio, or make one in Google Cloud Console (APIs & Services → Credentials → Create credentials → API key).':'')}
       finally{clearTimeout(tm)}
       toast(p.n+': '+(S.bkTest[p.id].startsWith('✅')?'works ✅':'failed ❌'));renderView()}},
   bkOpen:()=>{closeSheet();S.acctSub='';S.menuOpen=Object.assign({},S.menuOpen,{bk:true});setTab('account');setTimeout(()=>{const f=$('#mf_bk');if(f)f.scrollIntoView({block:'start',behavior:'smooth'})},120)},

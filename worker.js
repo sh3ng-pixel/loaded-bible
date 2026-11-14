@@ -85,6 +85,8 @@ async function ai(request, env) {
   const prompt = body && body.prompt;
   if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 30000) return json({ error: 'Bad request' }, 400);
   if (body.image != null && (typeof body.image !== 'string' || body.image.length > 6000000 || !/^[A-Za-z0-9+/=]+$/.test(body.image))) return json({ error: 'That photo is too big. Try another one.' }, 400);
+  const userKey = request.headers.get('X-Gemini-Key');
+  if (userKey) { if (userKey.length > 300 || !/^[A-Za-z0-9._\-]+$/.test(userKey)) return json({ error: 'gemini_failed', msg: 'That key has strange characters in it.' }, 400); return geminiAI(body, env, userKey); }
   return aiChain(body, env);
 }
 
@@ -144,14 +146,24 @@ async function openaiLike(body, url, key, model, vision) {
   return toAppStream(r.body);
 }
 
-async function geminiAI(body, env) {
-  const model = env.MODEL_GEMINI || 'gemini-2.5-flash';
+async function geminiAI(body, env, key) {
+  key = key || env.GEMINI_API_KEY;
   const parts = [{ text: body.prompt }]; if (body.image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: body.image } });
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: APP_CONTEXT }] }, contents: [{ role: 'user', parts }], generationConfig: { maxOutputTokens: body.tier === 'quick' ? 1500 : 6000 } }) });
-  if (!r.ok) { console.log('Gemini error', r.status, (await r.text()).slice(0, 300)); return json({ error: 'busy' }, r.status === 429 ? 429 : 502); }
-  return toAppStream(r.body);
+  const payload = JSON.stringify({ systemInstruction: { parts: [{ text: APP_CONTEXT }] }, contents: [{ role: 'user', parts }], generationConfig: { maxOutputTokens: body.tier === 'quick' ? 1500 : 6000 } });
+  const models = [...new Set([env.MODEL_GEMINI, 'gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'].filter(Boolean))];
+  let last = { status: 502, msg: '' };
+  for (const m of models) {
+    for (const how of ['header', 'query']) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?alt=sse` + (how === 'query' ? '&key=' + encodeURIComponent(key) : '');
+      const r = await fetch(url, { method: 'POST', headers: how === 'header' ? { 'Content-Type': 'application/json', 'x-goog-api-key': key } : { 'Content-Type': 'application/json' }, body: payload });
+      if (r.ok) return toAppStream(r.body);
+      const t = await r.text(); let msg = ''; try { msg = (JSON.parse(t).error || {}).message || ''; } catch (e) { msg = t.slice(0, 200); }
+      last = { status: r.status, msg }; console.log('Gemini error', m, how, r.status, msg.slice(0, 200));
+      if (r.status === 429) return json({ error: 'busy', msg }, 429);
+      if (r.status === 404) break;
+    }
+  }
+  return json({ error: 'gemini_failed', msg: last.msg }, last.status === 429 ? 429 : (last.status >= 400 && last.status < 500 ? last.status : 502));
 }
 
 // Free: Cloudflare Workers AI (daily free allowance, resets 00:00 UTC). Output is converted to the same stream format the app reads.
@@ -207,7 +219,7 @@ const handlers = {
     // Access still needs a valid Bible code, so allowing other origins only opens these two endpoints.
     const CORS_PATHS = ['/api/ai', '/api/code/check'];
     if (CORS_PATHS.includes(pathname)) {
-      const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, X-Code', 'Access-Control-Expose-Headers': 'X-AI-Provider', 'Access-Control-Max-Age': '86400' };
+      const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, X-Code, X-Gemini-Key', 'Access-Control-Expose-Headers': 'X-AI-Provider', 'Access-Control-Max-Age': '86400' };
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
       const res = await handlers.route(request, env, pathname);
       const h = new Headers(res.headers); Object.entries(cors).forEach(([k, v]) => h.set(k, v));
@@ -280,8 +292,8 @@ const handlers = {
     }
     if (pathname === '/api/ai' && request.method === 'POST') {
       const r = await D('/exists'); if (r.status === 401) return bad();
-      if (!(await L('/count', { name: 'ai:' + code, max: parseInt(env.DAILY_LIMIT || '80', 10) })).ok ||
-          !(await L('/count', { name: 'ai:all', max: parseInt(env.DAILY_TOTAL || '500', 10) })).ok)
+      if (!request.headers.get('X-Gemini-Key') && (!(await L('/count', { name: 'ai:' + code, max: parseInt(env.DAILY_LIMIT || '80', 10) })).ok ||
+          !(await L('/count', { name: 'ai:all', max: parseInt(env.DAILY_TOTAL || '500', 10) })).ok))
         return json({ error: 'You’ve reached today’s limit for ✨ requests. Try again tomorrow!' }, 429);
       return ai(request, env);
     }
