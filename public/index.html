@@ -1731,7 +1731,7 @@ const A={
       :SYS+`Give an in-depth study of this: ${what}. Use ## headings: Context, What it means, Key words, Connections in Scripture, Living it out. About 300 to 400 words.`;
     try{const r=await ai(prompt,t=>{S.ppStream[pk+'|'+mode]=t;const o=document.getElementById('ppx-'+cssId(pk));if(o)o.innerHTML=md(t)},null,mode==='deep'?'default':'quick');
       const P2=JSON.parse(JSON.stringify(recPaper(k)));P2.extra=P2.extra||{};P2.extra[i]=Object.assign({},P2.extra[i],{[mode]:r.text});delete S.ppStream[pk+'|'+mode];S.ppBusy=null;setPaper(k,P2)}
-    catch(e){toast(aiErr(e));S.ppBusy=null;delete S.ppPanel[pk];renderView()}},
+    catch(e){if(!qLimit(e,{explain:'💡 Explain',deep:'📖 In depth',simple:'🌱 Simplify'}[mode]+' (a Study step)','act',['ppAI',{k,i,m:mode,f:'1'}]))toast(aiErr(e));S.ppBusy=null;delete S.ppPanel[pk];renderView()}},
   ppSize:el=>{const P=recPaper(el.dataset.k);const x=P&&P.steps[+el.dataset.i];if(!x||(x.size||P.size||'margin')===el.dataset.z)return;A.ppRegen(el)},
   ppRegen:async el=>{const k=el.dataset.k,i=+el.dataset.i;const pk=k+'|'+i;const P=recPaper(k);const x=P.steps[i];const size=el.dataset.z||x.size||P.size||'margin';const W=nwhere(size);const r0=Store.get(k);
     const simple=!!el.dataset.s;S.ppBusy=pk+(simple?'|sregen':'|regen');renderView();
@@ -1745,7 +1745,7 @@ const A={
       else if(x.type==='link'){const t=vc(j.to);ns={type:'link',verse:v,to:t,html:`Write in the margin: <b>→ ${esc(t?codeToLabel(t):j.to||'')}</b>${j.why?' ('+esc(j.why)+')':''}`,note:j.why||''}}
       else ns={type:'heading',verse:'',html:`At the top of the page write: <b>${esc(j.heading||'')}</b>`,note:j.heading||''};
       const P2=JSON.parse(JSON.stringify(recPaper(k)));P2.steps[i]=ns;if(P2.done)delete P2.done[i];if(P2.extra)delete P2.extra[i];S.ppBusy=null;setPaper(k,P2);toast(el.dataset.z?'Note resized ✓':'New one 🔄')}
-    catch(e){S.ppBusy=null;toast(aiErr(e));renderView()}},
+    catch(e){S.ppBusy=null;if(!qLimit(e,(el.dataset.s?'🌱 Simple':'🔄 New')+' Study step','act',['ppRegen',Object.assign({},el.dataset)]))toast(aiErr(e));renderView()}},
   paperRedo:el=>makePaper(el.dataset.k,el.dataset.k.startsWith('j_')?'prayer':'study'),
   paperDel:el=>confirmSheet('Remove this checklist?','🗑 Remove',()=>{setPaper(el.dataset.k,null);closeSheet();renderView()}),
   paperTick:el=>{const k=el.dataset.k,i=el.dataset.i;const P=JSON.parse(JSON.stringify(recPaper(k)));P.done=P.done||{};if(P.done[i])delete P.done[i];else{P.done[i]=true;touch()}setPaper(k,P);if(P.steps.length&&Object.keys(P.done).length===P.steps.length)toast('All done! Your Bible is loaded 🎉')},
@@ -1930,7 +1930,7 @@ ${styleTxt}
 ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In Jesus’ name, Amen."\n'}${tl?`They want to pray about: ${tl}.\n`:''}${P.words.trim()?`In their own words: ${P.words.trim()}\n`:''}${P.who.trim()?`They are praying for: ${P.who.trim()}.\n`:''}${P.ref.trim()?`Build the prayer around this verse: ${P.ref.trim()}.\n`:''}`;
     P.busy=true;P.out='';P.edit=false;renderView();
     try{const r=await ai(prompt,t=>{P.out=t;const o=$('#prOut');if(o)o.innerHTML=`<div class="out">${md(t)}</div>`},null,'default');P.out=(r.text||P.out).trim()}
-    catch(e){P.out='';toast(aiErr(e))}P.busy=false;renderView()},
+    catch(e){P.out='';if(!qLimit(e,'🙏 Prayer'+(P.topics.length?': '+P.topics.join(', '):''),'pray',[JSON.parse(JSON.stringify(Object.assign({},P,{busy:false,out:''})))]))toast(aiErr(e))}P.busy=false;renderView()},
   prEditT:()=>{const P=S.pray;const t=$('#prEdit');if(t)P.out=t.value;P.edit=!P.edit;renderView()},
   prCopy:()=>copyText(S.pray.out.replace(/\*\*/g,'')),
   goNotes:()=>{closeSheet();S.onlineSub='notes';setTab('online');window.scrollTo(0,0)},
@@ -1981,7 +1981,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
     S.simpS=S.simpS||{};S.simpS[k]='';S.simpBusy=k;renderView();
     const prompt=SYS+`Rewrite this Bible study for someone who just became a Christian or is new to the Bible. Use very simple, short words and sentences. Explain any church word (like grace, sin, covenant, righteous) in plain words. Keep the main points and the Bible references. At most 220 words. Use a few short ## headings or bullet points. End with "Try this today:" and one simple thing to do.\n\nTHE STUDY (${y.refLabel}):\n${String(y.text||'').slice(0,9000)}`;
     try{const r=await ai(prompt,t=>{S.simpS[k]=t;const o=document.getElementById('simp-'+k);if(o)o.innerHTML=md(t)},null,'quick');const y2=Object.assign({},Store.get(k),{simple:r.text});delete y2.key;Store.set(k,y2)}
-    catch(e){toast(aiErr(e));S.simpOpen[k]=false}
+    catch(e){if(!qLimit(e,'🌱 Simplify study: '+(y.refLabel||''),'act',['studySimp',{k,f:'1'}]))toast(aiErr(e));S.simpOpen[k]=false}
     delete S.simpS[k];S.simpBusy=null;renderView()},
   studySimpClose:el=>{S.simpOpen=Object.assign({},S.simpOpen,{[el.dataset.k]:false});renderView()},
   hlMode:el=>{setHlMode(el.dataset.m==='one'?'one':'');renderView();if(sheetOpen())A.hlModeSheet();toast(el.dataset.m==='one'?'🖍 One color: Load will just say “highlight”':'🎨 Colors follow your topic key')},
@@ -2462,7 +2462,7 @@ async function regenPart(key,sec,mode,id,simple){const pl=Object.assign({key},St
         else{clear(secIds(p,sec));p.data[sec]=items}}});
     if(mode==='item')delete S.panel[key+'|'+id];
     toast(mode==='more'?'More added ＋':simple?'Made simpler 🌱':'Regenerated 🔄')}
-  catch(e){toast(aiErr(e))}
+  catch(e){if(!qLimit(e,(S._nsz?'📏 New size':simple?'🌱 Simple '+(SEC_NAME[sec]||'version'):mode==='more'?'＋ More '+(SEC_NAME[sec]||''):'🔄 New '+(SEC_NAME[sec]||'version'))+' ('+planTitle(pl)+')','regen',[key,sec,mode,id,simple,S._nsz]))toast(aiErr(e))}
   if(bk)S.itemBusy=null;else S.secBusy=null;renderView()}
 async function itemAI(key,id,mode,force){const pl=Object.assign({key},Store.get(key));const it=planItems(pl).find(x=>x.id===id);if(!it)return;const sk=key+'|'+id;
   S.panel[sk]=mode;const have=((pl.extra||{})[id]||{})[mode];if(have&&!force){renderView();return}
@@ -2472,7 +2472,7 @@ async function itemAI(key,id,mode,force){const pl=Object.assign({key},Store.get(
     :SYS+`Give an in-depth study of this: ${what}. Use ## headings: Context, What it means, Key words, Connections in Scripture, Living it out. About 350–450 words.`;
   try{const r=await ai(prompt,t=>{S.streams[sk+'|'+mode]=t;const el=document.getElementById('px-'+cssId(sk));if(el&&S.panel[sk]===mode)el.innerHTML=md(t)},null,mode==='deep'?'default':'quick');
     updatePlan(key,p=>{p.extra=Object.assign({},p.extra);p.extra[id]=Object.assign({},p.extra[id],{[mode]:r.text})})}
-  catch(e){toast(aiErr(e));if(!S.streams[sk+'|'+mode])delete S.panel[sk]}
+  catch(e){if(!qLimit(e,{explain:'💡 Explain',deep:'📖 In depth',simple:'🌱 Simplify'}[mode]+': '+String(it.text).slice(0,40)+'… ('+planTitle(pl)+')','itemAI',[key,id,mode]))toast(aiErr(e));if(!S.streams[sk+'|'+mode])delete S.panel[sk]}
   delete S.streams[sk+'|'+mode];S.itemBusy=null;renderView()}
 const INS_TYPES=[
  ['book','📚','Book overview','a book overview: author, first readers, big theme, a short outline with chapter ranges, and key verses','e.g. Romans, Psalms, Acts',['Genesis','John','Romans','Psalms','Revelation']],
@@ -3414,6 +3414,11 @@ async function qaAsk(sc,q){q=String(q||'').trim();if(!q){toast('Type a question 
   catch(e){if(isClaudeLimit(e)&&!S._qRunning){qAdd({kind:'ask',label:'Answer: “'+q.slice(0,40)+'”',data:{sc,q,ctx}});toast('⏳ Claude is at its limit. Your question is saved and will be answered by itself when Claude is back.')}else toast(aiErr(e))}
   S.qaBusy=null;delete S.qaLive[sc];renderView();setTimeout(()=>{const i=document.getElementById('qai-'+cssId(sc));if(i)i.scrollIntoView({block:'center',behavior:'smooth'})},60)}
 /* ===== ⏳ WHEN CLAUDE IS AT ITS LIMIT ===== */
+function qLimit(e,label,fn,args){if(!isClaudeLimit(e))return false;if(S._qRunning){S._qErr=1;return true}qAdd({kind:'fn',label,data:{fn,args}});toast('⏳ Claude is at its limit. Saved: it gets done by itself when Claude is back.');return true}
+const QFN={itemAI:(k,id,m)=>itemAI(k,id,m,true),
+  regen:async(k,sec,mode,id,simple,size)=>{S._nsz=size||null;try{await regenPart(k,sec,mode,id,simple)}finally{S._nsz=null}},
+  act:async(name,ds)=>{await A[name]({dataset:Object.assign({},ds),closest:()=>null,classList:{toggle(){},add(){},remove(){}}})},
+  pray:async(snap)=>{S.pray=Object.assign({},S.pray||{},snap,{busy:false,out:''});await A.prGo();if(!S._qErr&&S.pray.out){try{A.prSave()}catch(e){}}}};
 function qList(){return ((Store.get('aiqueue')||{}).list)||[]}
 function qSave(L){Store.set('aiqueue',{list:L})}
 function qAdd(it){const L=qList();if(L.some(x=>x.label===it.label))return;L.push(Object.assign({id:newId(),at:Date.now()},it));qSave(L);qKick()}
@@ -3440,6 +3445,7 @@ async function qRun(force){if(S._qRunning)return;const L=qList();if(!L.length){i
       try{
         if(it.kind==='load'){const keep=JSON.parse(JSON.stringify(S.build));Object.assign(S.build,JSON.parse(JSON.stringify(it.data)));await runBuild();ok=!S.build.err&&!!S.build.planKey;const pk=S.build.planKey;Object.assign(S.build,keep);if(ok)S.build.planKey=pk}
         else if(it.kind==='study'){const [tool,ref,q]=it.data.args;const keep=S.study;await runStudy(tool,ref,q,true);ok=!!(S.study&&S.study.text&&!S.study.err);if(!ok)S.study=keep}
+        else if(it.kind==='fn'){S._qErr=0;await QFN[it.data.fn](...it.data.args);ok=!S._qErr}
         else if(it.kind==='ask'){S.qaCtx=S.qaCtx||{};S.qaCtx[it.data.sc]=it.data.ctx;const n=qaThread(it.data.sc).length;await qaAsk(it.data.sc,it.data.q);ok=qaThread(it.data.sc).length>n}
       }catch(e){ok=false}
       if(!ok)break;qSave(qList().filter(x=>x.id!==it.id));done++;toast('✅ Ready: '+it.label)}}
