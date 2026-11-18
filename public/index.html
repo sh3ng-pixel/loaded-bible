@@ -2007,11 +2007,12 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   bDepth:el=>{S.build.depth=el.dataset.d;renderView()},
   secColor:el=>{const n=+el.dataset.n;updatePlan(el.dataset.k,p=>{p.data.sections[n].color=el.dataset.c});renderView()},
   secPrint:el=>{const x=((Store.get(el.dataset.k)||{}).data||{}).sections[+el.dataset.n];if(!x||!x.link)return;printSheet(x.link.ref,`<div style="max-width:9cm;border:1px dashed #999;padding:12px 14px;font-family:Georgia,serif"><p style="font-size:15px;line-height:1.45;margin:0">${esc(x.link.text||'')}</p><p style="font-size:12px;margin:6px 0 0;text-align:right"><b>${esc(x.link.ref)}</b></p></div><p style="font-size:12px;color:#666">Cut along the dashed line and glue it in.</p>`)},
+  bVPart:el=>{const p=el.dataset.p;S.build.vparts[p]=!S.build.vparts[p];renderView()},
   bSPart:el=>{const p=el.dataset.p;S.build.sparts[p]=!S.build.sparts[p];renderView()},
   xrPrint:async el=>{const pl=Store.get(el.dataset.k);const x=((pl.data||{}).xrefs||[])[+el.dataset.n];const y=x&&(x.refs||[])[+el.dataset.j];if(!y)return;let t=y.text;
     if(!t){toast('Getting the verse…');try{const r=await ai(`Output the text of ${y.ref} in ${quoteTrans()}. Reply with only the verse text, nothing else.`,null,null,'quick');t=r.text.trim()}catch(e){toast(aiErr(e));return}}
     printSheet(y.ref,`<div style="max-width:9cm;border:1px dashed #999;padding:12px 14px;font-family:Georgia,serif"><p style="font-size:15px;line-height:1.45;margin:0">${esc(t)}</p><p style="font-size:12px;margin:6px 0 0;text-align:right"><b>${esc(y.ref)}</b></p></div><p style="font-size:12px;color:#666">Cut along the dashed line and glue it in.</p>`)},
-  bPartAll:el=>{const t=el.dataset.t,m=el.dataset.m;const st=S.build[t];const keys=t==='sparts'?SPARTS:PARTS.map(x=>x[0]);
+  bPartAll:el=>{const t=el.dataset.t,m=el.dataset.m;const st=S.build[t];const keys=t==='sparts'?(S.build.style||noteStyle())==='mixed'?SPARTS.filter(k=>!MIX_SKIP.includes(k)):SPARTS:t==='vparts'?VPARTS:PARTS.map(x=>x[0]);
     if(m==='all'||m==='none')keys.forEach(k=>st[k]=m==='all');else if(m==='basic')keys.forEach(k=>st[k]=PBASIC[t].includes(k));else el.dataset.g.split(',').forEach(k=>st[k]=m==='gall');renderView()},
   stepMore:el=>{const k=el.dataset.sk;S.stepOpen=Object.assign({},S.stepOpen);S.stepOpen[k]=!S.stepOpen[k];const box=el.closest('.stepacts');if(box){box.classList.toggle('open',S.stepOpen[k]);el.textContent=S.stepOpen[k]?'‹ Less':'⋯ More'}},
   nextStep:el=>{const g=[...document.querySelectorAll('[data-act=tick][data-k="'+el.dataset.k+'"]')].find(b=>b.dataset.i===el.dataset.i);if(g){const st=g.closest('.step');st.scrollIntoView({behavior:'smooth',block:'center'});st.classList.add('flash');setTimeout(()=>st.classList.remove('flash'),1600)}},
@@ -2186,16 +2187,19 @@ const FEELINGS=['Sadness','Anxiety','Fear','Loneliness','Anger','Grief','Depress
 const PARTS=[['context','✍️ Chapter heading & context'],['hl','🖍 What to highlight'],['margin','✎ Margin notes'],['xrefs','🔗 Cross-references'],['words','🔤 Word meanings'],['truth','💬 Big truth'],['tricky','❓ Tricky verses'],['sticky','💭 My thought'],['question','❔ Question'],['simply','🗣️ Say it simply'],['remember','📌 Remember this'],['symbol','🎨 Draw a symbol'],['circle','⭕ Circle & connect'],['jesus','✝️ Points to Jesus'],['oldnew','🔁 Old & New'],['setting','📍 The setting'],['notice','🔍 Notice this'],['apply','💛 My life'],['prayer','🙏 Prayer line'],['soap','📖 S.O.A.P.']];
 const PART_INFO={jesus:['✝️','Points to Jesus','How it shows who Jesus is'],oldnew:['🔁','Old & New','What it repeats or fulfills from the Old Testament'],setting:['📍','The setting','Where, when and who is there'],notice:['🔍','Notice this','A small detail most people miss'],outline:['🧭','Outline','The section in 2-4 short points'],apply:['💛','My life','How does this apply to my life?'],prayer:['🙏','Prayer line','A one-line prayer for the bottom of the page'],circle:['⭕','Circle & connect','Key words to circle and link with a line'],shows:['💛','This shows me','A personal application line'],truth:['💬','Big truth','One strong line to write large on the page'],tricky:['❓','Tricky verses','Verses that are easy to misunderstand, explained'],sticky:['💭','My thought','A personal thought to write on a sticky note'],question:['❔','Study question','A question that makes you dig deeper'],simply:['🗣️','Say it simply','The whole meaning in one easy sentence'],remember:['📌','Remember this','The one thing to take away'],symbol:['🎨','Draw a symbol','A small drawing idea'],context:['✍️','Heading & context','A title + short background for the top of the page'],hl:['🖍','What to highlight','Which verses to color, and why'],margin:['✎','Margin notes','Short notes to write next to verses'],xrefs:['🔗','Cross-references','Other verses to link, ready to print & glue'],words:['🔤','Word meanings','Key Hebrew & Greek words, explained'],soap:['📖','S.O.A.P.','A short devotion, saved to your Journal']};
 const PGROUPS={parts:[['✍️','Basics',['context','hl','margin','setting']],['💡','Understand it',['words','tricky','notice','truth','question','simply']],['🔗','Connect it',['xrefs','oldnew','circle','jesus']],['💛','Personal',['apply','sticky','prayer','soap','remember','symbol']]],
-  sparts:[['✍️','Basics',['context','setting','outline','hl','margin','symbol']],['💡','Understand it',['words','tricky','notice','truth','question','simply']],['🔗','Connect it',['xrefs','oldnew','circle','jesus']],['💛','Personal',['prayer','remember']]]};
-const PBASIC={parts:['context','hl','margin'],sparts:['jesus','notice','xrefs','words','tricky','truth','question','remember']};
-const partsGrid=(st,act,keys,title)=>{const t=act==='bSPart'?'sparts':'parts';const on=keys.filter(k=>st[k]).length;
+  sparts:[['✍️','Basics',['context','setting','outline','hl','margin','symbol']],['💡','Understand it',['words','tricky','notice','truth','question','simply']],['🔗','Connect it',['xrefs','oldnew','circle','jesus']],['💛','Personal',['prayer','remember']]],
+  vparts:[['✍️','Mark the verse',['hl','margin','circle','symbol']],['💡','Understand & connect',['words','tricky','xrefs','notice']]]};
+const VPARTS=['hl','margin','circle','symbol','words','tricky','xrefs','notice'];
+const MIX_SKIP=['hl','margin','circle'];
+const PBASIC={vparts:['hl','margin','xrefs','words'],parts:['context','hl','margin'],sparts:['jesus','notice','xrefs','words','tricky','truth','question','remember']};
+const partsGrid=(st,act,keys,title)=>{const t=act==='bSPart'?'sparts':act==='bVPart'?'vparts':'parts';const on=keys.filter(k=>st[k]).length;
   return `<div class="stepl"><span>${title[0]}</span> ${title[1]}</div>
   <div class="pbar"><span class="small muted"><b>${on}</b> of ${keys.length} on</span><span class="grow"></span><button class="chip" data-act="bPartAll" data-t="${t}" data-m="all">✓ All</button><button class="chip" data-act="bPartAll" data-t="${t}" data-m="none">✕ None</button><button class="chip" data-act="bPartAll" data-t="${t}" data-m="basic">↺ Basic</button></div>
   ${PGROUPS[t].map(([e,l,ks])=>{ks=ks.filter(k=>keys.includes(k));const n=ks.filter(k=>st[k]).length;return `<div class="pgroup"><div class="pghead"><b>${e} ${l}</b><span class="small muted">${n}/${ks.length}</span><button class="linkbtn" data-act="bPartAll" data-t="${t}" data-m="${n===ks.length?'gnone':'gall'}" data-g="${ks.join(',')}">${n===ks.length?'none':'all'}</button></div>
    <div class="pchips">${ks.map(k=>{const i=PART_INFO[k];return `<button class="pchip ${st[k]?'on':''}" data-act="${act}" data-p="${k}" title="${esc(i[2])}"><span class="pck">${st[k]?'✓':''}</span><span class="pe">${i[0]}</span><span class="pt"><b>${i[1]}</b><small>${i[2]}</small></span></button>`}).join('')}</div></div>`}).join('')}`};
 const SPARTS=['hl','margin','xrefs','words','truth','tricky','circle','context','jesus','oldnew','setting','notice','outline','symbol','question','prayer','simply','remember'];
 const partsHtml=B=>isSimple()?`<div class="howto">🌱 You’ll get a heading, what to highlight and short notes to write. (Turn off Simple mode for more options.)</div>`:partsGrid(B.parts,'bPart',PARTS.map(x=>x[0]),['4','What do you want to add?']);
-S.panel={};S.streams={};S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:false,words:false,truth:false,tricky:false,sticky:false,circle:false,soap:false},sparts:{context:false,hl:false,margin:false,xrefs:true,words:true,truth:true,tricky:true,sticky:true,circle:false,jesus:true,oldnew:false,setting:false,notice:true,outline:false,symbol:false,question:true,prayer:false,simply:false,remember:true},topic:'',planKey:null,loading:false,err:'',prog:0};
+S.panel={};S.streams={};S.grpState={};S.build={mode:'chapter',parts:{context:true,hl:true,margin:true,xrefs:false,words:false,truth:false,tricky:false,sticky:false,circle:false,soap:false},sparts:{context:false,hl:false,margin:false,xrefs:true,words:true,truth:true,tricky:true,sticky:true,circle:false,jesus:true,oldnew:false,setting:false,notice:true,outline:false,symbol:false,question:true,prayer:false,simply:false,remember:true},vparts:{hl:true,margin:true,xrefs:true,words:true,circle:false,symbol:false,tricky:false,notice:false},topic:'',planKey:null,loading:false,err:'',prog:0};
 function vrange(p){if(!p||!p.v1)return [];const e=p.v2&&p.v2>=p.v1?p.v2:p.v1;return Array.from({length:Math.min(e-p.v1+1,60)},(_,i)=>p.v1+i)}
 function hlOne(){const pj=curProjObj();return ((pj?pj.hlMode:settings().hlMode)||'')==='one'}
 function setHlMode(m){const pj=curProjObj();if(pj)Store.set('projects',{list:projList().map(x=>x.id===pj.id?Object.assign({},x,{hlMode:m}):x)});else saveSettings({hlMode:m})}
@@ -2223,16 +2227,17 @@ const shortRef=r=>{const p=parseRef(r);if(!p)return r;const m=BM[p.b].name.match
 
 /* Turn a generated plan into a checklist of things to do in the paper Bible */
 /* ===== 📑 BY-SECTION STUDY PAGES ===== */
-function noteStyle(){const pj=curProjObj();const v=pj?pj.noteStyle:settings().noteStyle;if(v)return v;return (curBible()||{}).interleaved?'section':'verse'}
+function noteStyle(){const pj=curProjObj();const v=pj?pj.noteStyle:settings().noteStyle;if(v)return v;return (curBible()||{}).interleaved?'mixed':'verse'}
 function setNoteStyle(m){const pj=curProjObj();if(pj)Store.set('projects',{list:projList().map(x=>x.id===pj.id?Object.assign({},x,{noteStyle:m}):x)});else saveSettings({noteStyle:m})}
 const SEC_COLORS=['green','blue','pink','orange','purple','yellow','red','teal'];
 function styleParts(B){const st=B.style||noteStyle();const dp=B.depth||'normal';
-  const sw=`<div class="stepl"><span>3</span> How do you write in this Bible?</div><div class="modegrid">${[['verse','📝','Verse by verse','Highlights and short notes per verse'],['section','📑','By section','Study pages: one box per group of verses']].map(([k,e,l,d])=>`<button class="modecard ${st===k?'on':''}" data-act="bStyle" data-s="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div>`;
-  if(st!=='section')return sw+partsHtml(B);
-  const SP=B.sparts;return sw+`<div class="howto">📑 We split it into sections, like the headings in your Bible. Each section always gets a colored border to draw around the verses and a matching box for ${(curBible()||{}).interleaved?'the blank page next to it':'your margin or an insert'}. Pick what else each section may get. We only add them where they really fit.</div>
-   ${partsGrid(SP,'bSPart',SPARTS,['4','What can each section get?'])}
-   <div class="stepl"><span>5</span> How much detail?</div><div class="chips">${[['light','🌿 Light','just the main point'],['normal','📘 Normal',''],['full','📚 Full','study-Bible depth']].map(([k,l,d])=>`<button class="chip ${dp===k?'on':''}" data-act="bDepth" data-d="${k}">${l}${d?` <small class="muted">${d}</small>`:''}</button>`).join('')}</div>`}
-function sectionPrompt(name,isV,v1,v2,depth,SP){SP=SP||{};const tr=quoteTrans();const one=hlOne();const dd={light:'Keep every field short (happens and means: 1 sentence each). Use the optional fields only when they really matter.',normal:'Normal detail. Fill the optional fields ONLY where they truly fit (most sections have 1-3 of them, never all).',full:'Study-Bible depth: fuller explanations (means: 2-4 sentences) and fill the optional fields wherever they add real understanding.'}[depth||'normal'];
+  const sw=`<div class="stepl"><span>3</span> How do you write in this Bible?</div><div class="modegrid">${[['verse','📝','Verse by verse','Highlights and short notes per verse'],['section','📑','By section','Study pages: one box per group of verses'],['mixed','🧩','Mixed','A box per section, then notes per verse']].map(([k,e,l,d])=>`<button class="modecard ${st===k?'on':''}" data-act="bStyle" data-s="${k}"><span class="me">${e}</span><b>${l}</b><small>${d}</small></button>`).join('')}</div>`;
+  if(st==='verse')return sw+partsHtml(B);const mix=st==='mixed';
+  const SP=B.sparts;return sw+`<div class="howto">${mix?'🧩 Best of both. We split it into sections. Each section gets a colored border and a matching box first. After that you get short notes on the verses inside that section.':`📑 We split it into sections, like the headings in your Bible. Each section always gets a colored border to draw around the verses and a matching box for ${(curBible()||{}).interleaved?'the blank page next to it':'your margin or an insert'}. Pick what else each section may get. We only add them where they really fit.`}</div>
+   ${partsGrid(SP,'bSPart',mix?SPARTS.filter(k=>!MIX_SKIP.includes(k)):SPARTS,['4',mix?'What can each section box get?':'What can each section get?'])}
+   ${mix?partsGrid(B.vparts,'bVPart',VPARTS,['5','What can each verse get?']):''}
+   <div class="stepl"><span>${mix?6:5}</span> How much detail?</div><div class="chips">${[['light','🌿 Light','just the main point'],['normal','📘 Normal',''],['full','📚 Full','study-Bible depth']].map(([k,l,d])=>`<button class="chip ${dp===k?'on':''}" data-act="bDepth" data-d="${k}">${l}${d?` <small class="muted">${d}</small>`:''}</button>`).join('')}</div>`}
+function sectionPrompt(name,isV,v1,v2,depth,SP,VP){SP=Object.assign({},SP||{});if(VP)MIX_SKIP.forEach(k=>SP[k]=false);const tr=quoteTrans();const one=hlOne();const dd={light:'Keep every field short (happens and means: 1 sentence each). Use the optional fields only when they really matter.',normal:'Normal detail. Fill the optional fields ONLY where they truly fit (most sections have 1-3 of them, never all).',full:'Study-Bible depth: fuller explanations (means: 2-4 sentences) and fill the optional fields wherever they add real understanding.'}[depth||'normal'];
   const f=[`"title": "section heading, max 6 words"`,`"v1": first verse number`,`"v2": last verse number`,`"color": "one color from the list"`,`"happens": "what happens in these verses, in my own words"`,`"means": "what it means and why it matters"`];
   if(SP.shows)f.push(`"shows": "one personal application that starts with: This shows me"`);
   if(SP.setting)f.push(`"setting": "where, when and who is there, max 15 words"`);
@@ -2253,8 +2258,18 @@ function sectionPrompt(name,isV,v1,v2,depth,SP){SP=SP||{};const tr=quoteTrans();
   if(SP.simply)f.push(`"simply": "how I'd explain this section to a friend in one simple sentence, max 25 words"`);
   if(SP.remember)f.push(`"remember": "the one thing to remember, max 12 words"`);
   if(SP.sticky)f.push(`"sticky": "a personal thought or question for a sticky note (max 20 words) or empty"`);
+  if(VP){const one2=hlOne();const vf=[`"v": verse number`];
+    if(VP.hl)vf.push(`"hl": ${one2?'true or false (highlight this verse?)':'"color code from my key, or empty"'}, "hlwhy": "max 8 words, or empty"`);
+    if(VP.margin)vf.push(`"note": "short note to write next to this verse, max 12 words, or empty"`);
+    if(VP.circle)vf.push(`"circle": ["1-2 key words to circle"] or [], "connect": "where to draw a line, max 12 words, or empty"`);
+    if(VP.symbol)vf.push(`"draw": "tiny drawing idea, max 5 words, or empty"`);
+    if(VP.words)vf.push(`"word": "a key word to explain or empty", "meaning": "plain meaning, max 12 words"`);
+    if(VP.tricky)vf.push(`"tricky": "explain it if this verse is easy to misunderstand, max 25 words, or empty"`);
+    if(VP.xrefs)vf.push(`"xref": "one cross-reference (full book name) or empty", "xwhy": "how it connects, max 10 words"`);
+    if(VP.notice)vf.push(`"notice": "a small detail most readers miss, max 15 words, or empty"`);
+    f.push(`"verses": [{${vf.join(', ')}}] (VERSE BY VERSE notes for the verses inside this section, in order. ${depth==='full'?'Include almost every verse.':depth==='light'?'Only the 1-3 most important verses.':'The verses that matter most, usually 2-5.'} Leave fields empty when they don't fit; never repeat what the section box already says.)`)}
   const top=SP.context?`"context": {"heading": "short title to write above the passage (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "few words", "setting": "max 15 words", "background": ["2-4 short facts (max 15 words each)"]}, `:'';
-  return JSYS+`I'm making STUDY PAGES in my paper Bible for ${name} (${tr}). I don't write a note for every verse: I group verses into sections, draw a colored border around each section on the printed page, and write ONE matching colored box about the whole section (on the blank page next to it). I write in my own words: what happens and what it means${SP.shows?', and what it shows me for my life':''}.${isV?` Only cover verses ${v1}${v2>v1?'-'+v2:''}.`:''}
+  return JSYS+`I'm making STUDY PAGES in my paper Bible for ${name} (${tr}). I don't write a note for every verse: I group verses into sections, draw a colored border around each section on the printed page, and write ONE matching colored box about the whole section (on the blank page next to it). I write in my own words: what happens and what it means${SP.shows?', and what it shows me for my life':''}.${VP?' AFTER the box I also write short notes on single verses inside each section (verse by verse).':''}${isV?` Only cover verses ${v1}${v2>v1?'-'+v2:''}.`:''}
 Split the passage into its natural sections, like the section headings in a study Bible (usually 3-10 verses each; never one section per verse). Cover every verse, in order. Give each section a different border color than the one before it, from: ${SEC_COLORS.join(', ')}.
 ${dd}
 My highlighter color key: ${colorKeyText()}.
@@ -2282,7 +2297,17 @@ function secItems(pl,add){const d=pl.data||{};const bl=(curBible()||{}).interlea
     if(x.prayer)add(g,'se'+i,`🙏 Prayer line: <span class="hand" style="display:inline">${esc(x.prayer)}</span>`,`Prayer (${nm}): ${x.prayer}`);
     if(x.simply)add(g,'sf'+i,`🗣️ Say it simply: <span class="hand" style="display:inline">${esc(x.simply)}</span>`,`Say it simply (${nm}): ${x.simply}`);
     if(x.remember)add(g,'sg'+i,`📌 Remember this: <span class="hand" style="display:inline">★ ${esc(x.remember)}</span>`,`Remember (${nm}): ${x.remember}`);
-    if(x.sticky)add(g,'sk'+i,`🗒 On a sticky note: <span class="hand" style="display:inline">${esc(x.sticky)}</span>`,`Sticky note for ${nm}: ${x.sticky}`)})}
+    if(x.sticky)add(g,'sk'+i,`🗒 On a sticky note: <span class="hand" style="display:inline">${esc(x.sticky)}</span>`,`Sticky note for ${nm}: ${x.sticky}`);
+    (x.verses||[]).forEach((y,j)=>{if(!y||!y.v)return;const vref=refA(`${pl.b} ${pl.c}:${y.v}`,'v. '+y.v);const L=[],T=[];const one=hlOne();const H=t=>`<span class="hand" style="display:inline">${esc(t)}</span>`;
+      if(y.hl&&(one||okColor(y.hl))){L.push(`🖍 Highlight it${!one&&typeof y.hl==='string'?' in '+sw(y.hl)+' <b>'+colorWord(y.hl)+'</b>':''}${y.hlwhy?' <span class="small muted">('+esc(y.hlwhy)+')</span>':''}`);T.push('highlight')}
+      if(y.note){L.push(`✎ Write next to it: ${H(y.note)}`);T.push(y.note)}
+      if((y.circle||[]).length){L.push(`⭕ Circle ${y.circle.map(w=>'<b>“'+esc(w)+'”</b>').join(' and ')}${y.connect?' → '+H(y.connect):''}`);T.push('circle '+y.circle.join(', '))}
+      if(y.word){L.push(`🔤 Above <b>“${esc(y.word)}”</b>: ${H(y.meaning||'')}`);T.push(y.word+' = '+(y.meaning||''))}
+      if(y.xref){const p=parseRef(y.xref);L.push(`🔗 Write: ${p?refA(rc(p),y.xref):esc(y.xref)}${y.xwhy?' — '+H(y.xwhy):''}`);T.push('→ '+y.xref)}
+      if(y.tricky){L.push(`❓ ${H(y.tricky)}`);T.push(y.tricky)}
+      if(y.notice){L.push(`🔍 ${H(y.notice)}`);T.push(y.notice)}
+      if(y.draw){L.push(`🎨 Draw a small <b>${esc(y.draw)}</b>`);T.push('draw '+y.draw)}
+      if(L.length)add(g,'vn'+i+'_'+j,`📝 ${vref}<div style="margin-top:4px;line-height:1.55">${L.join('<br>')}</div>`,`${BM[pl.b].name} ${pl.c}:${y.v}: ${T.join('; ')}`)})})}
 function planItems(pl){const d=pl.data||{},items=[];const one=hlOne();const add=(group,id,html,text)=>items.push({group,id,html,text});
   if(pl.kind==='chapter'){const b=pl.b,c=pl.c,nm=`${BM[b].name} ${c}`;const vr=v=>refA(`${b} ${c}:${v}`,'v. '+v);
     if(d.context){const x=d.context;
@@ -2478,7 +2503,7 @@ async function regenPart(key,sec,mode,id,simple){const pl=Object.assign({key},St
       const clear=ids=>ids.forEach(i=>{delete p.checks[i];delete p.extra[i]});
       if(isObj){if(!d[sec])throw {message:'Nothing came back — try again.'};p.data[sec]=d[sec];clear(secIds(p,sec))}
       else{const items=(d.items||[]).filter(Boolean);if(!items.length)throw {message:'Nothing came back — try again.'};
-        if(mode==='item'){const i=idIndex(p,id);p.data[sec][i]=items[0];clear(sec==='sections'?['so','sb','sp','su','sa','sh','sm','sc','sj','sr','sx','st','sw','sq','sl','sk','sd','se','sf','sg'].map(x=>x+i):[id])}
+        if(mode==='item'){const i=idIndex(p,id);const old=p.data[sec][i]||{};p.data[sec][i]=sec==='sections'&&old.verses&&!items[0].verses?Object.assign({},items[0],{verses:old.verses}):items[0];clear(sec==='sections'?['so','sb','sp','su','sa','sh','sm','sc','sj','sr','sx','st','sw','sq','sl','sk','sd','se','sf','sg'].map(x=>x+i):[id])}
         else if(mode==='more')p.data[sec]=p.data[sec].concat(items);
         else{clear(secIds(p,sec));p.data[sec]=items}}});
     if(mode==='item')delete S.panel[key+'|'+id];
@@ -2550,8 +2575,8 @@ function archivePlan(pl){const pp=planProg(pl);const st=Object.assign({},Store.g
   ar.steps+=pp.dn;if(pp.done){if(pl.kind==='chapter'){ar.loaded++;if(pl.b==='PSA')ar.psalms++}else if(pl.kind==='topic')ar.topics++;else ar.books++}st.arch=ar;Store.set('stats',st)}
 function removePlan(k){const pl=Store.get(k);if(!pl)return;archivePlan(pl);Store.del(k);if(S.build.planKey===k)S.build.planKey=null}
 async function runBuild(){const B=S.build;if(B.mode==='inserts')return runInsert();const s=settings();let prompt,meta,key;
-  if((B.mode==='chapter'||B.mode==='verses')&&(B.style||noteStyle())==='section'){const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;
-    prompt=sectionPrompt(name,isV,v1,v2,B.depth,B.sparts);key=(isV?`k_${B.book}.${B.ch}.${v1}-${v2}`:`k_${B.book}.${B.ch}`)+'~s';meta=isV?{kind:'chapter',b:B.book,c:B.ch,v1,v2,style:'section'}:{kind:'chapter',b:B.book,c:B.ch,style:'section'}}
+  if((B.mode==='chapter'||B.mode==='verses')&&(B.style||noteStyle())!=='verse'){const mix=(B.style||noteStyle())==='mixed';const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;
+    prompt=sectionPrompt(name,isV,v1,v2,B.depth,B.sparts,mix?B.vparts:null);key=(isV?`k_${B.book}.${B.ch}.${v1}-${v2}`:`k_${B.book}.${B.ch}`)+(mix?'~m':'~s');const sty=mix?'mixed':'section';meta=isV?{kind:'chapter',b:B.book,c:B.ch,v1,v2,style:sty}:{kind:'chapter',b:B.book,c:B.ch,style:sty}}
   else if(B.mode==='chapter'||B.mode==='verses'){if(isSimple())B.parts={context:true,hl:true,margin:true,xrefs:false,words:false,soap:false};const parts=Object.keys(B.parts).filter(k=>B.parts[k]);if(!parts.length){toast('Pick at least one thing to add');return}
     const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);const name=`${BM[B.book].name} ${B.ch}${isV?':'+v1+(v2>v1?'-'+v2:''):''}`;const keys=[];
     if(B.parts.context)keys.push('"context": {"heading": "short title to write above the chapter (max 6 words)", "summary": "one-line summary (max 15 words)", "author": "", "audience": "who it was first written to (few words)", "setting": "when/where and what is happening (max 15 words)", "background": ["2-4 short historical or cultural facts a modern reader would miss (max 15 words each)"]}');
@@ -3449,7 +3474,7 @@ function limitBox(where){const B=S.build;const canBasic=where==='load'&&(B.mode=
    ${canBasic?`<button class="btn wide" data-act="basicLoad">📖 Make a basic loading now</button><p class="small muted" style="margin:4px 2px 0">Without AI: the key verse to highlight and simple steps to write your own notes.</p>`:''}</div>`}
 function basicPlan(){const B=S.build;const b=B.book,c=B.ch;const isV=B.mode==='verses';const v1=B.v1||1,v2=Math.max(B.v2||v1,v1);
   const keyv=[...new Set(VOTD.filter(r=>r.startsWith(b+' '+c+':')).map(r=>parseInt(r.split(':')[1])))].filter(v=>!isV||(v>=v1&&v<=v2)).sort((x,y)=>x-y).slice(0,4);
-  const sec=(B.style||noteStyle())==='section';
+  const sec=(B.style||noteStyle())!=='verse';
   const diy=[sec?'Read it slowly. Split it into 2 to 4 parts where the story or topic changes. Draw a colored border around each part.':'Read it slowly, then write your own short title above it.',
     sec?'Next to each part, make a matching colored box: in your own words, what happens and what it means.':'Which verse stands out most to you? Underline it and write why in the margin.',
     'Is there a word or verse you don’t understand? Circle it, and tap 💬 Ask when Claude is back.',
