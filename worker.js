@@ -146,6 +146,42 @@ async function openaiLike(body, url, key, model, vision) {
   return toAppStream(r.body);
 }
 
+// 🖼️ Pictures for Picture pages: the user's own Gemini key first, then Cloudflare's free FLUX model.
+async function imageAI(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const prompt = String(body.prompt || '').slice(0, 800);
+  if (!prompt) return json({ error: 'no_prompt' }, 400);
+  const key = request.headers.get('X-Gemini-Key');
+  let msg = '';
+  if (key && key.length < 300 && /^[A-Za-z0-9._\-]+$/.test(key)) {
+    const payload = JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } });
+    outer: for (const m of ['gemini-2.5-flash-image', 'gemini-2.5-flash-image-preview', 'gemini-2.0-flash-preview-image-generation']) {
+      for (const how of ['header', 'query']) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent` + (how === 'query' ? '?key=' + encodeURIComponent(key) : '');
+        const r = await fetch(url, { method: 'POST', headers: how === 'header' ? { 'Content-Type': 'application/json', 'x-goog-api-key': key } : { 'Content-Type': 'application/json' }, body: payload });
+        if (r.ok) {
+          const j = await r.json().catch(() => ({}));
+          const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
+          const d = parts.find(x => x.inlineData || x.inline_data);
+          if (d) { const x = d.inlineData || d.inline_data; return json({ image: `data:${x.mimeType || x.mime_type || 'image/png'};base64,${x.data}`, provider: 'gemini' }); }
+          break;
+        }
+        const t = await r.text(); try { msg = (JSON.parse(t).error || {}).message || ''; } catch (e) { msg = t.slice(0, 200); }
+        console.log('Gemini image error', m, how, r.status, msg.slice(0, 200));
+        if (r.status === 404) break;
+        if (r.status === 429) break outer;
+      }
+    }
+  }
+  if (env.AI) {
+    try {
+      const out = await env.AI.run('@cf/black-forest-labs/flux-1-schnell', { prompt, steps: 4 });
+      if (out && out.image) return json({ image: 'data:image/jpeg;base64,' + out.image, provider: 'flux' });
+    } catch (e) { msg = msg || String((e && e.message) || e).slice(0, 200); console.log('flux error', msg); }
+  }
+  return json({ error: 'image_failed', msg: msg || 'No picture painter is available right now.' }, 502);
+}
+
 async function geminiAI(body, env, key) {
   key = key || env.GEMINI_API_KEY;
   const parts = [{ text: body.prompt }]; if (body.image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: body.image } });
@@ -296,6 +332,13 @@ const handlers = {
           !(await L('/count', { name: 'ai:all', max: parseInt(env.DAILY_TOTAL || '500', 10) })).ok))
         return json({ error: 'You’ve reached today’s limit for ✨ requests. Try again tomorrow!' }, 429);
       return ai(request, env);
+    }
+    if (pathname === '/api/image' && request.method === 'POST') {
+      const r = await D('/exists'); if (r.status === 401) return bad();
+      if (!request.headers.get('X-Gemini-Key') && (!(await L('/count', { name: 'img:' + code, max: parseInt(env.IMAGE_LIMIT || '60', 10) })).ok ||
+          !(await L('/count', { name: 'img:all', max: parseInt(env.IMAGE_TOTAL || '400', 10) })).ok))
+        return json({ error: 'limit', msg: 'You’ve reached today’s picture limit. Try again tomorrow, or add your own Gemini key.' }, 429);
+      return imageAI(request, env);
     }
     let res;
     if (pathname === '/api/data' && request.method === 'GET') res = await D('/all');
