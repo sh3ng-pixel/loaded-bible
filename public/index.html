@@ -41,7 +41,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--p
 .sync.ok i{background:#4a9a5a}
 main{max-width:760px;margin:0 auto;padding:12px 14px 30px}
 nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-nav.bottom button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--muted);padding:4px 0;max-width:110px}
+nav.bottom button{flex:1;min-width:0;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;white-space:nowrap;font-weight:600;color:var(--muted);padding:4px 0;max-width:110px}
 nav.bottom button svg{width:23px;height:23px}
 nav.bottom button.on{color:var(--accent)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
@@ -712,6 +712,7 @@ body.introon{overflow:hidden}
 .vrow{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line,#e5dccb)}.vrowp{border:0;padding:0;background:none}.vtitle{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vthumb{position:relative;width:112px;height:63px;border-radius:10px;overflow:hidden;color:#fff;display:flex;align-items:flex-end;padding:6px;box-sizing:border-box;flex:none}.vthumb b{font-size:11px;line-height:1.1;text-align:left}.vthumb span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.9);color:#111;display:flex;align-items:center;justify-content:center;font-size:12px}.vthumb i{position:absolute;left:0;bottom:0;height:4px;background:#ff3b3b}
 .vfchips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.vfchips .chip{flex:none}
+.vbook{border:1px solid var(--line,#e5dccb);border-radius:14px;margin:6px 0;padding:0 10px;background:var(--card,#fff)}.vbook>summary{display:flex;align-items:center;gap:8px;padding:12px 2px;cursor:pointer;list-style:none}.vbook>summary::-webkit-details-marker{display:none}.vbook[open]>summary{border-bottom:1px solid var(--line,#e5dccb)}.vbook .vrow:last-child{border-bottom:0}.vbk{font-size:18px}.vtest{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 4px 4px}.vmaker>summary{cursor:pointer;padding:2px 0}
 </style>
 </head>
 <body>
@@ -733,6 +734,7 @@ body.introon{overflow:hidden}
   <button data-act="tab" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Study</button>
   <button data-act="tab" data-tab="tabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M19 7h2M19 11h2M19 15h2"/><path d="M9 8h6M9 12h6"/></svg>Bible Kit</button>
   <button data-act="tab" data-tab="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Journal</button>
+  <button data-act="tab" data-tab="videos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Videos</button>
   <button data-act="tab" data-tab="online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>Online Bible</button>
 </nav>
 <div id="sheetWrap"><div class="scrim" data-act="closeSheet"></div><div class="sheet" id="sheet"></div></div>
@@ -1038,7 +1040,7 @@ function changed(){if(rq)return;rq=true;requestAnimationFrame(()=>{rq=false;
 
 /* ---------- router ---------- */
 const isReading=()=>S.tab==='online'&&S.onlineSub==='read';
-function setTab(t){if(t==='account'&&S.tab!=='account'&&!S._navKeep)S.acctSub='';if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['today','load','study','tabs','journal','online','account'].includes(t))t='today';S.tab=t;updateAvatar();
+function setTab(t){if(t==='account'&&S.tab!=='account'&&!S._navKeep)S.acctSub='';if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['today','load','study','tabs','journal','videos','online','account'].includes(t))t='today';S.tab=t;updateAvatar();
   try{if(location.hash!=='#'+t)history.replaceState(null,'','#'+t)}catch(e){}
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderView();window.scrollTo(0,0)}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='pjEmoC'){const v=e.target.value.trim();const g=window.Intl&&Intl.Segmenter?[...new Intl.Segmenter().segment(v)].map(x=>x.segment):[...v];const em=g[0]||'';if(em){S._pjEmo=em;const pv=$('#pjEmoPrev');if(pv)pv.textContent=em;$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.remove('on'))}}});
@@ -1047,7 +1049,7 @@ window.addEventListener('scroll',()=>{const t=document.getElementById('totop');i
 window.addEventListener('hashchange',()=>{if(Date.now()-NAV.pop<600)return;const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
 
 function renderView(){const v=$('#view');
-  ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,online:viewOnline,account:viewAccount})[S.tab](v);
+  ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,videos:viewVideos,online:viewOnline,account:viewAccount})[S.tab](v);
   renderSelbar();if(S.coach!=null)setTimeout(coachHL,60);try{navRecord();biblePill();lastTrack()}catch(e){}}
 
 /* ---------- ONLINE BIBLE ---------- */
@@ -2071,8 +2073,8 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   vidGo:()=>{const V=vidS();if(V.busy)return;if(!VID_PARTS.some(p=>V.parts[p[0]])){toast('Pick at least one thing to cover');return}const c=$('#vidC');if(c)V.c=+c.value;
     const key='v_'+newId();Store.set(key,{scope:V.scope,b:V.b,c:V.scope==='chapter'?V.c:null,parts:Object.assign({},V.parts),min:V.min,at:Date.now(),proj:curProj()||''});touch();vidMake(key)},
   vidResume:el=>vidMake(el.dataset.k),
-  vidPlay:el=>{if(S.vplay&&VP.playing)vidSavePos();vidStopVoice();const x=Store.get(el.dataset.k)||{};const p=x.pos&&x.pct<97?x.pos:{seg:0,sc:0};S.vplay={key:el.dataset.k,seg:p.seg||0,sc:p.sc||0};VP.playing=true;VP.done=false;renderView();window.scrollTo({top:0,behavior:'smooth'});vidSceneGo();vidLoop();vidBtns();if(p.seg||p.sc)toast('▶ Continuing where you stopped')},
-  vidPlayGo:el=>{S.build.mode='video';setTab('load');A.vidPlay(el)},
+  vidPlay:el=>{closeSheet();if(S.tab!=='videos'){S.tab='videos';$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab==='videos'));try{history.replaceState(null,'','#videos')}catch(e){}}if(S.vplay&&VP.playing)vidSavePos();vidStopVoice();const x=Store.get(el.dataset.k)||{};const p=x.pos&&x.pct<97?x.pos:{seg:0,sc:0};S.vplay={key:el.dataset.k,seg:p.seg||0,sc:p.sc||0};VP.playing=true;VP.done=false;renderView();window.scrollTo({top:0,behavior:'smooth'});vidSceneGo();vidLoop();vidBtns();if(p.seg||p.sc)toast('▶ Continuing where you stopped')},
+  vidPlayGo:el=>A.vidPlay(el),
   vidSkip:el=>vidSeek(+el.dataset.n),
   vidRestart:()=>{if(!S.vplay)return;S.vplay.seg=0;S.vplay.sc=0;VP.playing=true;VP.done=false;vidSceneGo();vidLoop();vidBtns();vidSegsUpdate()},
   vidCaps:()=>{saveSettings({vidCaps:settings().vidCaps===false});renderView()},
@@ -2524,7 +2526,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   else if(B.mode==='scan')form=scanForm();
   else if(B.mode==='snote')form=snoteForm();
   else if(B.mode==='life')form=lappForm();
-  else if(B.mode==='video'){form=vidForm();setTimeout(()=>{vidBind(v);if(S.vplay){vidLoop();vidBindPlayer();vidUI()}},0)}
+  else if(B.mode==='video'){B.mode='chapter';form=''}
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
     <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
     <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
@@ -2803,7 +2805,7 @@ Use easy, everyday words that a 12-year-old or someone new to the Bible understa
   snCopy:()=>copyText(S.snote.out.replace(/\*\*/g,'')),
   snSave:()=>{const N=S.snote,B=S.build;const a=parseInt(N.v1)||0,b=Math.max(parseInt(N.v2)||a,a);const vs=a?Array.from({length:Math.min(b-a+1,60)},(_,i)=>a+i):[];
     Store.set('n_'+newId(),{ref:`${B.book} ${B.ch}${a?':'+a+(b>a?'-'+b:''):''}`,b:B.book,c:B.ch,vs,title:'📝 Study note: '+snRefLabel(),text:N.out,md:true,created:Date.now(),updated:Date.now()});touch();notesSaved('📝 Study note: '+snRefLabel())},
-  bMode:el=>{S.build.mode=el.dataset.m;S.build.planKey=null;S.build.err='';renderView()},
+  bMode:el=>{if(el.dataset.m==='video'){S.vidNew=true;setTab('videos');return}S.build.mode=el.dataset.m;S.build.planKey=null;S.build.err='';renderView()},
   bPart:el=>{const p=el.dataset.p;S.build.parts[p]=!S.build.parts[p];renderView()},
   bFeel:el=>{S.build.topic=el.dataset.f;renderView()},
   bGo:()=>runBuild(),
@@ -3442,7 +3444,7 @@ const NEW_TOUR=[
  {tab:'load',pre:()=>{S.build.mode='chapter'},sel:'[data-act=thinkTog]',t:'✍️ Think first',p:'Turn this on and you write your own thoughts first (what do you see, what does it mean, what will you do). Then you see the app’s steps and compare.'},
  {tab:'tabs',pre:()=>{S.loadedSub='threads'},sel:'[data-act=loadedSub][data-s=threads]',t:'🧵 Theme threads',p:'In a loading, tap ⋯ More › 🧵 Thread on a step. Here you see that theme through your whole Bible, in Bible order.'},
  {tab:'tabs',pre:()=>{S.loadedSub='cover';S.pmView='make';(S.pm||(S.pm={type:'picture',subj:'',book:'JHN',size:'full',busy:false,cur:null})).type='picture'},sel:'[data-act=pmType][data-k=picture]',t:'🖼️ Picture pages',p:'Make printable pages with pictures: a book overview, a Bible person, a story or a poster. Save them as a photo or as a PDF to print.'},
- {tab:'load',pre:()=>{S.build.mode='video'},sel:'[data-act=bMode][data-m=video]',t:'🎬 Study videos',p:'Pick a chapter or a whole book, choose what to cover and how long. You get a fast video with a voice, flashes, quizzes and lots of info. It starts playing while the rest is being made.'},
+ {tab:'videos',sel:'#nav [data-tab=videos]',t:'🎬 Study videos',p:'Your own Videos tab. Pick a chapter or a whole book, choose what to cover and how long. You get a fast video with a voice, flashes, quizzes and lots of info. It starts playing while the rest is being made.'},
  {tab:'today',find:()=>$('[data-act=rvStart]')||$('.rhythm'),t:'🔁 Weekly review',p:'Once a week a quick quiz shows up here, made from your own loadings. What you didn’t know comes back first next time.'}];
 function newTour(){S.coachList=NEW_TOUR;saveSettings({newSeen:NEW_ID});coachShow(0)}
 function maybeNew(){const st=settings();if(!st.toured||st.newSeen===NEW_ID||S.coach!=null)return;saveSettings({newSeen:NEW_ID});
@@ -3732,18 +3734,23 @@ function vidS(){const B=S.build;return S.vid||(S.vid={scope:'chapter',b:B.book||
 const vidList=()=>Store.list('v_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0));
 const vidName=V=>V.scope==='book'?`The book of ${BM[V.b].name}`:`${BM[V.b].name} ${V.c}`;
 function vidForm(){const V=vidS();const bookOpts=BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===V.b?'selected':''}>${esc(b.name)}</option>`).join('');const on=VID_PARTS.filter(p=>V.parts[p[0]]).length;
-  return `${S.vplay?vidPlayer():''}
-  <div class="stepl"><span>2</span> A chapter or a whole book?</div>
+  return `<div class="stepl" style="margin-top:4px"><span>1</span> A chapter or a whole book?</div>
   <div class="chips"><button class="chip ${V.scope==='chapter'?'on':''}" data-act="vidScope" data-s="chapter">📖 One chapter</button><button class="chip ${V.scope==='book'?'on':''}" data-act="vidScope" data-s="book">📚 Whole book (overview)</button></div>
   <div class="row" style="align-items:flex-end;margin-top:8px"><div class="grow"><label class="l">Book</label><select class="f" id="vidB">${bookOpts}</select></div>${V.scope==='chapter'?`<div><label class="l">Chapter</label><select class="f" id="vidC" style="width:90px">${Array.from({length:BM[V.b].chapters},(_,i)=>`<option ${i+1===V.c?'selected':''}>${i+1}</option>`).join('')}</select></div>`:''}</div>
-  <div class="stepl"><span>3</span> What should the video cover?</div>
+  <div class="stepl"><span>2</span> What should the video cover?</div>
   <div class="pbar"><span class="small muted"><b>${on}</b> of ${VID_PARTS.length} on</span><span class="grow"></span><button class="chip" data-act="vidAll" data-m="1">✓ All</button><button class="chip" data-act="vidAll" data-m="0">✕ None</button></div>
   <div class="pchips">${VID_PARTS.map(([k,e,l])=>`<button class="pchip ${V.parts[k]?'on':''}" data-act="vidPart" data-p="${k}"><span class="pck">${V.parts[k]?'✓':''}</span><span class="pe">${e}</span><span class="pt"><b>${l}</b></span></button>`).join('')}</div>
-  <div class="stepl"><span>4</span> How long?</div>
+  <div class="stepl"><span>3</span> How long?</div>
   <div class="chips">${[10,20,30].map(m=>`<button class="chip ${V.min===m?'on':''}" data-act="vidMin" data-m="${m}">${m} min</button>`).join('')}</div>
   <p class="small muted" style="margin:6px 2px 0">It starts playing as soon as the first part is ready. The rest is made while you watch.</p>
   <button class="btn pri wide" style="margin-top:10px" data-act="vidGo" ${V.busy?'disabled':''}>${V.busy?`<span class="spin"></span> <span id="vidProg">${esc(V.prog||'Making your video…')}</span>`:`🎬 Make my video: ${esc(vidName(V))}`}</button>
-  ${vidLibrary()}`}
+`}
+function viewVideos(v){const all=vidList();const V=vidS();const mk=S.vidNew||!all.length||V.busy;
+  v.innerHTML=`<div class="hero"><h2>🎬 Videos</h2><p>Fast Bible study videos with a voice. Saved per book, so you can always find them back.</p></div>
+  ${S.vplay&&Store.get(S.vplay.key)?vidPlayer():''}
+  <details class="card vmaker" ${mk?'open':''}><summary><b>＋ Make a new video</b>${V.busy?` <span class="small muted"><span class="spin"></span> ${esc(V.prog||'')}</span>`:''}</summary><div style="margin-top:6px">${vidForm()}</div></details>
+  ${all.length?vidLibrary():`<div class="empty">No videos yet.<br><small>Make your first one above. It will be saved here under its book.</small></div>`}`;
+  S.vidNew=false;setTimeout(()=>{vidBind(v);$$('details.vbook',v).forEach(d=>d.ontoggle=()=>{S.vbOpen=Object.assign({},S.vbOpen,{[d.dataset.b]:d.open})});if(S.vplay){vidLoop();vidBindPlayer();vidUI()}},0)}
 function vidBind(v){const V=vidS();const b=$('#vidB',v),c=$('#vidC',v);if(b)b.onchange=()=>{V.b=b.value;V.c=1;renderView()};if(c)c.onchange=()=>{V.c=+c.value}}
 /* ---- writing the script ---- */
 function vidTopics(V){return VID_PARTS.filter(p=>V.parts[p[0]]).map(p=>p[2]).join(', ')}
@@ -3773,7 +3780,7 @@ async function vidMake(key){const V=vidS();if(V.busy)return;V.busy=true;let x=St
     for(let i=0;i<O.segments.length;i++){x=Store.get(key);if(!x)break;if(x.segs&&x.segs[i]&&x.segs[i].scenes)continue;
       stat(`Writing part ${i+1} of ${O.segments.length}…`);let sc;try{sc=await vidSegment(x,O,i)}catch(e){try{sc=await vidSegment(x,O,i)}catch(e2){throw e2}}
       x=Store.get(key);const segs=(x.segs||[]).slice();segs[i]={title:O.segments[i].title,scenes:sc};Store.set(key,Object.assign({},x,{segs}));touch();
-      if(i===0&&!S.vplay){S.vplay={key,seg:0,sc:0};VP.playing=false;renderView();vidLoop();toast('🎬 Part 1 is ready. Tap ▶ to watch!')}else vidSegsUpdate()}
+      if(i===0&&!S.vplay){S.vplay={key,seg:0,sc:0};VP.playing=false;renderView();vidLoop();toast(S.tab==='videos'?'🎬 Part 1 is ready. Tap ▶ to watch!':'🎬 Part 1 is ready! Open the Videos tab to watch.')}else vidSegsUpdate()}
     stat('✓ Your video is ready')}
   catch(e){toast(aiErr(e));stat('Stopped. Tap ⏩ Finish later to make the rest.')}
   V.busy=false;renderView()}
@@ -3815,10 +3822,14 @@ const vFolders=()=>settings().vfolders||[];
 function vidThumb(x){const hue=((x.b?bOrder(x.b):0)*37+210)%360;return `<div class="vthumb" style="background:linear-gradient(135deg,hsl(${hue},55%,22%),hsl(${(hue+40)%360},60%,35%))"><b>${esc(x.scope==='book'?BM[x.b].name:BM[x.b].name+' '+x.c)}</b><span>▶</span>${x.pct?`<i style="width:${x.pct}%"></i>`:''}</div>`}
 function vidLibrary(){const all=vidList();if(!all.length)return '';const f=S.vfold||'all';const V=vidS();
   const cont=all.filter(x=>x.pct&&x.pct<97);const shown=f==='all'?all:f==='continue'?cont:all.filter(x=>(x.folder||'')===f);
-  return `<h3 style="margin:18px 2px 6px;font-size:17px">🎬 My videos</h3>
+  return `<h3 style="margin:4px 2px 6px;font-size:17px">📚 My videos</h3>
   <div class="chips vfchips"><button class="chip ${f==='all'?'on':''}" data-act="vidFold" data-f="all">🎬 All <small>${all.length}</small></button>${cont.length?`<button class="chip ${f==='continue'?'on':''}" data-act="vidFold" data-f="continue">▶ Continue <small>${cont.length}</small></button>`:''}${vFolders().map(n=>`<button class="chip ${f===n?'on':''}" data-act="vidFold" data-f="${esc(n)}">📁 ${esc(n)} <small>${all.filter(x=>x.folder===n).length}</small></button>`).join('')}<button class="chip" data-act="vidNewFold">＋ Folder</button></div>
   ${f!=='all'&&f!=='continue'?`<div class="row" style="margin:6px 2px"><span class="small muted grow">📁 ${esc(f)}</span><button class="mini" data-act="vidDelFold" data-f="${esc(f)}">🗑 Delete folder</button></div>`:''}
-  ${shown.length?shown.map(x=>{const n=(x.segs||[]).filter(s=>s&&s.scenes).length,tot=(x.outline||[]).length;return `<div class="vrow"><button class="vrowp" data-act="vidPlay" data-k="${x.key}">${vidThumb(x)}</button><div class="grow" style="min-width:0"><b class="vtitle">${esc(x.title||vidName(x))}</b><div class="small muted">${x.min} min${n<tot?` · ${n}/${tot} parts ready`:''}${x.folder?` · 📁 ${esc(x.folder)}`:''}</div><div class="small muted">${x.pct?(x.pct>=97?'✓ Watched':`${x.pct}% watched`):fmtDate(x.at)}</div></div><button class="iconbtn" data-act="vidMenu" data-k="${x.key}">⋯</button></div>`}).join(''):`<p class="small muted" style="margin:8px 2px">${f==='continue'?'Nothing half-watched.':'This folder is empty. Tap ⋯ on a video › 📁 Move to folder.'}</p>`}`}
+  ${shown.length?vidGroups(shown,f):`<p class="small muted" style="margin:8px 2px">${f==='continue'?'Nothing half-watched.':'This folder is empty. Tap ⋯ on a video › 📁 Move to folder.'}</p>`}`}
+function vidRow(x){const n=(x.segs||[]).filter(s=>s&&s.scenes).length,tot=(x.outline||[]).length;return `<div class="vrow"><button class="vrowp" data-act="vidPlay" data-k="${x.key}">${vidThumb(x)}</button><div class="grow" style="min-width:0"><b class="vtitle">${esc(x.title||vidName(x))}</b><div class="small muted">${x.scope==='book'?'📚 Whole book':'📖 Chapter '+x.c} · ${x.min} min${n<tot?` · ${n}/${tot} parts`:''}${x.folder?` · 📁 ${esc(x.folder)}`:''}</div><div class="small muted">${x.pct?(x.pct>=97?'✓ Watched':`${x.pct}% watched`):fmtDate(x.at)}</div></div><button class="iconbtn" data-act="vidMenu" data-k="${x.key}">⋯</button></div>`}
+function vidGroups(list,f){if(f==='continue')return list.map(vidRow).join('');const by=new Map();list.slice().sort((a,b)=>(bOrder(a.b)-bOrder(b.b))||((a.scope==='book'?0:a.c)-(b.scope==='book'?0:b.c))||((b.at||0)-(a.at||0))).forEach(x=>{if(!by.has(x.b))by.set(x.b,[]);by.get(x.b).push(x)});
+  const many=by.size>4;let lastT='';return [...by].map(([b,arr])=>{const T=bOrder(b)<39?'Old Testament':'New Testament';const head=T!==lastT?`<div class="vtest">${T==='Old Testament'?'📜':'✝️'} ${T}</div>`:'';lastT=T;const open=!many||(S.vbOpen||{})[b]||(S.vplay&&arr.some(x=>x.key===S.vplay.key));
+    return head+`<details class="vbook" ${open?'open':''} data-b="${b}"><summary><span class="vbk">📖</span><b class="grow">${esc(BM[b].name)}</b><small class="muted">${arr.length} video${arr.length>1?'s':''}</small></summary>${arr.map(vidRow).join('')}</details>`}).join('')}
 function vidContinueCard(){const x=vidList().find(v=>v.pct&&v.pct<97&&Date.now()-(v.seen||0)<14*864e5);if(!x)return '';return `<div class="tcard"><div class="row" style="align-items:center;gap:10px"><button class="vrowp" data-act="vidPlayGo" data-k="${x.key}">${vidThumb(x)}</button><div class="grow"><div class="small muted">🎬 Continue watching</div><b>${esc(x.title||vidName(x))}</b><div class="small muted">${x.pct}% watched</div></div><button class="btn sm pri" data-act="vidPlayGo" data-k="${x.key}">▶</button></div></div>`}
 
 function vidSegsHtml(x){return (x.outline||[]).map((s,i)=>{const ok=x.segs&&x.segs[i]&&x.segs[i].scenes;return `<button class="vidseg ${S.vplay&&S.vplay.seg===i?'on':''}" data-act="vidSeg" data-i="${i}" ${ok?'':'disabled'}><b>${i+1}</b> ${esc(s.title)} ${ok?'':'<small class="muted">· making…</small>'}</button>`}).join('')}
