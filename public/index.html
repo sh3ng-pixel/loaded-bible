@@ -2070,7 +2070,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   bsnSimple:el=>{},
   vidScope:el=>{vidS().scope=el.dataset.s;renderView()},
   vidAll:el=>{const V=vidS();VID_PARTS.forEach(p=>V.parts[p[0]]=el.dataset.m==='1');renderView()},
-  vidPart:el=>{const V=vidS();V.parts[el.dataset.p]=!V.parts[el.dataset.p];renderView()},
+  vidPart:el=>{const V=vidS();const on=V.parts[el.dataset.p]=!V.parts[el.dataset.p];el.classList.toggle('on',on);const ck=el.querySelector('.pck');if(ck)ck.textContent=on?'✓':'';const n=el.closest('.vmaker,#view').querySelector('.pbar b');if(n)n.textContent=VID_PARTS.filter(p=>V.parts[p[0]]).length},
   vidMin:el=>{vidS().min=+el.dataset.m;renderView()},
   vidGo:()=>{const V=vidS();if(V.busy)return;if(!VID_PARTS.some(p=>V.parts[p[0]])){toast('Pick at least one thing to cover');return}const c=$('#vidC');if(c)V.c=+c.value;
     const key='v_'+newId();Store.set(key,{scope:V.scope,b:V.b,c:V.scope==='chapter'?V.c:null,parts:Object.assign({},V.parts),nsize:V.nsize||defNoteSize(),min:V.min,at:Date.now(),proj:curProj()||''});touch();vidMake(key)},
@@ -3761,12 +3761,12 @@ function vidForm(){const V=vidS();const bookOpts=BOOKS.map(b=>`<option value="${
   <p class="small muted" style="margin:6px 2px 0">It starts playing as soon as the first part is ready. The rest is made while you watch.</p>
   <button class="btn pri wide" style="margin-top:10px" data-act="vidGo" ${V.busy?'disabled':''}>${V.busy?`<span class="spin"></span> <span id="vidProg">${esc(V.prog||'Making your video…')}</span>`:`🎬 Make my video: ${esc(vidName(V))}`}</button>
 `}
-function viewVideos(v){const all=vidList();const V=vidS();const mk=S.vidNew||!all.length||V.busy;
+function viewVideos(v){const all=vidList();const V=vidS();if(S.vidNew||!all.length)S.vmakerOpen=true;const mk=S.vmakerOpen==null?V.busy:S.vmakerOpen;
   v.innerHTML=`<div class="hero"><h2>🎬 Videos</h2><p>Fast Bible study videos with a voice. Saved per book, so you can always find them back.</p></div>
   ${S.vplay&&Store.get(S.vplay.key)?vidPlayer():''}
-  <details class="card vmaker" ${mk?'open':''}><summary><b>＋ Make a new video</b>${V.busy?` <span class="small muted"><span class="spin"></span> ${esc(V.prog||'')}</span>`:''}</summary><div style="margin-top:6px">${vidForm()}</div></details>
+  <details class="card vmaker" id="vmaker" ${mk?'open':''}><summary><b>＋ Make a new video</b>${V.busy?` <span class="small muted"><span class="spin"></span> ${esc(V.prog||'')}</span>`:''}</summary><div style="margin-top:6px">${vidForm()}</div></details>
   ${all.length?vidLibrary():`<div class="empty">No videos yet.<br><small>Make your first one above. It will be saved here under its book.</small></div>`}`;
-  S.vidNew=false;setTimeout(()=>{vidBind(v);$$('details.vbook',v).forEach(d=>d.ontoggle=()=>{S.vbOpen=Object.assign({},S.vbOpen,{[d.dataset.b]:d.open})});if(S.vplay){vidLoop();vidBindPlayer();vidUI()}},0)}
+  S.vidNew=false;setTimeout(()=>{vidBind(v);const mkr=$('#vmaker',v);if(mkr)mkr.ontoggle=()=>{S.vmakerOpen=mkr.open};$$('details.vbook',v).forEach(d=>d.ontoggle=()=>{S.vbOpen=Object.assign({},S.vbOpen,{[d.dataset.b]:d.open})});if(S.vplay){vidLoop();vidBindPlayer();vidUI()}},0)}
 function vidBind(v){const V=vidS();const b=$('#vidB',v),c=$('#vidC',v);if(b)b.onchange=()=>{V.b=b.value;V.c=1;renderView()};if(c)c.onchange=()=>{V.c=+c.value}}
 /* ---- writing the script ---- */
 function vidTopics(V){return VID_PARTS.filter(p=>V.parts[p[0]]).map(p=>p[2]).join(', ')}
