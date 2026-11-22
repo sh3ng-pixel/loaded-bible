@@ -715,6 +715,8 @@ body.introon{overflow:hidden}
 .vbook{border:1px solid var(--line,#e5dccb);border-radius:14px;margin:6px 0;padding:0 10px;background:var(--card,#fff)}.vbook>summary{display:flex;align-items:center;gap:8px;padding:12px 2px;cursor:pointer;list-style:none}.vbook>summary::-webkit-details-marker{display:none}.vbook[open]>summary{border-bottom:1px solid var(--line,#e5dccb)}.vbook .vrow:last-child{border-bottom:0}.vbk{font-size:18px}.vtest{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 4px 4px}.vmaker>summary{cursor:pointer;padding:2px 0}
 .vnotes{padding:4px 2px}.vnotes .vnh{font-weight:800;margin:10px 0 4px}.vnotes ol,.vnotes ul{margin:0;padding-left:20px}.vnotes li{margin:3px 0;line-height:1.4}
 .viddone{position:absolute;right:12px;bottom:46px;z-index:4;display:none;border:0;border-radius:24px;padding:12px 18px;font-weight:800;font-size:15px;background:#2fbf71;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.4)}.viddone.show{display:block;animation:vpulse 1.4s infinite}@keyframes vpulse{50%{transform:scale(1.06)}}.vcopy{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line,#e5dccb)}.vcopy.done>span{opacity:.5;text-decoration:line-through}.vcopy input{margin-top:3px;width:18px;height:18px;flex:none}
+.wlink{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line,#e5dccb);color:inherit;text-decoration:none}.wlink:last-child{border-bottom:0}.we{font-size:22px;width:30px;text-align:center}.wgo{width:32px;height:32px;border-radius:50%;background:#ff3b3b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none}.wplain{color:inherit;text-decoration:none}.wth{background:#222!important}.wth img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+nav.bottom button{font-size:9.5px}
 </style>
 </head>
 <body>
@@ -737,6 +739,7 @@ body.introon{overflow:hidden}
   <button data-act="tab" data-tab="tabs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h11l3 3v15H5z"/><path d="M19 7h2M19 11h2M19 15h2"/><path d="M9 8h6M9 12h6"/></svg>Bible Kit</button>
   <button data-act="tab" data-tab="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Journal</button>
   <button data-act="tab" data-tab="videos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Videos</button>
+  <button data-act="tab" data-tab="watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Watch</button>
   <button data-act="tab" data-tab="online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>Online Bible</button>
 </nav>
 <div id="sheetWrap"><div class="scrim" data-act="closeSheet"></div><div class="sheet" id="sheet"></div></div>
@@ -956,7 +959,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p|q|v)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans','aiqueue','bsnotes','threads'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p|q|v|w)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans','aiqueue','bsnotes','threads'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -1042,7 +1045,7 @@ function changed(){if(rq)return;rq=true;requestAnimationFrame(()=>{rq=false;
 
 /* ---------- router ---------- */
 const isReading=()=>S.tab==='online'&&S.onlineSub==='read';
-function setTab(t){if(t==='account'&&S.tab!=='account'&&!S._navKeep)S.acctSub='';if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['today','load','study','tabs','journal','videos','online','account'].includes(t))t='today';S.tab=t;updateAvatar();
+function setTab(t){if(t==='account'&&S.tab!=='account'&&!S._navKeep)S.acctSub='';if(t==='read'||t==='notes'){S.onlineSub=t;t='online'}if(t==='loaded')t='tabs';if(!['today','load','study','tabs','journal','videos','watch','online','account'].includes(t))t='today';S.tab=t;updateAvatar();
   try{if(location.hash!=='#'+t)history.replaceState(null,'','#'+t)}catch(e){}
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderView();window.scrollTo(0,0)}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='pjEmoC'){const v=e.target.value.trim();const g=window.Intl&&Intl.Segmenter?[...new Intl.Segmenter().segment(v)].map(x=>x.segment):[...v];const em=g[0]||'';if(em){S._pjEmo=em;const pv=$('#pjEmoPrev');if(pv)pv.textContent=em;$$('#sheet [data-act=pjEmo]').forEach(b=>b.classList.remove('on'))}}});
@@ -1051,7 +1054,7 @@ window.addEventListener('scroll',()=>{const t=document.getElementById('totop');i
 window.addEventListener('hashchange',()=>{if(Date.now()-NAV.pop<600)return;const t=location.hash.slice(1);if(t&&t!==S.tab)setTab(t)});
 
 function renderView(){const v=$('#view');
-  ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,videos:viewVideos,online:viewOnline,account:viewAccount})[S.tab](v);
+  ({today:viewToday,load:viewLoad,study:viewStudy,tabs:viewLoaded,journal:viewJournal,videos:viewVideos,watch:viewWatch,online:viewOnline,account:viewAccount})[S.tab](v);
   renderSelbar();if(S.coach!=null)setTimeout(coachHL,60);try{navRecord();biblePill();lastTrack()}catch(e){}}
 
 /* ---------- ONLINE BIBLE ---------- */
@@ -2075,6 +2078,15 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   vidGo:()=>{const V=vidS();if(V.busy)return;if(!VID_PARTS.some(p=>V.parts[p[0]])){toast('Pick at least one thing to cover');return}const c=$('#vidC');if(c)V.c=+c.value;
     const key='v_'+newId();Store.set(key,{scope:V.scope,b:V.b,c:V.scope==='chapter'?V.c:null,parts:Object.assign({},V.parts),nsize:V.nsize||defNoteSize(),min:V.min,at:Date.now(),proj:curProj()||''});touch();vidMake(key)},
   vidResume:el=>vidMake(el.dataset.k),
+  wScope:el=>{wS().scope=el.dataset.s;renderView()},
+  wKind:el=>{const W=wS();const on=W.kinds[el.dataset.k]=!W.kinds[el.dataset.k];const sy=scrollY;renderView();window.scrollTo(0,sy)},
+  wAI:async()=>{const W=wS();if(W.aiBusy)return;const ref=wRef(W);W.aiBusy=true;renderView();
+    try{const r=await ai(`${JSYS}Suggest 6-8 real, well-known YouTube videos or video series about ${ref} (Bible). Kinds wanted: ${W_KINDS.filter(k=>W.kinds[k[0]]).map(k=>k[2]).join(', ')||'any'}. Only suggest things you are confident exist (like BibleProject book overviews, famous sermon series). Never invent URLs. Return ONLY JSON: {"list":[{"title":"video or series title","who":"channel or speaker","why":"what it's good for, max 10 words","q":"a YouTube search that finds it, max 10 words"}]}`,null,null,'default');
+      const j=parseJSON(r.text);W.ai={ref,list:(j.list||[]).filter(x=>x&&x.title&&x.q).slice(0,10)}}catch(e){toast(aiErr(e))}W.aiBusy=false;const sy=scrollY;renderView();window.scrollTo(0,sy)},
+  wSave:()=>{const W=wS();const u=($('#wUrl')||{value:''}).value.trim();if(!/^https?:\/\//i.test(u)){toast('Paste a link that starts with https://');return}const t=($('#wTitle')||{value:''}).value.trim();const ref=wRef(W);
+    Store.set('w_'+newId(),{url:u,title:t||(ytId(u)?'YouTube video':u.replace(/^https?:\/\/(www\.)?/,'').slice(0,40)),b:W.b,c:W.scope==='book'?0:W.c,ref,at:Date.now(),proj:curProj()||''});touch();S.wbOpen=Object.assign({},S.wbOpen,{[W.b]:true});toast('💾 Saved under '+ref);renderView()},
+  wSeen:el=>{const x=Store.get(el.dataset.k);if(!x)return;Store.set(el.dataset.k,Object.assign({},x,{seen:!x.seen}));renderView()},
+  wDel:el=>confirmSheet('Remove this saved video?','Remove',()=>{Store.del(el.dataset.k);renderView()}),
   vidForce:el=>{const V=vidS();const k=el.dataset.k;clearTimeout(V.retryT);V.retryT=null;if(V.auto)delete V.auto[k];closeSheet();toast('⚡ Keep making… started again');vidMake(k,true);renderView()},
   vidPlay:el=>{closeSheet();if(S.tab!=='videos'){S.tab='videos';$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab==='videos'));try{history.replaceState(null,'','#videos')}catch(e){}}if(S.vplay&&VP.playing)vidSavePos();vidStopVoice();const x=Store.get(el.dataset.k)||{};const p=x.pos&&x.pct<97?x.pos:{seg:0,sc:0};S.vplay={key:el.dataset.k,seg:p.seg||0,sc:p.sc||0};VP.playing=true;VP.done=false;renderView();window.scrollTo({top:0,behavior:'smooth'});vidSceneGo();vidLoop();vidBtns();if(p.seg||p.sc)toast('▶ Continuing where you stopped')},
   vidPlayGo:el=>A.vidPlay(el),
@@ -3458,6 +3470,7 @@ const NEW_TOUR=[
  {tab:'tabs',pre:()=>{S.loadedSub='threads'},sel:'[data-act=loadedSub][data-s=threads]',t:'🧵 Theme threads',p:'In a loading, tap ⋯ More › 🧵 Thread on a step. Here you see that theme through your whole Bible, in Bible order.'},
  {tab:'tabs',pre:()=>{S.loadedSub='cover';S.pmView='make';(S.pm||(S.pm={type:'picture',subj:'',book:'JHN',size:'full',busy:false,cur:null})).type='picture'},sel:'[data-act=pmType][data-k=picture]',t:'🖼️ Picture pages',p:'Make printable pages with pictures: a book overview, a Bible person, a story or a poster. Save them as a photo or as a PDF to print.'},
  {tab:'videos',sel:'#nav [data-tab=videos]',t:'🎬 Study videos',p:'Your own Videos tab. Pick a chapter or a whole book, choose what to cover and how long. You get a fast video with a voice, flashes, quizzes and lots of info. It starts playing while the rest is being made.'},
+ {tab:'watch',sel:'#nav [data-tab=watch]',t:'🌐 Watch',p:'Find Bible videos on YouTube and the web for a book, chapter or verse: overviews, sermons, deep study, kids and more. Save the good ones under their book.'},
  {tab:'today',find:()=>$('[data-act=rvStart]')||$('.rhythm'),t:'🔁 Weekly review',p:'Once a week a quick quiz shows up here, made from your own loadings. What you didn’t know comes back first next time.'}];
 function newTour(){S.coachList=NEW_TOUR;saveSettings({newSeen:NEW_ID});coachShow(0)}
 function maybeNew(){const st=settings();if(!st.toured||st.newSeen===NEW_ID||S.coach!=null)return;saveSettings({newSeen:NEW_ID});
@@ -3999,6 +4012,43 @@ function vidDraw(ctx,now){const P=S.vplay;const c=vidCur();const x=c&&c.x;const 
   if(settings().vidCaps!==false&&sc.say){const cap=VP.phase===1&&sc.t==='copy'?(VP.copyWait?'✍️ Copy it into your Bible, then tap ✓ Done writing':'✍️ Write this down.'):VP.phase===1&&sc.reveal?sc.reveal:sc.say;ctx.font=`600 26px ${SANS}`;const L=pWrap(ctx,cap,VW-240).slice(0,2);const hh=L.length*34+18;ctx.fillStyle='rgba(0,0,0,.55)';pRound(ctx,100,VH-36-hh,VW-200,hh,14);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';L.forEach((l,i)=>ctx.fillText(l,cx,VH-36-hh+9+17+i*34))}
   // flash on scene change
   const fl=.45-t/300;if(fl>0){ctx.fillStyle=`rgba(255,255,255,${fl})`;ctx.fillRect(0,0,VW,VH)}}
+
+/* ===== 🌐 WATCH: Bible videos from the internet ===== */
+const W_KINDS=[['overview','🧭','Overview','overview summary'],['verse','📖','Verse by verse','verse by verse'],['sermon','🎙️','Sermons','sermon'],['deep','🔍','Deep study','bible study explained'],['history','🏛️','History & background','historical background context'],['places','🗺️','Places & maps','places map archaeology'],['words','🔤','Greek & Hebrew','Greek Hebrew word study'],['anim','🎨','Animated','animated'],['qa','❓','Questions & answers','meaning questions answered'],['devo','💛','Devotional','devotional'],['kids','🧒','For kids','for kids'],['song','🎵','Songs','song worship']];
+const W_CH=[['BibleProject','Animated overviews of every book, themes and word studies',['overview','anim','words','deep']],['Ligonier Ministries','Teaching by R.C. Sproul and others',['sermon','deep','qa']],['Desiring God','Sermons and short teachings by John Piper',['sermon','devo','qa']],['Truth For Life','Alistair Begg: clear verse-by-verse sermons',['sermon','verse','devo']],['Gospel in Life','Tim Keller sermons',['sermon','deep']],['Mike Winger','Long verse-by-verse studies and hard questions',['verse','qa','deep']],['Enduring Word','David Guzik: verse-by-verse commentary',['verse','deep']],['The Gospel Coalition','Sermons and articles from many pastors',['sermon','deep','devo']],['Crossway','Short videos from the ESV publisher',['overview','deep']],['That the World May Know','Ray Vander Laan: places, land and culture',['places','history']],['Got Questions','Short answers to Bible questions',['qa']],['Saddleback Kids','Animated Bible stories for kids',['kids','anim']]];
+function wS(){const B=S.build;return S.watch||(S.watch={scope:'chapter',b:B.book||'JHN',c:B.ch||1,v:'',kinds:{overview:true,deep:true,sermon:true},ai:null,aiBusy:false})}
+const wRef=W=>W.scope==='book'?BM[W.b].name:W.scope==='verse'&&W.v?`${BM[W.b].name} ${W.c}:${W.v}`:`${BM[W.b].name} ${W.c}`;
+const ytUrl=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+const gvUrl=q=>'https://www.google.com/search?tbm=vid&q='+encodeURIComponent(q);
+const ytId=u=>{const m=String(u||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);return m?m[1]:''};
+const wList=()=>Store.list('w_').filter(inProj);
+function wLink(href,html,cls){return `<a class="${cls||'wlink'}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${html}</a>`}
+function viewWatch(v){const W=wS();const ref=wRef(W);const K=W_KINDS.filter(k=>W.kinds[k[0]]);const kinds=K.length?K:[W_KINDS[0]];
+  const chans=W_CH.filter(c=>c[2].some(t=>W.kinds[t])).slice(0,8);
+  const searches=kinds.map(([k,e,l,q])=>({e,l,q:`${ref} ${q}`}));
+  v.innerHTML=`<div class="hero"><h2>🌐 Watch</h2><p>Bible videos from YouTube and the web, for a book, a chapter or even one verse. Save the good ones under their book.</p></div>
+  <div class="card"><div class="stepl" style="margin-top:0"><span>1</span> What do you want videos about?</div>
+   <div class="chips">${[['book','📚 Book'],['chapter','📖 Chapter'],['verse','🔎 Verse']].map(([k,l])=>`<button class="chip ${W.scope===k?'on':''}" data-act="wScope" data-s="${k}">${l}</button>`).join('')}</div>
+   <div class="row" style="align-items:flex-end;margin-top:8px;gap:8px"><div class="grow"><label class="l">Book</label><select class="f" id="wB">${BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===W.b?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div>
+   ${W.scope!=='book'?`<div><label class="l">Chapter</label><select class="f" id="wC" style="width:78px">${Array.from({length:BM[W.b].chapters},(_,i)=>`<option ${i+1===W.c?'selected':''}>${i+1}</option>`).join('')}</select></div>`:''}
+   ${W.scope==='verse'?`<div><label class="l">Verse(s)</label><input class="f" id="wV" style="width:78px" value="${esc(W.v)}" placeholder="16 or 1-5" inputmode="numeric"></div>`:''}</div>
+   <div class="stepl"><span>2</span> What kind of videos?</div>
+   <div class="pchips">${W_KINDS.map(([k,e,l])=>`<button class="pchip ${W.kinds[k]?'on':''}" data-act="wKind" data-k="${k}"><span class="pck">${W.kinds[k]?'✓':''}</span><span class="pe">${e}</span><span class="pt"><b>${l}</b></span></button>`).join('')}</div></div>
+  <h3 style="margin:16px 2px 6px;font-size:17px">🔎 Videos about ${esc(ref)}</h3>
+  <div class="card">${searches.map(s=>wLink(ytUrl(s.q),`<span class="we">${s.e}</span><span class="grow"><b>${esc(s.l)}</b><br><small class="muted">YouTube: “${esc(s.q)}”</small></span><span class="wgo">▶</span>`)).join('')}
+   ${wLink(gvUrl(ref+' Bible study video'),`<span class="we">🌍</span><span class="grow"><b>Search all video sites</b><br><small class="muted">Google Videos: “${esc(ref)} Bible study video”</small></span><span class="wgo">↗</span>`)}</div>
+  ${chans.length?`<h3 style="margin:16px 2px 6px;font-size:17px">⭐ Trusted channels</h3><div class="card">${chans.map(([n,d])=>wLink(ytUrl(`${n} ${ref}`),`<span class="we">📺</span><span class="grow"><b>${esc(n)}</b><br><small class="muted">${esc(d)}</small></span><span class="wgo">▶</span>`)).join('')}</div>`:''}
+  <div class="card" style="margin-top:12px"><div class="row" style="align-items:center"><b class="grow">✨ Ask the AI which videos to look for</b><button class="btn sm pri" data-act="wAI" ${W.aiBusy?'disabled':''}>${W.aiBusy?'<span class="spin"></span>':'Ask'}</button></div>
+   <p class="small muted" style="margin:4px 0 0">It suggests well-known videos and series. Each one opens as a search, so you always land on the real video.</p>
+   ${W.ai&&W.ai.ref===ref?W.ai.list.map(x=>wLink(ytUrl(x.q),`<span class="we">🎬</span><span class="grow"><b>${esc(x.title)}</b><br><small class="muted">${esc(x.who||'')}${x.why?' · '+esc(x.why):''}</small></span><span class="wgo">▶</span>`)).join(''):''}</div>
+  <div class="card" style="margin-top:12px"><b>＋ Save a video you found</b><p class="small muted" style="margin:4px 0 6px">Copy the link in YouTube (Share › Copy link) and paste it here. It’s saved under ${esc(ref)}.</p>
+   <input class="f" id="wUrl" placeholder="Paste a link: https://youtu.be/…"><input class="f" id="wTitle" style="margin-top:6px" placeholder="Title (optional)"><button class="btn pri wide" style="margin-top:8px" data-act="wSave">💾 Save under ${esc(ref)}</button></div>
+  ${wLibrary()}`;
+  const b=$('#wB',v),c=$('#wC',v),vv=$('#wV',v);if(b)b.onchange=()=>{W.b=b.value;W.c=1;W.v='';renderView()};if(c)c.onchange=()=>{W.c=+c.value;renderView()};if(vv)vv.onchange=()=>{W.v=vv.value.replace(/[^0-9\-–,]/g,'');renderView()};
+  $$('details.vbook',v).forEach(d=>d.ontoggle=()=>{S.wbOpen=Object.assign({},S.wbOpen,{[d.dataset.b]:d.open})})}
+function wLibrary(){const L=wList();if(!L.length)return '';const by=new Map();L.sort((a,b)=>(bOrder(a.b)-bOrder(b.b))||((a.c||0)-(b.c||0))||((b.at||0)-(a.at||0))).forEach(x=>{if(!by.has(x.b))by.set(x.b,[]);by.get(x.b).push(x)});let lastT='';
+  return `<h3 style="margin:18px 2px 6px;font-size:17px">📚 My saved videos</h3>`+[...by].map(([b,arr])=>{const T=bOrder(b)<39?'Old Testament':'New Testament';const head=T!==lastT?`<div class="vtest">${T==='Old Testament'?'📜':'✝️'} ${T}</div>`:'';lastT=T;const open=by.size<=4||(S.wbOpen||{})[b];
+   return head+`<details class="vbook" ${open?'open':''} data-b="${b}"><summary><span class="vbk">📖</span><b class="grow">${esc(BM[b].name)}</b><small class="muted">${arr.length}</small></summary>${arr.map(x=>{const id=ytId(x.url);return `<div class="vrow">${wLink(x.url,id?`<div class="vthumb wth"><img src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt="" onerror="this.remove()"><span>▶</span></div>`:`<div class="vthumb"><span>▶</span></div>`,'vrowp')}<div class="grow" style="min-width:0">${wLink(x.url,`<b class="vtitle">${esc(x.title||'Video')}</b>`,'wplain')}<div class="small muted">${esc(x.ref||'')}${x.seen?' · ✓ Watched':''}</div></div><button class="iconbtn" data-act="wSeen" data-k="${x.key}" title="Watched">${x.seen?'✅':'☑️'}</button><button class="iconbtn" data-act="wDel" data-k="${x.key}">🗑</button></div>`}).join('')}</details>`}).join('')}
 
 /* ===== 📸 SCAN MY BIBLE PAGE ===== */
 function scanS(){return S.scan||(S.scan={job:'todo',url:'',blob:null,b64:'',busy:false,err:'',res:null})}
