@@ -693,6 +693,7 @@ body.introon{overflow:hidden}
 .bsinfo{margin-top:10px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--card)}.bsinfo summary{cursor:pointer;list-style:none}.bsinfo summary::-webkit-details-marker{display:none}.bsinfo[open] summary{margin-bottom:4px}
 .picwrap{position:relative;margin-top:12px;min-height:220px}.picout{width:100%;display:block;border-radius:10px;box-shadow:0 6px 22px rgba(0,0,0,.18)}.picout:not([src]){visibility:hidden;height:300px}.picwait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .thinkcard{border-left:4px solid var(--accent,#c8577a);margin:8px 0}.ordbar{margin:6px 0 4px}.thline{margin-top:8px;border-left:2px dashed var(--line,#ccc);padding-left:12px}.thitem{display:flex;gap:8px;align-items:flex-start;padding:6px 0;position:relative}.thitem>i{position:absolute;left:-18px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--accent,#c8577a)}
+.vidwrap{position:relative;border-radius:14px;overflow:hidden;background:#000}.vidwrap canvas{width:100%;display:block}.vidbig{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.92);font-size:34px;color:#111;cursor:pointer}.vidbig:empty{opacity:0;width:100%;height:100%;border-radius:0}.vidctl{gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}.vidseg{display:block;width:100%;text-align:left;padding:9px 6px;border:0;background:none;border-bottom:1px solid var(--line,#ddd);color:inherit;font:inherit}.vidseg.on{font-weight:700;color:var(--accent,#8e2b22)}.vidseg:disabled{opacity:.55}.vidfs{position:fixed!important;inset:0;z-index:9999;border-radius:0;display:flex;align-items:center;justify-content:center}@media (orientation:portrait){.vidfs canvas{width:100vh!important;transform:rotate(90deg);flex:none}}
 </style>
 </head>
 <body>
@@ -933,7 +934,7 @@ const Store={
       onSnapshot:(n,e)=>F.onSnapshot(F.collection(db,path),sn=>n({docs:sn.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()})),metadata:{fromCache:sn.metadata.fromCache}}),e)})}
 };
 Store.ready=new Promise(r=>Store.readyResolve=r);
-const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p|q)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans','aiqueue','bsnotes','threads'].includes(k)||/^(y|g)_/.test(k);
+const isItemKey=k=>/^(n|h|b|j|t|i|k|s|p|q|v)_/.test(k)||['projects','maploaded','mybible','settings','progress','profile','stats','pic_avatar','pic_banner','readplan','memory','symbols','chains','cover','scans','aiqueue','bsnotes','threads'].includes(k)||/^(y|g)_/.test(k);
 function setSync(t,ok){const s=$('#sync');s.title=t;s.classList.toggle('ok',!!ok);s.querySelector('span').textContent=t}
 async function waitClaude(){for(let i=0;i<30;i++){if(window.claude&&typeof window.claude.use==='function')return window.claude;await sleep(100)}return null}
 
@@ -2045,6 +2046,23 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   thDelItem:el=>{thSaveAll(a=>{const t=a.find(x=>x.id===el.dataset.t);if(t)t.items.splice(+el.dataset.n,1)});renderView()},
   thDel:el=>confirmSheet('Delete this thread? The steps in your loadings stay.','Delete',()=>{thSaveAll(a=>{const i=a.findIndex(x=>x.id===el.dataset.t);if(i>=0)a.splice(i,1)});renderView()}),
   bsnSimple:el=>{},
+  vidScope:el=>{vidS().scope=el.dataset.s;renderView()},
+  vidAll:el=>{const V=vidS();VID_PARTS.forEach(p=>V.parts[p[0]]=el.dataset.m==='1');renderView()},
+  vidPart:el=>{const V=vidS();V.parts[el.dataset.p]=!V.parts[el.dataset.p];renderView()},
+  vidMin:el=>{vidS().min=+el.dataset.m;renderView()},
+  vidGo:()=>{const V=vidS();if(V.busy)return;if(!VID_PARTS.some(p=>V.parts[p[0]])){toast('Pick at least one thing to cover');return}const c=$('#vidC');if(c)V.c=+c.value;
+    const key='v_'+newId();Store.set(key,{scope:V.scope,b:V.b,c:V.scope==='chapter'?V.c:null,parts:Object.assign({},V.parts),min:V.min,at:Date.now(),proj:curProj()||''});touch();vidMake(key)},
+  vidResume:el=>vidMake(el.dataset.k),
+  vidPlay:el=>{vidStopVoice();S.vplay={key:el.dataset.k,seg:0,sc:0};VP.playing=true;VP.done=false;renderView();window.scrollTo({top:0,behavior:'smooth'});vidSceneGo();vidLoop();vidBtns()},
+  vidDel:el=>confirmSheet('Delete this video?','Delete',()=>{if(S.vplay&&S.vplay.key===el.dataset.k)A.vidClose();Store.del(el.dataset.k);renderView()}),
+  vidToggle:()=>{if(!S.vplay)return;if(VP.playing){VP.playing=false;vidStopVoice()}else{if(VP.done){S.vplay.seg=0;S.vplay.sc=0}VP.playing=true;vidSceneGo();vidLoop()}vidBtns()},
+  vidPrev:()=>{const P=S.vplay;if(!P)return;if(P.sc>0)P.sc--;else if(P.seg>0){P.seg--;const x=Store.get(P.key);P.sc=Math.max(0,(((x.segs||[])[P.seg]||{}).scenes||[1]).length-1)}VP.playing=true;vidSceneGo();vidBtns();vidSegsUpdate()},
+  vidNext:()=>{if(!S.vplay)return;VP.playing=true;vidAdvance();vidBtns()},
+  vidSeg:el=>{const P=S.vplay;if(!P)return;P.seg=+el.dataset.i;P.sc=0;VP.playing=true;vidSceneGo();vidBtns();vidSegsUpdate()},
+  vidVoice:()=>{saveSettings({vidVoice:settings().vidVoice===false});if(settings().vidVoice===false)vidStopVoice();renderView();if(VP.playing)vidSceneGo()},
+  vidRate:()=>{const r=[1,1.15,1.3,0.9];const cur=settings().vidRate||1;saveSettings({vidRate:r[(r.indexOf(cur)+1)%r.length]});renderView()},
+  vidFull:()=>{const w=$('#vidWrap');if(!w)return;const fs=w.requestFullscreen||w.webkitRequestFullscreen;if(fs&&!document.fullscreenElement){try{const p=fs.call(w);if(p&&p.catch)p.catch(()=>w.classList.toggle('vidfs'));return}catch(e){}}if(document.fullscreenElement){document.exitFullscreen();return}w.classList.toggle('vidfs')},
+  vidClose:()=>{VP.playing=false;vidStopVoice();cancelAnimationFrame(VP.raf);S.vplay=null;renderView()},
   loadOrder:el=>{saveSettings({loadOrder:el.dataset.o});renderView()},
   nextStep:el=>{const g=[...document.querySelectorAll('[data-act=tick][data-k="'+el.dataset.k+'"]')].find(b=>b.dataset.i===el.dataset.i);if(g){const st=g.closest('.step');st.scrollIntoView({behavior:'smooth',block:'center'});st.classList.add('flash');setTimeout(()=>st.classList.remove('flash'),1600)}},
   bkSave:async()=>{const k=Object.assign({},settings().aikeys||{});BK_PROV.forEach(([id])=>{const e=$('#bk_'+id);if(e)k[id]=e.value.trim().replace(/\s+/g,'')});saveSettings({aikeys:k});S._bkSheet=null;S.bkTest={};const L=bkKeys();if(!L.length){toast('Paste a key first');renderView();return}
@@ -2423,7 +2441,7 @@ function planItems(pl){const d=pl.data||{},items=[];const one=hlOne();const add=
 function loadPlans(){return Store.list('k_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0))}
 function planTitle(pl){return pl.kind==='chapter'?`${BM[pl.b].name} ${pl.c}${pl.v1?':'+pl.v1+(pl.v2&&pl.v2>pl.v1?'-'+pl.v2:''):''}${(pl.data||{}).sections?' · 📑 sections':''}${pl.basic?' · 📖 basic':''}`:pl.kind==='topic'?`${(pl.data&&pl.data.emoji)||'💭'} ${(pl.data&&pl.data.title)||pl.topic}`:`📚 ${BM[pl.b].name} (whole book)`}
 
-const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in'],['scan','📸','Photo of my page','It helps you load it']];
+const LOAD_MODES=[['chapter','📖','A chapter','Step by step'],['verses','📌','Verses','One or a few'],['topic','💭','Feeling or topic','Verses that help'],['book','📚','Whole book','Set up a book'],['snote','📝','Study note','Easy explanation'],['life','🌱','Life application','Live it out'],['inserts','🗂️','Inserts','Cards to tuck in'],['scan','📸','Photo of my page','It helps you load it'],['video','🎬','Study video','A fast video with voice']];
 const LOAD_HELP={scan:'Take a photo of a page in your paper Bible. We see what’s already marked and where there’s room, and tell you exactly what to add, or we read your handwritten notes and save them.',chapter:'Pick a chapter and what you want to add. You get step-by-step what to highlight, write and tab in your paper Bible. Tick off each step. It also goes into your Online Bible.',verses:'Same as a chapter, but just for one verse or a few verses.',topic:'Pick a feeling or topic. You get verses to highlight, where to put a tab, and a chain to write in your margins. Saved to Bible Kit › Topics.',book:'Get a heading for each chapter, what to write on the book’s first page, key verses and where to put the book tab.',snote:'A short note in easy words that explains a passage. Write it in your margin, on a sticky note or on an insert. Saved to Online Bible › My notes.',life:'Turn a passage into something for your own life: what it means for you and one thing to do this week. Saved to My notes or your Journal.',inserts:'Make cards and pages to tuck into your Bible. Saved ones go to Bible Kit › Tabs › Inserts.'};
 const LAPP_AREAS=[['family','👨‍👩‍👧 Family'],['friends','🤝 Friends'],['school','🎒 School or work'],['feelings','💭 Feelings'],['faith','🔥 My faith'],['money','💰 Money'],['habits','⏰ Habits'],['love','❤️ Relationships'],['church','⛪ Church']];
 function lappForm(){const N=S.lapp||(S.lapp={v1:'',v2:'',areas:[],situ:'',size:'card',out:'',busy:false});const B=S.build;
@@ -2467,6 +2485,7 @@ function viewLoad(v){const B=S.build;const s=settings();if(!B.book){B.book=s.boo
   else if(B.mode==='scan')form=scanForm();
   else if(B.mode==='snote')form=snoteForm();
   else if(B.mode==='life')form=lappForm();
+  else if(B.mode==='video'){form=vidForm();setTimeout(()=>{vidBind(v);if(S.vplay)vidLoop()},0)}
   else if(B.mode==='topic')form=`<label class="l">A feeling, struggle or topic</label>
     <input class="f" id="bTopic" value="${esc(B.topic)}" placeholder="e.g. sadness, fear, my new job, patience">
     <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FEELINGS.map(f=>`<button class="chip ${B.topic===f?'on':''}" data-act="bFeel" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
@@ -3384,6 +3403,7 @@ const NEW_TOUR=[
  {tab:'load',pre:()=>{S.build.mode='chapter'},sel:'[data-act=thinkTog]',t:'✍️ Think first',p:'Turn this on and you write your own thoughts first (what do you see, what does it mean, what will you do). Then you see the app’s steps and compare.'},
  {tab:'tabs',pre:()=>{S.loadedSub='threads'},sel:'[data-act=loadedSub][data-s=threads]',t:'🧵 Theme threads',p:'In a loading, tap ⋯ More › 🧵 Thread on a step. Here you see that theme through your whole Bible, in Bible order.'},
  {tab:'tabs',pre:()=>{S.loadedSub='cover';S.pmView='make';(S.pm||(S.pm={type:'picture',subj:'',book:'JHN',size:'full',busy:false,cur:null})).type='picture'},sel:'[data-act=pmType][data-k=picture]',t:'🖼️ Picture pages',p:'Make printable pages with pictures: a book overview, a Bible person, a story or a poster. Save them as a photo or as a PDF to print.'},
+ {tab:'load',pre:()=>{S.build.mode='video'},sel:'[data-act=bMode][data-m=video]',t:'🎬 Study videos',p:'Pick a chapter or a whole book, choose what to cover and how long. You get a fast video with a voice, flashes, quizzes and lots of info. It starts playing while the rest is being made.'},
  {tab:'today',find:()=>$('[data-act=rvStart]')||$('.rhythm'),t:'🔁 Weekly review',p:'Once a week a quick quiz shows up here, made from your own loadings. What you didn’t know comes back first next time.'}];
 function newTour(){S.coachList=NEW_TOUR;saveSettings({newSeen:NEW_ID});coachShow(0)}
 function maybeNew(){const st=settings();if(!st.toured||st.newSeen===NEW_ID||S.coach!=null)return;saveSettings({newSeen:NEW_ID});
@@ -3666,6 +3686,119 @@ function loadedThreads(el){const L=thList();const open=S.thOpen;
     ${open===t.id?`<div class="thline">${its.length?its.map((x,j)=>`<div class="thitem"><i></i><div class="grow">${x.b?refA(`${x.b} ${x.c}${x.v?':'+x.v:''}`,`${BM[x.b].name} ${x.c}${x.v?':'+x.v:''}`):'<b>'+esc(x.ref||'')+'</b>'}<div class="small">${esc(x.text)}</div></div><button class="mini" data-act="thDelItem" data-t="${t.id}" data-n="${t.items.indexOf(x)}">✕</button></div>`).join(''):'<p class="small muted">Empty. In a loading, tap ⋯ More › 🧵 Thread on a step to add it here.</p>'}
      <p class="small muted" style="margin:8px 0 0">✍️ Tip: in your Bible, write the next place of this thread next to each verse (like a chain), so you can follow it page by page.</p>
      <div class="row" style="margin-top:8px"><button class="btn sm" data-act="thDel" data-t="${t.id}">🗑 Delete thread</button></div></div>`:''}</div>`}).join(''):`<div class="empty">No threads yet.<br><small>Make one above, or tap ⋯ More › 🧵 Thread on any step in a loading.</small></div>`}`}
+
+/* ===== 🎬 STUDY VIDEOS (fast, animated, with voice) ===== */
+const VID_PARTS=[['context','📍','Setting & background'],['story','🎬','What happens'],['people','👥','Who’s who'],['words','🔤','Key words (Greek/Hebrew)'],['truth','💬','Big truths'],['jesus','✝️','Points to Jesus'],['oldnew','🔁','Old & New'],['xrefs','🔗','Cross-references'],['tricky','❓','Tricky verses'],['views','⚖️','Different views'],['history','🏛️','Voices from history'],['notice','🔍','Details you miss'],['apply','💛','My life'],['quiz','🧠','Quiz questions'],['mark','🖍','What to mark in my Bible'],['prayer','🙏','Prayer at the end']];
+function vidS(){const B=S.build;return S.vid||(S.vid={scope:'chapter',b:B.book||'JHN',c:B.ch||1,min:20,parts:{context:true,story:true,people:true,words:true,truth:true,jesus:true,quiz:true,apply:true,notice:true,xrefs:true},busy:false,prog:'',cur:null})}
+const vidList=()=>Store.list('v_').filter(inProj).sort((a,b)=>(b.at||0)-(a.at||0));
+const vidName=V=>V.scope==='book'?`The book of ${BM[V.b].name}`:`${BM[V.b].name} ${V.c}`;
+function vidForm(){const V=vidS();const bookOpts=BOOKS.map(b=>`<option value="${b.abbr}" ${b.abbr===V.b?'selected':''}>${esc(b.name)}</option>`).join('');const on=VID_PARTS.filter(p=>V.parts[p[0]]).length;
+  return `${S.vplay?vidPlayer():''}
+  <div class="stepl"><span>2</span> A chapter or a whole book?</div>
+  <div class="chips"><button class="chip ${V.scope==='chapter'?'on':''}" data-act="vidScope" data-s="chapter">📖 One chapter</button><button class="chip ${V.scope==='book'?'on':''}" data-act="vidScope" data-s="book">📚 Whole book (overview)</button></div>
+  <div class="row" style="align-items:flex-end;margin-top:8px"><div class="grow"><label class="l">Book</label><select class="f" id="vidB">${bookOpts}</select></div>${V.scope==='chapter'?`<div><label class="l">Chapter</label><select class="f" id="vidC" style="width:90px">${Array.from({length:BM[V.b].chapters},(_,i)=>`<option ${i+1===V.c?'selected':''}>${i+1}</option>`).join('')}</select></div>`:''}</div>
+  <div class="stepl"><span>3</span> What should the video cover?</div>
+  <div class="pbar"><span class="small muted"><b>${on}</b> of ${VID_PARTS.length} on</span><span class="grow"></span><button class="chip" data-act="vidAll" data-m="1">✓ All</button><button class="chip" data-act="vidAll" data-m="0">✕ None</button></div>
+  <div class="pchips">${VID_PARTS.map(([k,e,l])=>`<button class="pchip ${V.parts[k]?'on':''}" data-act="vidPart" data-p="${k}"><span class="pck">${V.parts[k]?'✓':''}</span><span class="pe">${e}</span><span class="pt"><b>${l}</b></span></button>`).join('')}</div>
+  <div class="stepl"><span>4</span> How long?</div>
+  <div class="chips">${[10,20,30].map(m=>`<button class="chip ${V.min===m?'on':''}" data-act="vidMin" data-m="${m}">${m} min</button>`).join('')}</div>
+  <p class="small muted" style="margin:6px 2px 0">It starts playing as soon as the first part is ready. The rest is made while you watch.</p>
+  <button class="btn pri wide" style="margin-top:10px" data-act="vidGo" ${V.busy?'disabled':''}>${V.busy?`<span class="spin"></span> <span id="vidProg">${esc(V.prog||'Making your video…')}</span>`:`🎬 Make my video: ${esc(vidName(V))}`}</button>
+  ${vidList().length?`<h3 style="margin:18px 2px 6px;font-size:17px">🎬 My videos</h3>${vidList().map(x=>{const n=(x.segs||[]).filter(s=>s&&s.scenes).length;return `<div class="card scancard"><div class="row" style="align-items:center"><span style="font-size:22px">🎬</span><span class="grow"><b>${esc(x.title||vidName(x))}</b><br><small class="muted">${x.min} min · ${n}/${(x.outline||[]).length} parts ready · ${fmtDate(x.at)}</small></span><button class="btn sm pri" data-act="vidPlay" data-k="${x.key}">▶</button>${n<(x.outline||[]).length&&!V.busy?`<button class="btn sm" data-act="vidResume" data-k="${x.key}">⏩ Finish</button>`:''}<button class="iconbtn" data-act="vidDel" data-k="${x.key}">🗑</button></div></div>`}).join('')}`:''}`}
+function vidBind(v){const V=vidS();const b=$('#vidB',v),c=$('#vidC',v);if(b)b.onchange=()=>{V.b=b.value;V.c=1;renderView()};if(c)c.onchange=()=>{V.c=+c.value}}
+/* ---- writing the script ---- */
+function vidTopics(V){return VID_PARTS.filter(p=>V.parts[p[0]]).map(p=>p[2]).join(', ')}
+async function vidOutline(V){const n=Math.max(3,Math.round(V.min/2.5));const name=vidName(V);
+  const r=await ai(`${SYS}Plan a ${V.min}-minute, fast-paced, exciting Bible study video (16:9, with a narrator) about ${name}${V.scope==='book'?` (an overview of the whole book, ${BM[V.b].chapters} chapters)`:''}. Cover these topics, woven together in a natural order: ${vidTopics(V)}.
+Return ONLY JSON: {"title":"catchy video title, max 7 words","hook":"one-line hook, max 14 words","segments":[{"title":"part title, max 5 words","covers":"what this part covers, with verse numbers, max 30 words"}]} with exactly ${n} segments. Part 1 starts with a strong hook. ${V.parts.prayer?'The last part ends with a recap and a short prayer.':'The last part ends with a quick recap.'}`,null,null,'default');
+  return parseJSON(r.text)}
+async function vidSegment(V,O,i){const seg=O.segments[i];const tr=quoteTrans();const P=V.parts;
+  const types=[`{"t":"title","big":"max 5 words","small":"max 9 words","say":"…"}`,`{"t":"fact","emoji":"one emoji","big":"max 6 words","small":"max 14 words","say":"…"}`,`{"t":"verse","ref":"Book chapter:verse","text":"the verse in ${tr}, max 32 words","hl":"1-3 words from the text to highlight","say":"…"}`,`{"t":"list","big":"heading, max 5 words","items":["2-4 items, max 6 words each"],"say":"…"}`,`{"t":"number","n":"a number like 6 or 120","unit":"max 4 words","small":"max 12 words","say":"…"}`,`{"t":"versus","a":"left label","b":"right label","ai":["1-3 short points"],"bi":["1-3 short points"],"say":"…"}`,`{"t":"timeline","items":[{"when":"short","what":"max 5 words"}],"say":"…"}`,`{"t":"people","items":[{"name":"","role":"max 5 words","emoji":"one emoji"}],"say":"…"}`];
+  if(P.words)types.push(`{"t":"word","word":"English word","orig":"Greek or Hebrew word in Latin letters","lang":"Greek|Hebrew","meaning":"max 8 words","say":"…"}`);
+  if(P.history)types.push(`{"t":"quote","who":"name, century","text":"what they taught, in your own words (never invent quotes), max 20 words","say":"…"}`);
+  if(P.quiz)types.push(`{"t":"quiz","q":"quiz question, max 12 words","opts":["3 short options"],"a":0,"say":"read the question","reveal":"the answer and why, max 20 words"}`);
+  if(P.mark)types.push(`{"t":"mark","emoji":"🖍","big":"what to mark in your Bible, max 8 words","small":"where and how, max 12 words","say":"…"}`);
+  const r=await ai(`${SYS}You write PART ${i+1} of ${O.segments.length} of a fast, exciting Bible study video about ${vidName(V)}. Video title: "${O.title}".
+This part: "${seg.title}" — ${seg.covers}
+${i?`Earlier parts were: ${O.segments.slice(0,i).map(s=>s.title).join('; ')}. Don't repeat them.`:`Open with this hook: ${O.hook}`}
+Topics the viewer chose: ${vidTopics(V)}.
+STYLE: dopamine pacing like the best YouTube explainers. Short, punchy narration (each "say" is 8-22 words, spoken by a warm narrator). Lots of surprising facts, numbers, contrasts, mini cliffhangers and questions. Accurate to the Bible and history; say "many think" for uncertain things. Plain modern English, no King James style. Quote verses in ${tr}.
+Make 26-34 scenes (about 150 seconds of narration). Vary the scene types; never the same type 3 times in a row.
+Scene types:
+${types.join('\n')}
+Return ONLY JSON: {"scenes":[ ... ]}`,null,null,'default');
+  const j=parseJSON(r.text);return (j.scenes||[]).filter(x=>x&&x.t&&x.say).slice(0,40)}
+async function vidMake(key){const V=vidS();if(V.busy)return;V.busy=true;let x=Store.get(key);const stat=t=>{V.prog=t;const e=$('#vidProg');if(e)e.textContent=t;const s=$('#vidStat');if(s)s.textContent=t};
+  try{if(!x.outline){stat('Planning the video…');const O=await vidOutline(x);x=Object.assign({},Store.get(key),{title:O.title,hook:O.hook,outline:O.segments,segs:[]});Store.set(key,x);renderView()}
+    const O={title:x.title,hook:x.hook,segments:x.outline};
+    for(let i=0;i<O.segments.length;i++){x=Store.get(key);if(!x)break;if(x.segs&&x.segs[i]&&x.segs[i].scenes)continue;
+      stat(`Writing part ${i+1} of ${O.segments.length}…`);let sc;try{sc=await vidSegment(x,O,i)}catch(e){try{sc=await vidSegment(x,O,i)}catch(e2){throw e2}}
+      x=Store.get(key);const segs=(x.segs||[]).slice();segs[i]={title:O.segments[i].title,scenes:sc};Store.set(key,Object.assign({},x,{segs}));touch();
+      if(i===0&&!S.vplay){S.vplay={key,seg:0,sc:0};VP.playing=false;renderView();vidLoop();toast('🎬 Part 1 is ready. Tap ▶ to watch!')}else vidSegsUpdate()}
+    stat('✓ Your video is ready')}
+  catch(e){toast(aiErr(e));stat('Stopped. Tap ⏩ Finish later to make the rest.')}
+  V.busy=false;renderView()}
+/* ---- player ---- */
+const VP={playing:false,t0:0,raf:0,timer:0,phase:0,u:null,voice:true,rate:1};
+function vidCur(){const P=S.vplay;if(!P)return null;const x=Store.get(P.key);if(!x)return null;const seg=(x.segs||[])[P.seg];return {x,seg,scene:seg&&seg.scenes?seg.scenes[P.sc]:null}}
+function vidPlayer(){const P=S.vplay;const x=Store.get(P.key);if(!x)return '';const segs=x.outline||[];
+  return `<div class="card vidcard"><div class="vidwrap" id="vidWrap"><canvas id="vidCv" width="1280" height="720"></canvas><button class="vidbig" data-act="vidToggle" id="vidBig">${VP.playing?'':'▶'}</button></div>
+   <div class="row vidctl"><button class="iconbtn" data-act="vidPrev">⏮</button><button class="btn sm pri" data-act="vidToggle" id="vidTg">${VP.playing?'⏸ Pause':'▶ Play'}</button><button class="iconbtn" data-act="vidNext">⏭</button><span class="grow"></span><button class="chip ${settings().vidVoice!==false?'on':''}" data-act="vidVoice">🔊 Voice</button><button class="chip" data-act="vidRate">${settings().vidRate||1}×</button><button class="iconbtn" data-act="vidFull" title="Full screen">⛶</button><button class="iconbtn" data-act="vidClose" title="Close">✕</button></div>
+   <div class="small muted" id="vidStat" style="margin:4px 2px">${esc(vidS().busy?vidS().prog:'')}</div>
+   <details class="tmore"><summary class="small"><b>📑 Parts (${segs.length})</b></summary><div id="vidSegs">${vidSegsHtml(x)}</div></details></div>`}
+function vidSegsHtml(x){return (x.outline||[]).map((s,i)=>{const ok=x.segs&&x.segs[i]&&x.segs[i].scenes;return `<button class="vidseg ${S.vplay&&S.vplay.seg===i?'on':''}" data-act="vidSeg" data-i="${i}" ${ok?'':'disabled'}><b>${i+1}</b> ${esc(s.title)} ${ok?'':'<small class="muted">· making…</small>'}</button>`}).join('')}
+function vidSegsUpdate(){const P=S.vplay;if(!P)return;const x=Store.get(P.key);const e=$('#vidSegs');if(e&&x)e.innerHTML=vidSegsHtml(x)}
+function vidStart(){if(!S.vplay)return;VP.playing=true;vidSceneGo();vidLoop();vidBtns()}
+function vidBtns(){const t=$('#vidTg');if(t)t.textContent=VP.playing?'⏸ Pause':'▶ Play';const b=$('#vidBig');if(b)b.textContent=VP.playing?'':'▶'}
+function vidStopVoice(){clearTimeout(VP.timer);try{if(ttsOK())speechSynthesis.cancel()}catch(e){}}
+function vidSceneGo(){vidStopVoice();if(!VP.playing)return;const c=vidCur();VP.t0=performance.now();VP.phase=0;
+  if(!c||!c.scene){VP.wait=true;VP.timer=setTimeout(()=>{VP.wait=false;const c2=vidCur();if(c2&&c2.scene)vidSceneGo();else if(vidS().busy)vidSceneGo();else{VP.playing=false;VP.done=true;vidBtns()}},1200);return}
+  VP.wait=false;VP.done=false;const sc=c.scene;vidSay(sc.say,()=>{if(sc.t==='quiz'){VP.timer=setTimeout(()=>{VP.phase=1;VP.t1=performance.now();vidSay(sc.reveal||'',()=>{VP.timer=setTimeout(vidAdvance,500)})},2600)}else VP.timer=setTimeout(vidAdvance,350)})}
+function vidSay(text,done){const rate=settings().vidRate||1;const words=String(text||'').split(/\s+/).length;const est=Math.max(1800,words/2.6*1000/rate+600);
+  if(settings().vidVoice===false||!ttsOK()||!text){VP.timer=setTimeout(done,est);return}
+  let fin=false;const end=()=>{if(fin)return;fin=true;clearTimeout(guard);done()};const u=new SpeechSynthesisUtterance(text);const v=ttsVoice();if(v)u.voice=v;u.lang='en-US';u.rate=Math.min(1.6,1.05*rate);u.onend=end;u.onerror=end;VP.u=u;const guard=setTimeout(end,est+4000);try{speechSynthesis.speak(u)}catch(e){end()}}
+function vidAdvance(){const P=S.vplay;if(!P)return;const x=Store.get(P.key);const seg=(x.segs||[])[P.seg];if(seg&&seg.scenes&&P.sc<seg.scenes.length-1)P.sc++;else if(P.seg<(x.outline||[]).length-1){P.seg++;P.sc=0;vidSegsUpdate()}else{VP.playing=false;VP.done=true;vidBtns();return}vidSceneGo()}
+function vidLoop(){cancelAnimationFrame(VP.raf);const f=()=>{const cv=$('#vidCv');if(!cv&&VP.playing){VP.miss=(VP.miss||0)+1;if(VP.miss>90){VP.playing=false;vidStopVoice()}}else VP.miss=0;if(cv&&S.vplay)vidDraw(cv.getContext('2d'),performance.now());if(S.vplay)VP.raf=requestAnimationFrame(f)};VP.raf=requestAnimationFrame(f)}
+/* ---- drawing ---- */
+const VW=1280,VH=720;const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const eob=t=>{t=clamp(t,0,1);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};const eo=t=>1-Math.pow(1-clamp(t,0,1),3);
+function vPop(ctx,t,delay,x,y,fn){const k=(t-delay)/380;if(k<=0)return;ctx.save();ctx.globalAlpha=clamp(k*2,0,1);const s=.55+.45*eob(k);ctx.translate(x,y);ctx.scale(s,s);ctx.translate(-x,-y);fn();ctx.restore()}
+function vText(ctx,str,x,y,maxW,size,weight,color,align,font){let s=size;ctx.font=`${weight||''} ${s}px ${font||SANS}`;while(ctx.measureText(str).width>maxW&&s>14){s-=2;ctx.font=`${weight||''} ${s}px ${font||SANS}`}ctx.fillStyle=color||'#fff';ctx.textAlign=align||'center';ctx.textBaseline='middle';ctx.fillText(str,x,y);return s}
+function vWrap(ctx,str,x,y,maxW,size,lh,color,weight,maxLines,font){ctx.font=`${weight||''} ${size}px ${font||SANS}`;let L=pWrap(ctx,String(str||''),maxW);while(L.length>(maxLines||4)&&size>16){size-=2;ctx.font=`${weight||''} ${size}px ${font||SANS}`;L=pWrap(ctx,String(str||''),maxW)}ctx.fillStyle=color||'#fff';ctx.textAlign='center';ctx.textBaseline='middle';const h=L.length*size*lh;L.forEach((l,i)=>ctx.fillText(l,x,y-h/2+size*lh*(i+.5)));return h}
+function vCard(ctx,x,y,w,h,col,r){ctx.save();ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=24;ctx.fillStyle=col;pRound(ctx,x,y,w,h,r||22);ctx.fill();ctx.restore()}
+function vidDraw(ctx,now){const P=S.vplay;const c=vidCur();const x=c&&c.x;const hue=((P?P.seg:0)*47+210)%360;const T=now/1000;
+  const g=ctx.createLinearGradient(0,0,VW,VH);g.addColorStop(0,`hsl(${hue},55%,14%)`);g.addColorStop(1,`hsl(${(hue+40)%360},60%,22%)`);ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
+  for(let i=0;i<3;i++){const bx=VW*(.2+.6*((Math.sin(T*.13+i*2.1)+1)/2)),by=VH*(.2+.6*((Math.cos(T*.11+i*1.7)+1)/2));const rg=ctx.createRadialGradient(bx,by,0,bx,by,380);rg.addColorStop(0,`hsla(${(hue+i*60)%360},80%,60%,.22)`);rg.addColorStop(1,'hsla(0,0%,0%,0)');ctx.fillStyle=rg;ctx.fillRect(0,0,VW,VH)}
+  ctx.fillStyle='rgba(255,255,255,.5)';for(let i=0;i<40;i++){const px=(i*137.5+T*18*(1+i%3))%VW,py=(i*71.3+T*9*(1+i%2))%VH;ctx.globalAlpha=.25+.25*Math.sin(T*2+i);ctx.fillRect(px,py,2,2)}ctx.globalAlpha=1;
+  if(!x)return;const segT=(x.outline||[])[P.seg];const acc=`hsl(${(hue+180)%360},90%,65%)`,acc2=`hsl(${(hue+120)%360},85%,62%)`;
+  // top bar
+  ctx.fillStyle='rgba(255,255,255,.12)';pRound(ctx,30,24,Math.min(560,40+(segT?segT.title.length*13:0)),40,20);ctx.fill();vText(ctx,`${P.seg+1}/${(x.outline||[]).length} · ${segT?segT.title:''}`,50,44,520,20,'700','#fff','left');
+  vText(ctx,x.title||'',VW-34,44,520,20,'600','rgba(255,255,255,.7)','right');
+  // progress
+  const all=(x.outline||[]).length;const segN=c.seg&&c.seg.scenes?c.seg.scenes.length:1;const pr=(P.seg+(P.sc+ (VP.playing?clamp((now-VP.t0)/5000,0,1):0))/segN)/Math.max(all,1);ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(0,VH-6,VW,6);ctx.fillStyle=acc;ctx.fillRect(0,VH-6,VW*clamp(pr,0,1),6);
+  const sc=c.scene;const t=now-VP.t0;
+  if(!sc){vText(ctx,VP.done?'✓ The end':'Making the next part…',VW/2,VH/2,900,46,'800','#fff');if(!VP.done){ctx.strokeStyle=acc;ctx.lineWidth=6;ctx.beginPath();ctx.arc(VW/2,VH/2+70,22,T*5,T*5+4);ctx.stroke()}return}
+  const cx=VW/2,cy=VH/2+10;
+  switch(sc.t){
+   case 'title':vPop(ctx,t,0,cx,cy-40,()=>vText(ctx,String(sc.big||'').toUpperCase(),cx,cy-40,1100,96,'900','#fff'));vPop(ctx,t,220,cx,cy+70,()=>vText(ctx,sc.small||'',cx,cy+70,1000,36,'600',acc));ctx.fillStyle=acc;ctx.fillRect(cx-140*eo(t/500),cy+22,280*eo(t/500),6);break;
+   case 'fact':vPop(ctx,t,0,cx,cy-130,()=>vText(ctx,sc.emoji||'💡',cx,cy-130,300,120,'',null,'center','"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'));vPop(ctx,t,180,cx,cy+10,()=>vText(ctx,sc.big||'',cx,cy+10,1150,72,'900','#fff'));vPop(ctx,t,380,cx,cy+90,()=>vWrap(ctx,sc.small||'',cx,cy+100,980,34,1.3,'rgba(255,255,255,.85)','500',2));break;
+   case 'verse':{vPop(ctx,t,0,cx,cy,()=>{vCard(ctx,150,130,VW-300,420,'rgba(255,255,255,.95)');ctx.font=`italic 40px ${SERIF}`;const L=pWrap(ctx,'“'+(sc.text||'')+'”',VW-420);const lh=56,top=cy-L.length*lh/2-20;const norm=w=>w.toLowerCase().replace(/[^a-z0-9']/g,'');const hw=new Set(String(sc.hl||'').split(/\s+/).map(norm).filter(w=>w.length>1));const k=eo((t-700)/500);
+     L.forEach((l,i)=>{const ly=top+lh*(i+.5);const lw=ctx.measureText(l).width;let xx=cx-lw/2;l.split(' ').forEach((w,j,arr)=>{const ww=ctx.measureText(w).width;if(hw.has(norm(w))){ctx.fillStyle='rgba(255,214,70,.85)';ctx.fillRect(xx-4,ly-24,(ww+8)*k,48)}xx+=ww+(j<arr.length-1?ctx.measureText(' ').width:0)});ctx.fillStyle='#222';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(l,cx,ly)});
+     vText(ctx,sc.ref||'',cx,510,800,30,'800',`hsl(${hue},60%,35%)`)})}break;
+   case 'list':{vPop(ctx,t,0,cx,130,()=>vText(ctx,String(sc.big||'').toUpperCase(),cx,140,1100,60,'900','#fff'));const it=(sc.items||[]).slice(0,4);it.forEach((s,i)=>{const yy=240+i*105;vPop(ctx,t,250+i*260,cx,yy,()=>{vCard(ctx,220,yy-40,VW-440,80,'rgba(255,255,255,.12)');ctx.fillStyle=i%2?acc2:acc;ctx.beginPath();ctx.arc(270,yy,24,0,7);ctx.fill();vText(ctx,String(i+1),270,yy,40,28,'900','#111');vText(ctx,s,320,yy,VW-600,38,'700','#fff','left')})})}break;
+   case 'number':{const n=parseFloat(String(sc.n).replace(/[^0-9.]/g,''))||0;const shown=isFinite(n)&&n>0?Math.round(n*eo(t/1100)):sc.n;vPop(ctx,t,0,cx,cy-60,()=>vText(ctx,String(shown),cx,cy-70,1000,190,'900',acc));vPop(ctx,t,300,cx,cy+80,()=>vText(ctx,String(sc.unit||'').toUpperCase(),cx,cy+80,1000,48,'800','#fff'));vPop(ctx,t,500,cx,cy+150,()=>vWrap(ctx,sc.small||'',cx,cy+160,950,30,1.3,'rgba(255,255,255,.8)','500',2))}break;
+   case 'versus':{const half=(VW-120)/2;[[sc.a,sc.ai,60,acc],[sc.b,sc.bi,60+half+0,acc2]].forEach(([lab,its,x0,col],j)=>{vPop(ctx,t,j*350,x0+half/2,cy,()=>{vCard(ctx,x0+10,110,half-20,520,'rgba(255,255,255,.1)');ctx.fillStyle=col;pRound(ctx,x0+10,110,half-20,90,22);ctx.fill();vText(ctx,String(lab||'').toUpperCase(),x0+half/2,155,half-60,40,'900','#111');(its||[]).slice(0,3).forEach((s,i)=>vWrap(ctx,'• '+s,x0+half/2,270+i*110,half-80,32,1.25,'#fff','600',2))})});vPop(ctx,t,700,cx,cy+20,()=>{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy+20,44,0,7);ctx.fill();vText(ctx,'VS',cx,cy+20,80,32,'900','#111')})}break;
+   case 'word':vPop(ctx,t,0,cx,cy-140,()=>vText(ctx,`${sc.lang||''} WORD`.toUpperCase(),cx,cy-150,800,28,'800',acc2));vPop(ctx,t,120,cx,cy-60,()=>vText(ctx,sc.orig||'',cx,cy-60,1100,110,'900',acc,'center',SERIF));vPop(ctx,t,400,cx,cy+50,()=>vText(ctx,`“${sc.word||''}”`,cx,cy+50,1000,40,'700','rgba(255,255,255,.85)'));vPop(ctx,t,700,cx,cy+130,()=>{vCard(ctx,cx-430,cy+95,860,74,'rgba(255,255,255,.95)');vText(ctx,'= '+(sc.meaning||''),cx,cy+132,800,36,'800','#222')});break;
+   case 'quote':vPop(ctx,t,0,cx,cy,()=>{vText(ctx,'“',200,200,200,240,'900',acc,'center',SERIF);vWrap(ctx,sc.text||'',cx,cy-20,980,48,1.3,'#fff','600',4,SERIF)});vPop(ctx,t,500,cx,cy+170,()=>vText(ctx,'— '+(sc.who||''),cx,cy+180,900,34,'800',acc2));vText(ctx,'(in our own words)',cx,cy+225,600,20,'500','rgba(255,255,255,.5)');break;
+   case 'timeline':{const it=(sc.items||[]).slice(0,5);const n=Math.max(it.length,1);const k=eo(t/900);ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(190,cy);ctx.lineTo(190+(VW-380)*k,cy);ctx.stroke();it.forEach((s,i)=>{const xx=190+(VW-380)*(n===1?.5:i/(n-1));vPop(ctx,t,300+i*280,xx,cy,()=>{ctx.fillStyle=i%2?acc2:acc;ctx.beginPath();ctx.arc(xx,cy,18,0,7);ctx.fill();vText(ctx,s.when||'',xx,i%2?cy+60:cy-60,240,28,'900',i%2?acc2:acc);vWrap(ctx,s.what||'',xx,i%2?cy+120:cy-120,230,26,1.2,'#fff','600',2)})})}break;
+   case 'people':{const it=(sc.items||[]).slice(0,4);const n=Math.max(it.length,1);const w=Math.min(280,(VW-200)/n-30);it.forEach((p,i)=>{const xx=cx+(i-(n-1)/2)*(w+30);vPop(ctx,t,i*260,xx,cy,()=>{vCard(ctx,xx-w/2,cy-170,w,340,'rgba(255,255,255,.12)');vText(ctx,p.emoji||'👤',xx,cy-80,200,90,'',null,'center','"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif');vText(ctx,p.name||'',xx,cy+30,w-30,38,'900','#fff');vWrap(ctx,p.role||'',xx,cy+95,w-30,24,1.25,acc,'700',2)})})}break;
+   case 'quiz':{vPop(ctx,t,0,cx,120,()=>{vText(ctx,'🧠 QUIZ',cx,105,400,30,'900',acc2);vWrap(ctx,sc.q||'',cx,170,1100,46,1.2,'#fff','800',2)});const o=(sc.opts||[]).slice(0,3);o.forEach((s,i)=>{const yy=300+i*110;vPop(ctx,t,400+i*200,cx,yy,()=>{const right=VP.phase===1&&i===(+sc.a||0),wrong=VP.phase===1&&!right;vCard(ctx,250,yy-42,VW-500,84,right?'#2fbf71':wrong?'rgba(255,255,255,.06)':'rgba(255,255,255,.14)');vText(ctx,`${'ABC'[i]}   ${s}${right?'  ✓':''}`,290,yy,VW-600,36,'700',wrong?'rgba(255,255,255,.4)':'#fff','left')})});
+     }break;
+   case 'mark':vPop(ctx,t,0,cx,cy-130,()=>vText(ctx,sc.emoji||'🖍',cx,cy-130,300,110,'',null,'center','"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'));vPop(ctx,t,150,cx,cy-30,()=>vText(ctx,'MARK IT IN YOUR BIBLE',cx,cy-30,900,28,'900',acc2));vPop(ctx,t,300,cx,cy+40,()=>vText(ctx,sc.big||'',cx,cy+40,1100,56,'900','#fff'));vPop(ctx,t,550,cx,cy+120,()=>vWrap(ctx,sc.small||'',cx,cy+125,950,32,1.3,'rgba(255,255,255,.85)','500',2));break;
+   default:vWrap(ctx,sc.big||sc.say||'',cx,cy,1100,48,1.3,'#fff','800',4)}
+  // captions
+  if(settings().vidCaps!==false&&sc.say){const cap=VP.phase===1&&sc.reveal?sc.reveal:sc.say;ctx.font=`600 26px ${SANS}`;const L=pWrap(ctx,cap,VW-240).slice(0,2);const hh=L.length*34+18;ctx.fillStyle='rgba(0,0,0,.55)';pRound(ctx,100,VH-36-hh,VW-200,hh,14);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';L.forEach((l,i)=>ctx.fillText(l,cx,VH-36-hh+9+17+i*34))}
+  // flash on scene change
+  const fl=.45-t/300;if(fl>0){ctx.fillStyle=`rgba(255,255,255,${fl})`;ctx.fillRect(0,0,VW,VH)}}
 
 /* ===== 📸 SCAN MY BIBLE PAGE ===== */
 function scanS(){return S.scan||(S.scan={job:'todo',url:'',blob:null,b64:'',busy:false,err:'',res:null})}
