@@ -2174,6 +2174,7 @@ Return JSON: {"name":"full edition name","publisher":"...","translation":"short 
     $('#bkFile').onchange=async e=>{const f=e.target.files[0];if(f)restoreFrom(await f.text())}},
   backupRestoreGo:()=>{const t=$('#bkText').value.trim();if(!t){toast('Choose a file or paste the backup text');return}restoreFrom(t)},
   tourEnd:()=>{const pb=S._pendBible;S._pendBible='';if(pb)setTimeout(()=>A.bsFind(null,pb,''),500);const n=$('#twName');if(n&&n.value.trim())saveProfile({name:n.value.trim()});saveSettings({toured:true});closeSheet();coachEnd();if(S.tab!=='today')setTab('today')},
+  newTour:()=>{closeSheet();newTour()},
   tourAgain:()=>{coachEnd();S.intro=null;showIntro(0)},
   twSimple:el=>{const on=!settings().simple;saveSettings({simple:on});applyTheme();const sw=(el&&el.querySelector('.switch'))||$('.switchrow .switch');if(sw)sw.classList.toggle('on',on)},
   coachStart:()=>{const n=$('#twName');if(n&&n.value.trim())saveProfile({name:n.value.trim()});coachShow(0)},
@@ -3374,13 +3375,27 @@ function showTour(){const pf=profile();openSheet(`<div class="tour"><div class="
   <label class="l" style="text-align:left">What should we call you?</label><input class="f" id="twName" maxlength="30" value="${esc(pf.name||'')}" placeholder="Your name">
   <button class="switchrow" data-act="twSimple"><span class="switch ${settings().simple?'on':''}"><i></i></span><span style="text-align:left"><b>Simple mode</b><br><small class="muted">Bigger text and easier words</small></span></button>
   <div class="row" style="margin-top:14px"><button class="btn grow" data-act="tourEnd">Skip</button><button class="btn pri grow" data-act="coachStart">Show me around →</button></div></div>`)}
-function coachShow(i){S.coach=i;const c=COACH[i];closeSheet();if(c.pre)try{c.pre()}catch(e){}if(S.tab!==c.tab)setTab(c.tab);else renderView();
+const NEW_ID='n2';
+const NEW_TOUR=[
+ {tab:'load',pre:()=>{S.build.mode='chapter';const pl=loadPlans().find(p=>p.kind==='chapter'&&!(p.data||{}).sections);if(pl)S.build.planKey=pl.key},find:()=>$('.ordbar')||$('[data-act=bStyle][data-s=verse]'),t:'🔢 Steps in verse order',p:'Every loading now shows its steps per verse: verse 1, verse 3, verse 4… Highlights, colors and notes for one verse stay together. New steps you load later go in the right place too.'},
+ {tab:'load',pre:()=>{S.build.mode='chapter'},sel:'[data-act=bStyle][data-s=mixed]',t:'🧩 Mixed',p:'A third way to write: first a colored box per section, then short notes on the verses in that section. Great for your interleaved Bible.'},
+ {tab:'load',pre:()=>{S.build.mode='scan';scanS().job='notes'},sel:'[data-act=scanJob][data-j=notes]',t:'📸 Scan your study notes',p:'Take a photo of the printed study notes under a chapter. The app saves what they say. Tap 🌱 Simple words or 💬 Ask on any note you don’t get.'},
+ {tab:'load',pre:()=>{S.build.mode='chapter'},find:()=>$('[data-act=skipOld]')||[...document.querySelectorAll('.pghead b')].find(b=>/Beyond/.test(b.textContent)),t:'🧠 Only new things',p:'Loadings now skip what your study notes and your earlier loadings already say. And there are new boxes: ⚖️ Different views, 🏛️ Voices from history, ❤️ Heart questions and ✂️ Note in one line.'},
+ {tab:'load',pre:()=>{S.build.mode='chapter'},sel:'[data-act=thinkTog]',t:'✍️ Think first',p:'Turn this on and you write your own thoughts first (what do you see, what does it mean, what will you do). Then you see the app’s steps and compare.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='threads'},sel:'[data-act=loadedSub][data-s=threads]',t:'🧵 Theme threads',p:'In a loading, tap ⋯ More › 🧵 Thread on a step. Here you see that theme through your whole Bible, in Bible order.'},
+ {tab:'tabs',pre:()=>{S.loadedSub='cover';S.pmView='make';(S.pm||(S.pm={type:'picture',subj:'',book:'JHN',size:'full',busy:false,cur:null})).type='picture'},sel:'[data-act=pmType][data-k=picture]',t:'🖼️ Picture pages',p:'Make printable pages with pictures: a book overview, a Bible person, a story or a poster. Save them as a photo or as a PDF to print.'},
+ {tab:'today',find:()=>$('[data-act=rvStart]')||$('.rhythm'),t:'🔁 Weekly review',p:'Once a week a quick quiz shows up here, made from your own loadings. What you didn’t know comes back first next time.'}];
+function newTour(){S.coachList=NEW_TOUR;saveSettings({newSeen:NEW_ID});coachShow(0)}
+function maybeNew(){const st=settings();if(!st.toured||st.newSeen===NEW_ID||S.coach!=null)return;saveSettings({newSeen:NEW_ID});
+  openSheet(`<div style="text-align:center"><div style="font-size:42px">✨</div><h3>New in Loaded Bible</h3><p class="small">Verse order, scanning your study notes, think first, theme threads, picture pages and a weekly review.</p>
+   <button class="btn pri wide" data-act="newTour">▶ Show me (1 minute)</button><button class="btn wide ghost" style="margin-top:6px" data-act="closeSheet">Later</button><p class="small muted" style="margin-top:8px">You can find it later in Profile › Help & tour.</p></div>`)}
+function coachShow(i){S.coach=i;const LIST=S.coachList||COACH;const c=LIST[i];closeSheet();if(c.pre)try{c.pre()}catch(e){}if(S.tab!==c.tab)setTab(c.tab);else renderView();
   let b=$('#coach');if(!b){b=document.createElement('div');b.id='coach';document.body.appendChild(b)}
-  b.innerHTML=`<div class="row" style="align-items:center"><div class="tourdots grow" style="margin:0">${COACH.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><span class="stepn">${i+1}/${COACH.length}</span></div><h3>${c.t}</h3><p>${c.p}</p>${c.act?`<button class="btn sm coachact" data-act="${c.act[1]}">${c.act[0]}</button>`:''}
-   <div class="row" style="margin-top:10px">${i<COACH.length-1?`<button class="btn sm ghost" data-act="tourEnd">Skip tour</button><span class="grow"></span>${i?`<button class="btn sm" data-act="coachGo" data-i="${i-1}">←</button>`:''}<button class="btn sm pri" data-act="coachGo" data-i="${i+1}">Next →</button>`:`<button class="btn pri wide" data-act="tourEnd">Let’s go! 🎉</button>`}</div>`;
+  b.innerHTML=`<div class="row" style="align-items:center"><div class="tourdots grow" style="margin:0">${LIST.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><span class="stepn">${i+1}/${LIST.length}</span></div><h3>${c.t}</h3><p>${c.p}</p>${c.act?`<button class="btn sm coachact" data-act="${c.act[1]}">${c.act[0]}</button>`:''}
+   <div class="row" style="margin-top:10px">${i<LIST.length-1?`<button class="btn sm ghost" data-act="tourEnd">Skip tour</button><span class="grow"></span>${i?`<button class="btn sm" data-act="coachGo" data-i="${i-1}">←</button>`:''}<button class="btn sm pri" data-act="coachGo" data-i="${i+1}">Next →</button>`:`<button class="btn pri wide" data-act="tourEnd">Let’s go! 🎉</button>`}</div>`;
   b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');setTimeout(coachHL,120)}
-function coachHL(){$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));if(S.coach==null)return;const c=COACH[S.coach];if(!c||!c.sel)return;const t=c.sel.split(',').map(x=>$(x.trim())).find(Boolean);if(t){t.classList.add('coachhl');t.scrollIntoView({behavior:'smooth',block:'center'})}}
-function coachEnd(){S.coach=null;$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));const b=$('#coach');if(b)b.remove()}
+function coachHL(){$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));if(S.coach==null)return;const c=(S.coachList||COACH)[S.coach];if(!c||!(c.sel||c.find))return;const t=c.find?c.find():c.sel.split(',').map(x=>$(x.trim())).find(Boolean);if(t){t.classList.add('coachhl');t.scrollIntoView({behavior:'smooth',block:'center'})}}
+function coachEnd(){S.coach=null;S.coachList=null;$$('.coachhl').forEach(x=>x.classList.remove('coachhl'));const b=$('#coach');if(b)b.remove()}
 function maybeTour(){if(settings().toured)return;const au=document.querySelector('#auth');if(au&&au.innerHTML.trim()&&getComputedStyle(au).display!=='none')return;saveSettings({toured:true});showIntro(0)}
 /* ===== ‹ BACK + 📖 BIBLE PILL ===== */
 const NAV={st:[],pop:0};
@@ -3873,7 +3888,7 @@ function viewAccount(v){const pf=profile(),st=computeStats(),lv=levelOf(st.xp);c
 
    <div class="card" id="backupCard"><b>💾 Backup</b><p class="small muted" style="margin:4px 0 8px">Download everything you made into one file. If you ever lose your code or your phone, you can restore it.${settings().lastBackup?' Last backup: '+fmtDate(settings().lastBackup)+'.':''}</p>
      <div class="row" style="flex-wrap:wrap"><button class="btn sm pri" data-act="backupDl">⬇️ Download my backup</button><button class="btn sm" data-act="backupCopy">⧉ Copy as text</button><button class="btn sm" data-act="backupRestore">⬆️ Restore</button></div></div>`)}
-   ${mrow('help','👋','Help & tour','Guide, tour and the intro',()=>`<div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn sm" data-act="guide">📘 Guide</button><button class="btn sm" data-act="tourAgain">▶ Take the tour</button></div>`)}
+   ${mrow('help','👋','Help & tour','Guide, tour and the intro',()=>`<div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn sm pri" data-act="newTour">✨ What’s new</button><button class="btn sm" data-act="guide">📘 Guide</button><button class="btn sm" data-act="tourAgain">▶ Take the tour</button></div>`)}
    ${mrow('give','❤️','Support Loaded Bible','Help keep it free and growing',null,'data-act="donate"')}
    </div>
    <p class="small muted" style="text-align:center">${st.activeDays} active day${st.activeDays===1?'':'s'} · ${st.hl} highlights · ${st.notes} notes · ${st.journal} journal entries · ${st.read} chapters read</p>`;
@@ -4234,7 +4249,7 @@ function showHaveCode(msg){welcomeBox(`<h3 style="text-align:center;font-size:24
    <button class="linkbtn" data-act="codeBack">← Back</button>`);
   const i=$('#codeIn2');i.focus();i.addEventListener('keydown',e=>{if(e.key==='Enter')A.codeOpen()});i.addEventListener('blur',()=>{i.value=normCode(i.value)})}
 function codeLost(){Code.clear();Store.disconnect();Store.items.clear();clearLocal();showWelcome('That Bible code wasn’t found. Start fresh or try your code again.')}
-function startCode(){offlineBar();if(navigator.onLine!==false&&!(navigator.connection&&navigator.connection.saveData))setTimeout(()=>{if(!KJV)loadKJV().catch(()=>{})},9000);setTimeout(()=>{if(S.pendingShare)showIncomingShare();else maybeTour()},1200);hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
+function startCode(){offlineBar();if(navigator.onLine!==false&&!(navigator.connection&&navigator.connection.saveData))setTimeout(()=>{if(!KJV)loadKJV().catch(()=>{})},9000);setTimeout(()=>{if(S.pendingShare)showIncomingShare();else{maybeTour();setTimeout(maybeNew,600)}},1200);hideAuth();setSync('Saved with your code',true);Store.useNamespace('me');Store.connectServer();applyTheme();updateAvatar();renderView();if(S.pendingSync)setTimeout(showSyncPrompt,600)}
 Object.assign(A,{
   codeNew:async el=>{el.disabled=true;el.innerHTML='<span class="spin"></span> Making your code…';
     try{const r=await fetch('/api/code/new',{method:'POST'});const j=await r.json();if(!r.ok||!j.code)throw {message:j.error||'Please try again.'};showNewCode(j.code)}
@@ -4293,7 +4308,7 @@ Object.assign(A,{
 (function(){const sh=location.hash.match(/^#lbshare=([A-Za-z0-9_-]+)$/);if(sh){S.pendingShare=sh[1];try{history.replaceState(null,'',location.pathname+'#today')}catch(e){location.hash='#today'}}})();
 (function(){const m=location.hash.match(/^#lbsync=([A-Za-z0-9_-]+)$/);if(m){S.pendingSync=m[1];try{history.replaceState(null,'',location.pathname+'#load')}catch(e){location.hash='#load'}}})();
 if(STANDALONE){Store.LS='lb1:me:d:';Store.loadLocal();Store.readyResolve();applyTheme();setTab((location.hash||'#today').slice(1));updateAvatar();if(Code.value)startCode();else showWelcome('')}
-else{Store.loadLocal();applyTheme();setTab((location.hash||'#today').slice(1));Store.connect();setTimeout(()=>{if(S.pendingShare)showIncomingShare();else maybeTour()},1500)}
+else{Store.loadLocal();applyTheme();setTab((location.hash||'#today').slice(1));Store.connect();setTimeout(()=>{if(S.pendingShare)showIncomingShare();else{maybeTour();setTimeout(maybeNew,600)}},1500)}
 Store.ready.then(()=>{if(isReading()&&!S.verses&&!S.loadingCh){const s0=chKey();loadChapter(false).then(()=>{})}});
 </script>
 <script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));</script>
