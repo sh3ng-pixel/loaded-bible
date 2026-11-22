@@ -3758,7 +3758,9 @@ async function vidOutline(V){const n=Math.max(3,Math.round(V.min/2.5));const nam
   const r=await ai(`${SYS}Plan a ${V.min}-minute, fast-paced, exciting Bible study video (16:9, with a narrator) about ${name}${V.scope==='book'?` (an overview of the whole book, ${BM[V.b].chapters} chapters)`:''}. Cover these topics, woven together in a natural order: ${vidTopics(V)}.
 Return ONLY JSON: {"title":"catchy video title, max 7 words","hook":"one-line hook, max 14 words","segments":[{"title":"part title, max 5 words","covers":"what this part covers, with verse numbers, max 30 words"}]} with exactly ${n} segments. Part 1 starts with a strong hook. ${V.parts.prayer?'The last part ends with a recap and a short prayer.':'The last part ends with a quick recap.'}`,null,null,'default');
   return parseJSON(r.text)}
-async function vidSegment(V,O,i){const seg=O.segments[i];const tr=quoteTrans();const P=V.parts;
+const sceneDur=sc=>Math.max(1.8,vWords(sc.say)/2.6)+(sc.t==='quiz'?2.6+Math.max(1.2,vWords(sc.reveal)/2.6):0)+.4;
+const segSecs=sc=>(sc||[]).reduce((a,x)=>a+sceneDur(x),0);
+async function vidSegment(V,O,i){const seg=O.segments[i];const tr=quoteTrans();const P=V.parts;const secs=V.min*60/O.segments.length;const K=Math.round(secs/6);const W=Math.round(secs*2.5);
   const types=[`{"t":"title","big":"max 5 words","small":"max 9 words","say":"…"}`,`{"t":"fact","emoji":"one emoji","big":"max 6 words","small":"max 14 words","say":"…"}`,`{"t":"verse","ref":"Book chapter:verse","text":"the verse in ${tr}, max 32 words","hl":"1-3 words from the text to highlight","say":"…"}`,`{"t":"list","big":"heading, max 5 words","items":["2-4 items, max 6 words each"],"say":"…"}`,`{"t":"number","n":"a number like 6 or 120","unit":"max 4 words","small":"max 12 words","say":"…"}`,`{"t":"versus","a":"left label","b":"right label","ai":["1-3 short points"],"bi":["1-3 short points"],"say":"…"}`,`{"t":"timeline","items":[{"when":"short","what":"max 5 words"}],"say":"…"}`,`{"t":"people","items":[{"name":"","role":"max 5 words","emoji":"one emoji"}],"say":"…"}`];
   if(P.words)types.push(`{"t":"word","word":"English word","orig":"Greek or Hebrew word in Latin letters","lang":"Greek|Hebrew","meaning":"max 8 words","say":"…"}`);
   if(P.history)types.push(`{"t":"quote","who":"name, century","text":"what they taught, in your own words (never invent quotes), max 20 words","say":"…"}`);
@@ -3769,11 +3771,18 @@ This part: "${seg.title}" — ${seg.covers}
 ${i?`Earlier parts were: ${O.segments.slice(0,i).map(s=>s.title).join('; ')}. Don't repeat them.`:`Open with this hook: ${O.hook}`}
 Topics the viewer chose: ${vidTopics(V)}.
 STYLE: dopamine pacing like the best YouTube explainers. Short, punchy narration (each "say" is 8-22 words, spoken by a warm narrator). Lots of surprising facts, numbers, contrasts, mini cliffhangers and questions. Accurate to the Bible and history; say "many think" for uncertain things. Plain modern English, no King James style. Quote verses in ${tr}.
-Make 26-34 scenes (about 150 seconds of narration). Vary the scene types; never the same type 3 times in a row.
+IMPORTANT LENGTH: this part must last ${Math.round(secs)} seconds when spoken. Make about ${K} scenes, and the total narration (all "say" + "reveal" together) must be about ${W} words. Vary the scene types; never the same type 3 times in a row.
 Scene types:
 ${types.join('\n')}
 Return ONLY JSON: {"scenes":[ ... ]}`,null,null,'default');
-  const j=parseJSON(r.text);return (j.scenes||[]).filter(x=>x&&x.t&&x.say).slice(0,40)}
+  const j=parseJSON(r.text);let sc=(j.scenes||[]).filter(x=>x&&x.t&&x.say).slice(0,90);
+  // 📏 top up until this part really has its length
+  for(let k=0;k<3&&segSecs(sc)<secs*.93;k++){const need=secs-segSecs(sc);try{const r2=await ai(`${SYS}Continue PART ${i+1} ("${seg.title}" — ${seg.covers}) of a fast Bible study video about ${vidName(V)}. It is ${Math.round(need)} seconds too short. Add about ${Math.max(3,Math.round(need/6))} NEW scenes (about ${Math.round(need*2.5)} words of narration in total) with new facts, verses, details or questions — never repeat what is already said. Plain modern English, quote verses in ${tr}.
+Already in this part: ${sc.map(x=>x.big||x.q||x.ref||x.word||'').filter(Boolean).slice(-25).join(' | ')}
+Use the same scene types: ${types.join('\n')}
+Return ONLY JSON: {"scenes":[ ... ]}`,null,null,'default');const add=(parseJSON(r2.text).scenes||[]).filter(x=>x&&x.t&&x.say);if(!add.length)break;sc=sc.concat(add)}catch(e){break}}
+  while(sc.length>6&&segSecs(sc)>secs*1.03){const cut=sc.length-4;if(segSecs(sc)-sceneDur(sc[cut])<secs*.97)break;sc.splice(cut,1)}
+  return sc}
 async function vidMake(key){const V=vidS();if(V.busy)return;V.busy=true;let x=Store.get(key);const stat=t=>{V.prog=t;const e=$('#vidProg');if(e)e.textContent=t;const s=$('#vidStat');if(s)s.textContent=t};
   try{if(!x.outline){stat('Planning the video…');const O=await vidOutline(x);x=Object.assign({},Store.get(key),{title:O.title,hook:O.hook,outline:O.segments,segs:[]});Store.set(key,x);renderView()}
     const O={title:x.title,hook:x.hook,segments:x.outline};
@@ -3789,7 +3798,7 @@ const VP={playing:false,t0:0,raf:0,timer:0,phase:0,u:null,voice:true,rate:1};
 function vidCur(){const P=S.vplay;if(!P)return null;const x=Store.get(P.key);if(!x)return null;const seg=(x.segs||[])[P.seg];return {x,seg,scene:seg&&seg.scenes?seg.scenes[P.sc]:null}}
 /* ---- Netflix/YouTube-style controls ---- */
 const vWords=t=>String(t||'').split(/\s+/).filter(Boolean).length;
-function vidFlat(x){const out=[];let t=0;const rate=settings().vidRate||1;(x.segs||[]).forEach((sg,si)=>{if(!sg||!sg.scenes)return;sg.scenes.forEach((sc,ci)=>{const d=(Math.max(1.8,vWords(sc.say)/2.6)+(sc.t==='quiz'?2.6+Math.max(1.2,vWords(sc.reveal)/2.6):0))/rate+.4;out.push({seg:si,sc:ci,t,d});t+=d})});return {list:out,total:t}}
+function vidFlat(x){const out=[];let t=0;const rate=settings().vidRate||1;(x.segs||[]).forEach((sg,si)=>{if(!sg||!sg.scenes)return;sg.scenes.forEach((sc,ci)=>{const d=sceneDur(sc)/rate;out.push({seg:si,sc:ci,t,d});t+=d})});return {list:out,total:t}}
 const vFmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(r).padStart(2,'0')};
 function vidIdx(F){const P=S.vplay;return Math.max(0,F.list.findIndex(e=>e.seg===P.seg&&e.sc===P.sc))}
 function vidPlayer(){const P=S.vplay;const x=Store.get(P.key);if(!x)return '';const segs=x.outline||[];const F=vidFlat(x);const i=vidIdx(F);const e=F.list[i]||{t:0};
@@ -3826,7 +3835,7 @@ function vidLibrary(){const all=vidList();if(!all.length)return '';const f=S.vfo
   <div class="chips vfchips"><button class="chip ${f==='all'?'on':''}" data-act="vidFold" data-f="all">🎬 All <small>${all.length}</small></button>${cont.length?`<button class="chip ${f==='continue'?'on':''}" data-act="vidFold" data-f="continue">▶ Continue <small>${cont.length}</small></button>`:''}${vFolders().map(n=>`<button class="chip ${f===n?'on':''}" data-act="vidFold" data-f="${esc(n)}">📁 ${esc(n)} <small>${all.filter(x=>x.folder===n).length}</small></button>`).join('')}<button class="chip" data-act="vidNewFold">＋ Folder</button></div>
   ${f!=='all'&&f!=='continue'?`<div class="row" style="margin:6px 2px"><span class="small muted grow">📁 ${esc(f)}</span><button class="mini" data-act="vidDelFold" data-f="${esc(f)}">🗑 Delete folder</button></div>`:''}
   ${shown.length?vidGroups(shown,f):`<p class="small muted" style="margin:8px 2px">${f==='continue'?'Nothing half-watched.':'This folder is empty. Tap ⋯ on a video › 📁 Move to folder.'}</p>`}`}
-function vidRow(x){const n=(x.segs||[]).filter(s=>s&&s.scenes).length,tot=(x.outline||[]).length;return `<div class="vrow"><button class="vrowp" data-act="vidPlay" data-k="${x.key}">${vidThumb(x)}</button><div class="grow" style="min-width:0"><b class="vtitle">${esc(x.title||vidName(x))}</b><div class="small muted">${x.scope==='book'?'📚 Whole book':'📖 Chapter '+x.c} · ${x.min} min${n<tot?` · ${n}/${tot} parts`:''}${x.folder?` · 📁 ${esc(x.folder)}`:''}</div><div class="small muted">${x.pct?(x.pct>=97?'✓ Watched':`${x.pct}% watched`):fmtDate(x.at)}</div></div><button class="iconbtn" data-act="vidMenu" data-k="${x.key}">⋯</button></div>`}
+function vidRow(x){const n=(x.segs||[]).filter(s=>s&&s.scenes).length,tot=(x.outline||[]).length;return `<div class="vrow"><button class="vrowp" data-act="vidPlay" data-k="${x.key}">${vidThumb(x)}</button><div class="grow" style="min-width:0"><b class="vtitle">${esc(x.title||vidName(x))}</b><div class="small muted">${x.scope==='book'?'📚 Whole book':'📖 Chapter '+x.c} · ${n<tot?x.min+' min':Math.round(vidFlat(x).total/60*(settings().vidRate||1))+' min'}${n<tot?` · ${n}/${tot} parts`:''}${x.folder?` · 📁 ${esc(x.folder)}`:''}</div><div class="small muted">${x.pct?(x.pct>=97?'✓ Watched':`${x.pct}% watched`):fmtDate(x.at)}</div></div><button class="iconbtn" data-act="vidMenu" data-k="${x.key}">⋯</button></div>`}
 function vidGroups(list,f){if(f==='continue')return list.map(vidRow).join('');const by=new Map();list.slice().sort((a,b)=>(bOrder(a.b)-bOrder(b.b))||((a.scope==='book'?0:a.c)-(b.scope==='book'?0:b.c))||((b.at||0)-(a.at||0))).forEach(x=>{if(!by.has(x.b))by.set(x.b,[]);by.get(x.b).push(x)});
   const many=by.size>4;let lastT='';return [...by].map(([b,arr])=>{const T=bOrder(b)<39?'Old Testament':'New Testament';const head=T!==lastT?`<div class="vtest">${T==='Old Testament'?'📜':'✝️'} ${T}</div>`:'';lastT=T;const open=!many||(S.vbOpen||{})[b]||(S.vplay&&arr.some(x=>x.key===S.vplay.key));
     return head+`<details class="vbook" ${open?'open':''} data-b="${b}"><summary><span class="vbk">📖</span><b class="grow">${esc(BM[b].name)}</b><small class="muted">${arr.length} video${arr.length>1?'s':''}</small></summary>${arr.map(vidRow).join('')}</details>`}).join('')}
@@ -3839,7 +3848,7 @@ function vidBtns(){const t=$('#vidTg');if(t)t.textContent=VP.playing?'⏸':'▶'
 function vidStopVoice(){clearTimeout(VP.timer);try{if(ttsOK())speechSynthesis.cancel()}catch(e){}}
 function vidSceneGo(){vidStopVoice();if(!VP.playing)return;const c=vidCur();VP.t0=performance.now();VP.phase=0;vidUI();if(Date.now()-(VP.lastSave||0)>15000)vidSavePos();
   if(!c||!c.scene){VP.wait=true;VP.timer=setTimeout(()=>{VP.wait=false;const c2=vidCur();if(c2&&c2.scene)vidSceneGo();else if(vidS().busy)vidSceneGo();else{VP.playing=false;VP.done=true;vidBtns()}},1200);return}
-  VP.wait=false;VP.done=false;const sc=c.scene;vidSay(sc.say,()=>{if(sc.t==='quiz'){VP.timer=setTimeout(()=>{VP.phase=1;VP.t1=performance.now();vidSay(sc.reveal||'',()=>{VP.timer=setTimeout(vidAdvance,500)})},2600)}else VP.timer=setTimeout(vidAdvance,350)})}
+  VP.wait=false;VP.done=false;const sc=c.scene;const planMs=sceneDur(sc)*1000/(settings().vidRate||1);const rest=min=>Math.max(min,planMs-(performance.now()-VP.t0));vidSay(sc.say,()=>{if(sc.t==='quiz'){VP.timer=setTimeout(()=>{VP.phase=1;VP.t1=performance.now();vidSay(sc.reveal||'',()=>{VP.timer=setTimeout(vidAdvance,rest(500))})},2600)}else VP.timer=setTimeout(vidAdvance,rest(350))})}
 function vidSay(text,done){const rate=settings().vidRate||1;const words=String(text||'').split(/\s+/).length;const est=Math.max(1800,words/2.6*1000/rate+600);
   if(settings().vidVoice===false||!ttsOK()||!text){VP.timer=setTimeout(done,est);return}
   let fin=false;const end=()=>{if(fin)return;fin=true;clearTimeout(guard);done()};const u=new SpeechSynthesisUtterance(text);const v=ttsVoice();if(v)u.voice=v;u.lang='en-US';u.rate=Math.min(1.6,1.05*rate);u.onend=end;u.onerror=end;VP.u=u;const guard=setTimeout(end,est+4000);try{speechSynthesis.speak(u)}catch(e){end()}}
