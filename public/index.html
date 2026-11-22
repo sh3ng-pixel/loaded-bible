@@ -2094,7 +2094,7 @@ ${mine||'Start naturally (for example "Father," or "Dear God,") and end with "In
   vidNewFold:()=>openSheet(`<h3>📁 New video folder</h3><input class="f" id="vfName" placeholder="e.g. Gospels, Sunday, Genesis series"><button class="btn pri wide" style="margin-top:10px" data-act="vidNewFoldOk">＋ Make folder</button>`),
   vidNewFoldOk:()=>{const n=($('#vfName')||{value:''}).value.trim().slice(0,30);if(!n){toast('Type a name');return}const L=vFolders();if(!L.includes(n))saveSettings({vfolders:L.concat(n)});const k=S._vmove;S._vmove=null;if(k){const x=Store.get(k);Store.set(k,Object.assign({},x,{folder:n}));toast('Moved to 📁 '+n)}closeSheet();S.vfold=n;renderView()},
   vidDelFold:el=>confirmSheet(`Delete the folder “${el.dataset.f}”? The videos stay in All.`,'Delete',()=>{const f=el.dataset.f;saveSettings({vfolders:vFolders().filter(n=>n!==f)});vidList().filter(x=>x.folder===f).forEach(x=>Store.set(x.key,Object.assign({},Store.get(x.key),{folder:''})));S.vfold='all';renderView()}),
-  vidMenu:el=>{const k=el.dataset.k;const x=Store.get(k)||{};const n=(x.segs||[]).filter(s=>s&&s.scenes).length;openSheet(`<h3>${esc(x.title||vidName(x))}</h3>
+  vidMenu:el=>{const k=el.dataset.k;const x=Store.get(k)||{};const n=(x.segs||[]).filter(segOK).length;openSheet(`<h3>${esc(x.title||vidName(x))}</h3>
     <button class="savecard" data-act="vidPlay" data-k="${k}"><span>▶</span><div><b>${x.pct&&x.pct<97?'Continue watching':'Play'}</b><small>${x.pct?x.pct+'% watched':'From the start'}</small></div></button>
     ${x.pct?`<button class="savecard" data-act="vidFromStart" data-k="${k}"><span>↺</span><div><b>Watch from the start</b></div></button>`:''}
     <button class="savecard" data-act="vidMove" data-k="${k}"><span>📁</span><div><b>Move to folder</b><small>${x.folder?'Now in '+esc(x.folder):'Not in a folder'}</small></div></button>
@@ -3764,7 +3764,7 @@ function vidForm(){const V=vidS();const bookOpts=BOOKS.map(b=>`<option value="${
 function viewVideos(v){const all=vidList();const V=vidS();if(S.vidNew||!all.length)S.vmakerOpen=true;const mk=S.vmakerOpen==null?V.busy:S.vmakerOpen;
   v.innerHTML=`<div class="hero"><h2>🎬 Videos</h2><p>Fast Bible study videos with a voice. Saved per book, so you can always find them back.</p></div>
   ${S.vplay&&Store.get(S.vplay.key)?vidPlayer():''}
-  <details class="card vmaker" id="vmaker" ${mk?'open':''}><summary><b>＋ Make a new video</b>${V.busy?` <span class="small muted"><span class="spin"></span> ${esc(V.prog||'')}</span>`:''}</summary><div style="margin-top:6px">${vidForm()}</div></details>
+  <details class="card vmaker" id="vmaker" ${mk?'open':''}><summary><b>＋ Make a new video</b>${V.busy||V.retryT?` <span class="small muted">${V.busy?'<span class="spin"></span> ':''}${esc(V.prog||'')}</span>`:''}</summary><div style="margin-top:6px">${vidForm()}</div></details>
   ${all.length?vidLibrary():`<div class="empty">No videos yet.<br><small>Make your first one above. It will be saved here under its book.</small></div>`}`;
   S.vidNew=false;setTimeout(()=>{vidBind(v);const mkr=$('#vmaker',v);if(mkr)mkr.ontoggle=()=>{S.vmakerOpen=mkr.open};$$('details.vbook',v).forEach(d=>d.ontoggle=()=>{S.vbOpen=Object.assign({},S.vbOpen,{[d.dataset.b]:d.open})});if(S.vplay){vidLoop();vidBindPlayer();vidUI()}},0)}
 function vidBind(v){const V=vidS();const b=$('#vidB',v),c=$('#vidC',v);if(b)b.onchange=()=>{V.b=b.value;V.c=1;renderView()};if(c)c.onchange=()=>{V.c=+c.value}}
@@ -3807,16 +3807,31 @@ Use the same scene types: ${types.join('\n')}
 Return ONLY JSON: {"scenes":[ ... ]}`,null,null,'default');const add=(parseJSON(r2.text).scenes||[]).filter(x=>x&&x.t&&x.say);if(!add.length)break;sc=sc.concat(add)}catch(e){break}}
   while(sc.length>6&&segSecs(sc)>secs*1.03){const cut=sc.length-4;if(segSecs(sc)-sceneDur(sc[cut])<secs*.97)break;sc.splice(cut,1)}
   return sc}
-async function vidMake(key){const V=vidS();if(V.busy)return;V.busy=true;let x=Store.get(key);const stat=t=>{V.prog=t;const e=$('#vidProg');if(e)e.textContent=t;const s=$('#vidStat');if(s)s.textContent=t};
-  try{if(!x.outline){stat('Planning the video…');const O=await vidOutline(x);x=Object.assign({},Store.get(key),{title:O.title,hook:O.hook,outline:O.segments,segs:[]});Store.set(key,x);renderView()}
-    const O={title:x.title,hook:x.hook,segments:x.outline};
-    for(let i=0;i<O.segments.length;i++){x=Store.get(key);if(!x)break;if(x.segs&&x.segs[i]&&x.segs[i].scenes)continue;
-      stat(`Writing part ${i+1} of ${O.segments.length}…`);let sc;try{sc=await vidSegment(x,O,i)}catch(e){try{sc=await vidSegment(x,O,i)}catch(e2){throw e2}}
-      x=Store.get(key);if(i===0&&sc.some(q=>q.t==='copy'))sc.splice(1,0,vidSetupScene(x));const segs=(x.segs||[]).slice();segs[i]={title:O.segments[i].title,scenes:sc};Store.set(key,Object.assign({},x,{segs}));touch();
+const segOK=sg=>!!(sg&&sg.scenes&&sg.scenes.length>=3);
+const vSleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function vidTry(fn,stat,label){let last;for(let a=0;a<4;a++){try{const r=await fn();return r}catch(e){last=e;if(isLimitErr(e))throw e;if(a<3){const w=[3,8,20][a];stat(`${label} · hiccup, trying again in ${w}s…`);await vSleep(w*1000)}}}throw last}
+async function vidWake(on){try{if(on){if(!VP.wl&&navigator.wakeLock)VP.wl=await navigator.wakeLock.request('screen')}else if(VP.wl){await VP.wl.release();VP.wl=null}}catch(e){VP.wl=null}}
+async function vidMake(key){const V=vidS();if(V.busy)return;let x=Store.get(key);if(!x)return;V.busy=true;V.busyKey=key;clearTimeout(V.retryT);V.retryT=null;vidWake(true);
+  Store.set(key,Object.assign({},x,{making:true,tryAt:Date.now()}));
+  const stat=t=>{V.prog=t;const e=$('#vidProg');if(e)e.textContent=t;const s=$('#vidStat');if(s)s.textContent=t};let ok=false,lim=false;
+  try{x=Store.get(key);if(!x.outline||!x.outline.length){stat('Planning the video…');const O=await vidTry(async()=>{const o=await vidOutline(x);if(!o||!(o.segments||[]).length)throw new Error('empty plan');return o},stat,'Planning');x=Object.assign({},Store.get(key),{title:O.title,hook:O.hook,outline:O.segments,segs:[]});Store.set(key,x);renderView()}
+    x=Store.get(key);const O={title:x.title,hook:x.hook,segments:x.outline};
+    for(let i=0;i<O.segments.length;i++){x=Store.get(key);if(!x)break;if(segOK((x.segs||[])[i]))continue;
+      stat(`Writing part ${i+1} of ${O.segments.length}…`);
+      const sc=await vidTry(async()=>{const r=await vidSegment(x,O,i);if(!r||r.length<3)throw new Error('part came back empty');return r},stat,`Part ${i+1}`);
+      x=Store.get(key);if(!x)break;if(i===0&&sc.some(q=>q.t==='copy')&&!sc.some(q=>q.t==='setup'))sc.splice(1,0,vidSetupScene(x));const segs=(x.segs||[]).slice();segs[i]={title:O.segments[i].title,scenes:sc};Store.set(key,Object.assign({},x,{segs}));touch();
       if(i===0&&!S.vplay){S.vplay={key,seg:0,sc:0};VP.playing=false;renderView();vidLoop();toast(S.tab==='videos'?'🎬 Part 1 is ready. Tap ▶ to watch!':'🎬 Part 1 is ready! Open the Videos tab to watch.')}else vidSegsUpdate()}
-    stat('✓ Your video is ready')}
-  catch(e){toast(aiErr(e));stat('Stopped. Tap ⏩ Finish later to make the rest.')}
-  V.busy=false;renderView()}
+    ok=true;stat('✓ Your video is ready')}
+  catch(e){lim=isLimitErr(e);const n=(V.auto=V.auto||{})[key]=(V.auto[key]||0)+1;const wait=lim?10*60:Math.min(120,30*n);
+    if(n<=12){stat(`${lim?'⏳ The AI is at its limit.':'⚠️ The connection dropped.'} I’ll keep going by myself in ${wait>=60?Math.round(wait/60)+' min':wait+'s'} — keep the app open.`);V.retryT=setTimeout(()=>vidMake(key),wait*1000)}
+    else{toast(aiErr(e));stat('Stopped. Tap ⏩ Finish to try again.')}}
+  const x2=Store.get(key);if(x2)Store.set(key,Object.assign({},x2,{making:!ok}));if(ok&&V.auto)delete V.auto[key];
+  V.busy=false;V.busyKey=null;vidWake(false);if(S.tab==='videos')renderView()}
+// ▶ keep going after the app was in the background, the phone slept or the internet came back
+function vidKeepGoing(){const V=vidS();if(V.busy||V.retryT&&false)return;const x=vidList().find(v=>v.making&&(v.outline?!(v.outline||[]).every((_,i)=>segOK((v.segs||[])[i])):true));if(!x)return;if(Date.now()-(x.tryAt||0)<20000)return;clearTimeout(V.retryT);vidMake(x.key)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(vidS().busy)vidWake(true);setTimeout(vidKeepGoing,1500)}});
+window.addEventListener('online',()=>setTimeout(vidKeepGoing,2000));
+setInterval(()=>{if(!document.hidden)vidKeepGoing()},45000);
 /* ---- player ---- */
 const VP={playing:false,t0:0,raf:0,timer:0,phase:0,u:null,voice:true,rate:1};
 function vidCur(){const P=S.vplay;if(!P)return null;const x=Store.get(P.key);if(!x)return null;const seg=(x.segs||[])[P.seg];return {x,seg,scene:seg&&seg.scenes?seg.scenes[P.sc]:null}}
@@ -3870,13 +3885,13 @@ function vidLibrary(){const all=vidList();if(!all.length)return '';const f=S.vfo
   <div class="chips vfchips"><button class="chip ${f==='all'?'on':''}" data-act="vidFold" data-f="all">🎬 All <small>${all.length}</small></button>${cont.length?`<button class="chip ${f==='continue'?'on':''}" data-act="vidFold" data-f="continue">▶ Continue <small>${cont.length}</small></button>`:''}${vFolders().map(n=>`<button class="chip ${f===n?'on':''}" data-act="vidFold" data-f="${esc(n)}">📁 ${esc(n)} <small>${all.filter(x=>x.folder===n).length}</small></button>`).join('')}<button class="chip" data-act="vidNewFold">＋ Folder</button></div>
   ${f!=='all'&&f!=='continue'?`<div class="row" style="margin:6px 2px"><span class="small muted grow">📁 ${esc(f)}</span><button class="mini" data-act="vidDelFold" data-f="${esc(f)}">🗑 Delete folder</button></div>`:''}
   ${shown.length?vidGroups(shown,f):`<p class="small muted" style="margin:8px 2px">${f==='continue'?'Nothing half-watched.':'This folder is empty. Tap ⋯ on a video › 📁 Move to folder.'}</p>`}`}
-function vidRow(x){const n=(x.segs||[]).filter(s=>s&&s.scenes).length,tot=(x.outline||[]).length;return `<div class="vrow"><button class="vrowp" data-act="vidPlay" data-k="${x.key}">${vidThumb(x)}</button><div class="grow" style="min-width:0"><b class="vtitle">${esc(x.title||vidName(x))}</b><div class="small muted">${x.scope==='book'?'📚 Whole book':'📖 Chapter '+x.c} · ${n<tot?x.min+' min':Math.round(vidFlat(x).total/60*(settings().vidRate||1))+' min'}${n<tot?` · ${n}/${tot} parts`:''}${x.folder?` · 📁 ${esc(x.folder)}`:''}</div><div class="small muted">${x.pct?(x.pct>=97?'✓ Watched':`${x.pct}% watched`):fmtDate(x.at)}</div></div><button class="iconbtn" data-act="vidMenu" data-k="${x.key}">⋯</button></div>`}
+function vidRow(x){const n=(x.segs||[]).filter(segOK).length,tot=(x.outline||[]).length;return `<div class="vrow"><button class="vrowp" data-act="vidPlay" data-k="${x.key}">${vidThumb(x)}</button><div class="grow" style="min-width:0"><b class="vtitle">${esc(x.title||vidName(x))}</b><div class="small muted">${x.scope==='book'?'📚 Whole book':'📖 Chapter '+x.c} · ${n<tot?x.min+' min':Math.round(vidFlat(x).total/60*(settings().vidRate||1))+' min'}${n<tot?` · ${n}/${tot} parts`:''}${x.folder?` · 📁 ${esc(x.folder)}`:''}</div><div class="small muted">${x.pct?(x.pct>=97?'✓ Watched':`${x.pct}% watched`):fmtDate(x.at)}</div></div><button class="iconbtn" data-act="vidMenu" data-k="${x.key}">⋯</button></div>`}
 function vidGroups(list,f){if(f==='continue')return list.map(vidRow).join('');const by=new Map();list.slice().sort((a,b)=>(bOrder(a.b)-bOrder(b.b))||((a.scope==='book'?0:a.c)-(b.scope==='book'?0:b.c))||((b.at||0)-(a.at||0))).forEach(x=>{if(!by.has(x.b))by.set(x.b,[]);by.get(x.b).push(x)});
   const many=by.size>4;let lastT='';return [...by].map(([b,arr])=>{const T=bOrder(b)<39?'Old Testament':'New Testament';const head=T!==lastT?`<div class="vtest">${T==='Old Testament'?'📜':'✝️'} ${T}</div>`:'';lastT=T;const open=!many||(S.vbOpen||{})[b]||(S.vplay&&arr.some(x=>x.key===S.vplay.key));
     return head+`<details class="vbook" ${open?'open':''} data-b="${b}"><summary><span class="vbk">📖</span><b class="grow">${esc(BM[b].name)}</b><small class="muted">${arr.length} video${arr.length>1?'s':''}</small></summary>${arr.map(vidRow).join('')}</details>`}).join('')}
 function vidContinueCard(){const x=vidList().find(v=>v.pct&&v.pct<97&&Date.now()-(v.seen||0)<14*864e5);if(!x)return '';return `<div class="tcard"><div class="row" style="align-items:center;gap:10px"><button class="vrowp" data-act="vidPlayGo" data-k="${x.key}">${vidThumb(x)}</button><div class="grow"><div class="small muted">🎬 Continue watching</div><b>${esc(x.title||vidName(x))}</b><div class="small muted">${x.pct}% watched</div></div><button class="btn sm pri" data-act="vidPlayGo" data-k="${x.key}">▶</button></div></div>`}
 
-function vidSegsHtml(x){return (x.outline||[]).map((s,i)=>{const ok=x.segs&&x.segs[i]&&x.segs[i].scenes;return `<button class="vidseg ${S.vplay&&S.vplay.seg===i?'on':''}" data-act="vidSeg" data-i="${i}" ${ok?'':'disabled'}><b>${i+1}</b> ${esc(s.title)} ${ok?'':'<small class="muted">· making…</small>'}</button>`}).join('')}
+function vidSegsHtml(x){return (x.outline||[]).map((s,i)=>{const ok=segOK(x.segs&&x.segs[i]);return `<button class="vidseg ${S.vplay&&S.vplay.seg===i?'on':''}" data-act="vidSeg" data-i="${i}" ${ok?'':'disabled'}><b>${i+1}</b> ${esc(s.title)} ${ok?'':'<small class="muted">· making…</small>'}</button>`}).join('')}
 function vidSegsUpdate(){const P=S.vplay;if(!P)return;const x=Store.get(P.key);const e=$('#vidSegs');if(e&&x)e.innerHTML=vidSegsHtml(x)}
 function vidStart(){if(!S.vplay)return;VP.playing=true;vidSceneGo();vidLoop();vidBtns()}
 function vidBtns(){const t=$('#vidTg');if(t)t.textContent=VP.playing?'⏸':'▶';if(VP.playing)vidShowOv();else{const o=$('#vidOv');if(o){o.classList.add('show');clearTimeout(VP.ovT)}}}
