@@ -4446,7 +4446,7 @@ function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.
      <p class="small muted" style="margin:6px 0 8px">${isMain?'⭐ <b>Your main key.</b> Load, Study and the highlight colors in the Online Bible all use it. Open another set and tap ⭐ Make this my main key to switch. This is the key you use in your paper Bible: each topic has a highlighter color and its verses. Save verses or whole topics here from the other sets.':s.id==='starter'?'Ready-made topics to get you started. Tap ⭐ to save verses or topics into your main key.':`Generated${s.focus?' for “'+esc(s.focus)+'”':''}${s.at?' · '+new Date(s.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}. Compare the colors, then save what fits you with ⭐.`}</p>
      ${keyLegend(s)}
      <div class="row" style="margin-top:10px">
-       <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button><button class="btn sm" data-act="keyPhoto">📸 From a photo</button><button class="btn sm" data-act="keyMulti">🎨 Color with 2–3 meanings</button>
+       <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button><button class="btn sm pri" data-act="keyPhoto">📸 Key from a photo</button><button class="btn sm" data-act="keyMulti">🎨 Color with 2–3 meanings</button>
        ${isMain?'<button class="btn sm" data-act="copyKey">📋 Copy key for my inside cover</button>':''}
        ${!isMain?'<button class="btn sm" data-act="keyRename">✏️ Rename</button>':''}
      </div></div>
@@ -4489,7 +4489,7 @@ function keyPhotoReview(){const K=S.kph;if(!K)return;openSheet(`<h3>📸 I found
 
 function multiSheet(){const M=S.km||(S.km={n:2,places:['top','side'],color:'v',names:{}});const s=getSet(S.keySet);
   const combos=M.n===2?[['top','side'],['top','bottom'],['side','bottom']]:[['top','side','bottom']];if(!combos.some(c=>c.join()===M.places.join()))M.places=combos[0];
-  openSheet(`<h3>🎨 One color, more meanings</h3><p class="small muted">The meaning depends on where you put the tab.</p>
+  openSheet(`<h3>🎨 One color, more meanings</h3><p class="small muted">The meaning depends on where you put the tab.</p><button class="btn wide" data-act="keyPhoto">📸 Already wrote it? Read it from a photo</button>
    <label class="l">How many meanings?</label><div class="chips"><button class="chip ${M.n===2?'on':''}" data-act="kmN" data-n="2">2 meanings</button><button class="chip ${M.n===3?'on':''}" data-act="kmN" data-n="3">3 meanings</button></div>
    ${M.n===2?`<label class="l">Which places?</label><div class="chips">${combos.map(c=>`<button class="chip ${c.join()===M.places.join()?'on':''}" data-act="kmPl" data-p="${c.join()}">${c.map(p=>placeIcon(p)+' '+p).join(' + ')}</button>`).join('')}</div>`:''}
    <label class="l">Color</label><div class="palette">${PALETTE.map(([c,n])=>`<button class="pal sw-${c} ${M.color===c?'on':''}" data-act="kmColor" data-c="${c}" title="${n}"><small>${n}${s.topics.some(t=>t.color===c)?' •':''}</small></button>`).join('')}</div>
@@ -4522,6 +4522,7 @@ function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
   openSheet(`<h3>✨ Generate a new set</h3><p class="small muted">Get a fresh set of topics, each with a highlighter color and 5 verses. It opens as its own tab, so your main key stays safe.</p>
    <label class="l">How many topics / colors?</label>
    <div class="row stepper"><button class="iconbtn" data-act="genStep" data-d="-1">−</button><b id="genN" style="font-size:28px;min-width:44px;text-align:center">${S.genN}</b><button class="iconbtn" data-act="genStep" data-d="1">＋</button><span class="small muted">(2–25)</span></div>
+   <button class="btn wide" data-act="keyPhoto" style="margin-bottom:6px">📸 Already have a key? Read it from a photo instead</button>
    <label class="l">Double meanings?</label><div class="chips"><button class="chip ${S.genPlaces?'':'on'}" data-act="genPlaces" data-v="0">One meaning per color</button><button class="chip ${S.genPlaces===2?'on':''}" data-act="genPlaces" data-v="2">🎨 2 meanings per color</button><button class="chip ${S.genPlaces===3?'on':''}" data-act="genPlaces" data-v="3">🎨 3 meanings per color</button></div><p class="small muted" style="margin:4px 2px 0">2 = e.g. ⬆️ top + ➡️ side · 3 = ⬆️ top + ➡️ side + ⬇️ bottom</p>
    <label class="l">Focus (optional)</label><input class="f" id="genFocus" value="${esc(S.genFocus)}" placeholder="e.g. hard times, new believers, my marriage">
    <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FOCUS_IDEAS.map(f=>`<button class="chip" data-act="genFocusPick" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
