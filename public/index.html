@@ -4446,7 +4446,7 @@ function loadedKey(el){const sets=allSets();if(!sets.find(s=>s.id===S.keySet))S.
      <p class="small muted" style="margin:6px 0 8px">${isMain?'⭐ <b>Your main key.</b> Load, Study and the highlight colors in the Online Bible all use it. Open another set and tap ⭐ Make this my main key to switch. This is the key you use in your paper Bible: each topic has a highlighter color and its verses. Save verses or whole topics here from the other sets.':s.id==='starter'?'Ready-made topics to get you started. Tap ⭐ to save verses or topics into your main key.':`Generated${s.focus?' for “'+esc(s.focus)+'”':''}${s.at?' · '+new Date(s.at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):''}. Compare the colors, then save what fits you with ⭐.`}</p>
      ${keyLegend(s)}
      <div class="row" style="margin-top:10px">
-       <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button><button class="btn sm" data-act="keyPhoto">📸 From a photo</button>
+       <button class="btn sm pri" data-act="keyAddTopic">＋ Add topic</button><button class="btn sm" data-act="keyPhoto">📸 From a photo</button><button class="btn sm" data-act="keyMulti">🎨 Color with 2–3 meanings</button>
        ${isMain?'<button class="btn sm" data-act="copyKey">📋 Copy key for my inside cover</button>':''}
        ${!isMain?'<button class="btn sm" data-act="keyRename">✏️ Rename</button>':''}
      </div></div>
@@ -4487,6 +4487,16 @@ function keyPhotoReview(){const K=S.kph;if(!K)return;openSheet(`<h3>📸 I found
   $$('[data-kph]').forEach(cb=>cb.onchange=()=>{K.list[+cb.dataset.kph].on=cb.checked;cb.closest('.kphrow').classList.toggle('off',!cb.checked)});
   $$('[data-kphn]').forEach(inp=>inp.oninput=()=>{K.list[+inp.dataset.kphn].name=inp.value})}
 
+function multiSheet(){const M=S.km||(S.km={n:2,places:['top','side'],color:'v',names:{}});const s=getSet(S.keySet);
+  const combos=M.n===2?[['top','side'],['top','bottom'],['side','bottom']]:[['top','side','bottom']];if(!combos.some(c=>c.join()===M.places.join()))M.places=combos[0];
+  openSheet(`<h3>🎨 One color, more meanings</h3><p class="small muted">The meaning depends on where you put the tab.</p>
+   <label class="l">How many meanings?</label><div class="chips"><button class="chip ${M.n===2?'on':''}" data-act="kmN" data-n="2">2 meanings</button><button class="chip ${M.n===3?'on':''}" data-act="kmN" data-n="3">3 meanings</button></div>
+   ${M.n===2?`<label class="l">Which places?</label><div class="chips">${combos.map(c=>`<button class="chip ${c.join()===M.places.join()?'on':''}" data-act="kmPl" data-p="${c.join()}">${c.map(p=>placeIcon(p)+' '+p).join(' + ')}</button>`).join('')}</div>`:''}
+   <label class="l">Color</label><div class="palette">${PALETTE.map(([c,n])=>`<button class="pal sw-${c} ${M.color===c?'on':''}" data-act="kmColor" data-c="${c}" title="${n}"><small>${n}${s.topics.some(t=>t.color===c)?' •':''}</small></button>`).join('')}</div>
+   <p class="small muted" style="margin:2px">• = already used in this key</p>
+   ${M.places.map(p=>`<label class="l">${placeIcon(p)} On the ${placeWord(p)} it means…</label><input class="f" id="km_${p}" value="${esc(M.names[p]||'')}" placeholder="${p==='top'?'e.g. Repentance':p==='side'?'e.g. Sin':'e.g. Forgiveness'}" maxlength="40">`).join('')}
+   <button class="btn pri wide" style="margin-top:14px" data-act="kmSave">＋ Add ${M.n} meanings</button>`);
+  M.places.forEach(p=>{const i=$('#km_'+p);if(i)i.oninput=()=>{M.names[p]=i.value}})}
 function topicCard(s,t){const isMain=s.id==='main';const open=S.openTopic===s.id+'|'+t.id;const busy=S.keyBusy===s.id+'|'+t.id;
   const vrow=(v,i,sugg)=>{const p=parseRef(v.ref);return `<div class="refrow" style="align-items:flex-start"><div class="grow">${p?refA(rc(p),codeToLabel(v.ref)):esc(v.ref)}${v.why?`<div class="small muted">${esc(v.why)}</div>`:''}</div>
     ${sugg?`<button class="btn sm pri" data-act="keyAddSugg" data-t="${t.id}" data-i="${i}">＋ Add</button>`:isMain?`<button class="btn sm ghost" data-act="keyDelVerse" data-t="${t.id}" data-i="${i}" aria-label="Remove">✕</button>`:`<button class="btn sm" data-act="keySaveVerse" data-t="${t.id}" data-i="${i}">⭐ Save</button>`}</div>`};
@@ -4512,7 +4522,7 @@ function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
   openSheet(`<h3>✨ Generate a new set</h3><p class="small muted">Get a fresh set of topics, each with a highlighter color and 5 verses. It opens as its own tab, so your main key stays safe.</p>
    <label class="l">How many topics / colors?</label>
    <div class="row stepper"><button class="iconbtn" data-act="genStep" data-d="-1">−</button><b id="genN" style="font-size:28px;min-width:44px;text-align:center">${S.genN}</b><button class="iconbtn" data-act="genStep" data-d="1">＋</button><span class="small muted">(2–25)</span></div>
-   <label class="l">Double meanings?</label><div class="chips"><button class="chip ${S.genPlaces?'':'on'}" data-act="genPlaces" data-v="0">One meaning per color</button><button class="chip ${S.genPlaces?'on':''}" data-act="genPlaces" data-v="1">🎨 Some colors: top / side / bottom</button></div>
+   <label class="l">Double meanings?</label><div class="chips"><button class="chip ${S.genPlaces?'':'on'}" data-act="genPlaces" data-v="0">One meaning per color</button><button class="chip ${S.genPlaces===2?'on':''}" data-act="genPlaces" data-v="2">🎨 2 meanings per color</button><button class="chip ${S.genPlaces===3?'on':''}" data-act="genPlaces" data-v="3">🎨 3 meanings per color</button></div><p class="small muted" style="margin:4px 2px 0">2 = e.g. ⬆️ top + ➡️ side · 3 = ⬆️ top + ➡️ side + ⬇️ bottom</p>
    <label class="l">Focus (optional)</label><input class="f" id="genFocus" value="${esc(S.genFocus)}" placeholder="e.g. hard times, new believers, my marriage">
    <div class="chips" style="flex-wrap:wrap;margin-top:6px">${FOCUS_IDEAS.map(f=>`<button class="chip" data-act="genFocusPick" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
    <button class="btn pri wide" id="genGo" data-act="genGo">✨ Generate ${S.genN} topics</button><div id="genMsg" class="small muted" style="text-align:center;margin-top:8px"></div>
@@ -4520,7 +4530,7 @@ function genSheet(){S.genN=S.genN||6;S.genFocus=S.genFocus||'';
   $('#genFocus').addEventListener('input',e=>S.genFocus=e.target.value)}
 async function runGenerate(){const n=S.genN,focus=(S.genFocus||'').trim();const btn=$('#genGo');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generating your set…'}
   const pal=PALETTE.map(([c,nm])=>`${c}=${nm}`).join(', ');
-  try{const r=await ai(JSYS+`Create a set of ${n} topic tabs for marking up a paper Bible with highlighters${focus&&focus!=='General'?`, focused on: ${focus}`:''}. Give each topic one highlighter color from this palette: ${pal}. Use a different color for each topic where possible${n>PALETTE.length?' (reuse colors for related topics if needed)':''}.${S.genPlaces?' ALSO use double meanings: for 2-3 colors, give the same color to 2 or 3 RELATED topics and give each a different "place" where the tab goes: "top", "side" (long edge) or "bottom" (like purple side = Sin, purple top = Repentance). Other topics get "place": "any".':''} Keep each "why" very short.\nReturn JSON: {"name": "short set name (2-4 words)", "topics": [{"name": "1-3 words", "emoji": "one emoji", "color": "palette letter", "meaning": "what this color marks, max 10 words"${S.genPlaces?', "place": "top|side|bottom|any"':''}, "verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]}]} with exactly ${n} topics and exactly 5 well-known verses per topic, each true to its context.`,null,null,'default');
+  try{const r=await ai(JSYS+`Create a set of ${n} topic tabs for marking up a paper Bible with highlighters${focus&&focus!=='General'?`, focused on: ${focus}`:''}. Give each topic one highlighter color from this palette: ${pal}. Use a different color for each topic where possible${n>PALETTE.length?' (reuse colors for related topics if needed)':''}.${S.genPlaces?` ALSO use colors with ${S.genPlaces} meanings: for 2-3 colors, give the same color to exactly ${S.genPlaces} RELATED topics, each with a different "place" where the tab goes: ${S.genPlaces===3?'"top", "side" (long edge) and "bottom"':'two of "top", "side" (long edge), "bottom"'} (like purple side = Sin, purple top = Repentance). Other topics get "place": "any".`:''} Keep each "why" very short.\nReturn JSON: {"name": "short set name (2-4 words)", "topics": [{"name": "1-3 words", "emoji": "one emoji", "color": "palette letter", "meaning": "what this color marks, max 10 words"${S.genPlaces?', "place": "top|side|bottom|any"':''}, "verses": [{"ref": "Book chapter:verse (full book name)", "why": "max 12 words"}]}]} with exactly ${n} topics and exactly 5 well-known verses per topic, each true to its context.`,null,null,'default');
     const d=parseJSON(r.text);const id='g'+newId();
     const topics=(d.topics||[]).slice(0,25).map(t=>({id:'t'+newId(),emoji:t.emoji||'🏷️',name:String(t.name||'Topic').slice(0,40),color:okColor(t.color),place:['top','side','bottom'].includes(t.place)?t.place:'',meaning:t.meaning||'',verses:(t.verses||[]).map(v=>({ref:normRef(v.ref),why:v.why||''})).filter(v=>v.ref).slice(0,5)}));
     if(!topics.length)throw {message:'No topics came back — try again.'};
@@ -4548,8 +4558,16 @@ Object.assign(A,{
   genGo:()=>runGenerate(),
   keyAddTopic:()=>topicSheet(null),
   keyPickPlace:el=>{S._tPlace=el.dataset.p==='any'?'':el.dataset.p;S._tClashOk=false;$$('#tkPlaces .chip').forEach(b=>b.classList.toggle('on',b.dataset.p===el.dataset.p))},
-  genPlaces:el=>{S.genPlaces=el.dataset.v==='1';$$('[data-act=genPlaces]').forEach(b=>b.classList.toggle('on',b.dataset.v===el.dataset.v))},
+  genPlaces:el=>{S.genPlaces=+el.dataset.v||0;$$('[data-act=genPlaces]').forEach(b=>b.classList.toggle('on',b.dataset.v===el.dataset.v))},
   keyPhoto:()=>keyPhotoSheet(),
+  keyMulti:()=>{S.km=null;multiSheet()},
+  kmN:el=>{S.km.n=+el.dataset.n;S.km.places=S.km.n===3?['top','side','bottom']:['top','side'];multiSheet()},
+  kmPl:el=>{S.km.places=el.dataset.p.split(',');multiSheet()},
+  kmColor:el=>{S.km.color=el.dataset.c;$$('[data-act=kmColor]').forEach(b=>b.classList.toggle('on',b.dataset.c===el.dataset.c))},
+  kmSave:()=>{const M=S.km;const L=M.places.map(p=>({p,name:(($('#km_'+p)||{}).value||'').trim()}));if(L.some(x=>!x.name)){toast('Fill in a meaning for every place');return}
+    const s=getSet(S.keySet);const old=s.topics.filter(t=>t.color===M.color&&!L.some(x=>sameName(x.name,t.name)));
+    updateSet(S.keySet,st=>{L.forEach(x=>{const ex=st.topics.find(t=>sameName(t.name,x.name));if(ex){ex.color=M.color;ex.place=x.p}else st.topics.push({id:'t'+newId(),emoji:'🏷️',name:x.name.slice(0,40),color:M.color,place:x.p,meaning:'',verses:[]})})});
+    closeSheet();renderView();toast(`🎨 ${colorWord(M.color)}: ${L.map(x=>placeIcon(x.p)+' '+x.name).join(' · ')}`+(old.length?` · ⚠️ “${old[0].name}” also uses ${colorWord(M.color)}. Give it another color or a place.`:''))},
   kphPlace:el=>{const t=S.kph.list[+el.dataset.i];const o=['','top','side','bottom'];t.place=o[(o.indexOf(t.place)+1)%4];el.textContent=t.place?placeIcon(t.place)+' '+t.place:'✳️ any'},
   kphColor:el=>{const i=+el.dataset.i;const t=S.kph.list[i];const cur=PALETTE.findIndex(p=>p[0]===t.color);t.color=PALETTE[(cur+1)%PALETTE.length][0];el.className='kdot sw-'+ck(t.color);const d=el.parentElement.querySelector('.small');if(d)d.textContent=colorWord(t.color)+(t.meaning?' · '+t.meaning:'')},
   kphSave:el=>{const K=S.kph;if(!K)return;const L=K.list.filter(t=>t.on&&t.name.trim()).map(t=>({id:'t'+newId(),emoji:t.emoji,name:t.name.trim().slice(0,40),color:t.color,place:t.place,meaning:t.meaning,verses:[]}));if(!L.length){toast('Nothing ticked');return}
